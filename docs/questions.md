@@ -1,0 +1,1 @@
+1. Should we allow negative coordinates?
