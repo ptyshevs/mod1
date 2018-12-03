@@ -18,6 +18,8 @@ the individual triangle boundaries cannot be seen.
 To avoid a "blobby" look, fine detail is usually applied to Bézier surfaces
 at this stage using texture maps, bump maps and other pixel shader techniques.
 
+The curve in general does not pass through any of the control points except the first and last.
+
 3) Lagrange polynomial
 
 [This](https://forum.intra.42.fr/topics/1070/messages/last) guy expains the shortages
