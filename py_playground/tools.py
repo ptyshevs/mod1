@@ -21,7 +21,7 @@ def gen_borders(xmin=0, xmax=1, ymin=0, ymax=1, n_points=50):
     """ Generate border points """
     border = []
     border += [[_, ymin, 0] for _ in np.linspace(xmin, xmax, n_points)]
-    border += [[0, _, 0] for _ in np.linspace(ymin, ymax, n_points)]
+    border += [[xmin, _, 0] for _ in np.linspace(ymin, ymax, n_points)]
     border += [[xmax, _, 0] for _ in np.linspace(ymin, ymax, n_points)]
     border += [[_, ymax, 0] for _ in np.linspace(xmin, xmax, n_points)]
     return np.array(border)
