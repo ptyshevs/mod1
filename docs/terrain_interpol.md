@@ -28,3 +28,6 @@ gives examples of lagrange interpolation:
 
 https://www.wolframalpha.com/input/?i=plot+z%3Dx(x-1)y(y-1),+x%3D0..1+y%3D0..1
 https://www.wolframalpha.com/input/?i=plot+z%3Dx(x-1)y(y-1)(+-1)
+
+Overview of surface interpolation methods is located [here](http://m.dressler.sweb.cz/AOSIM.pdf).
+All methods mentioned depend on *gridding* - rectangular grid is constructed to envelope map points, and for each point $(x, y)$ interpolation is built using vertices of the enclosing grid cell.
