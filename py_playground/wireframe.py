@@ -1,49 +1,45 @@
+import numpy as np
 import math
-
-
-class Node:
-    def __init__(self, coordinates):
-        self.x = coordinates[0]
-        self.y = coordinates[1]
-        self.z = coordinates[2]
-
-
-class Edge:
-    def __init__(self, start, stop):
-        self.start = start
-        self.stop = stop
 
 
 class Wireframe:
     def __init__(self):
-        self.nodes = []
+        self.nodes = np.zeros((0, 4))
         self.edges = []
 
-    def addNodes(self, nodeList):
-        for node in nodeList:
-            self.nodes.append(Node(node))
+    def copy(self):
+        w = Wireframe()
+        w.edges = self.edges[:]
+        w.nodes = self.nodes
+        return w
 
     def addEdges(self, edgeList):
-        for (start, stop) in edgeList:
-            self.edges.append(Edge(self.nodes[start], self.nodes[stop]))
+        self.edges += edgeList
+
+    def addNodes(self, node_array):
+        ones_col = np.ones((len(node_array), 1))
+
+        ones_added = np.hstack((node_array, ones_col))
+        self.nodes = np.vstack((self.nodes, ones_added))
 
     def outputNodes(self):
-        print("------- Nodes --------")
-        for i, node in enumerate(self.nodes):
-            print(f"{i}: ({node.x:.2f}, {node.y:.2f}, {node.z:.2f})")
+        print("---- Nodes ----")
+        for i, (x, y, z, _) in enumerate(self.nodes):
+            print(f"{i}: ({x}, {y}, {z})")
 
     def outputEdges(self):
-        print("------- Edges --------")
-        for i, edge in enumerate(self.edges):
-            start, stop = edge.start, edge.stop
-            print(f"{i}: ({start.x:.2f}, {start.y:.2f}, {start.z:.2f}) ->"
-                  f" ({stop.x:.2f}, {stop.y:.2f}, {stop.z:.2f})")
+        print("---- Edges ----")
+        for i, (frm, to) in enumerate(self.edges):
+            print(f"{i}: {frm} -> {to}")
+
+    def transform(self, matrix):
+        self.nodes = self.nodes @ matrix
 
     def translate(self, axis, d):
         """ Translate each node of a wireframe by d along a given axis """
         if axis in ['x', 'y', 'z']:
-            for node in self.nodes:
-                setattr(node, axis, getattr(node, axis) + d)
+            col = 0 if axis == 'x' else (1 if axis == 'y' else 2)
+            self.nodes[:, col] += d
 
     def scale(self, centre, scale):
         """ Scale the wireframe from the centre of the screen. """
@@ -54,11 +50,7 @@ class Wireframe:
             node.z *= scale
 
     def findCentre(self):
-        num_nodes = len(self.nodes)
-        meanX = sum([node.x for node in self.nodes]) / num_nodes
-        meanY = sum([node.y for node in self.nodes]) / num_nodes
-        meanZ = sum([node.z for node in self.nodes]) / num_nodes
-        return meanX, meanY, meanZ
+        return np.mean(self.nodes, axis=0)
 
     def rotateZ(self, centre, radians):
         cx, cy, cz = centre
@@ -91,10 +83,56 @@ class Wireframe:
             node.x = cx + d * math.sin(theta)
 
 
+def translationMatrix(dx=0, dy=0, dz=0):
+    r = np.eye(4)
+    r[3, :-1] = dx, dy, dz
+    return r
+
+
+def scaleMatrix(sx=0, sy=0, sz=0):
+    r = np.eye(4)
+    r[0, 0] = sx
+    r[1, 1] = sy
+    r[2, 2] = sz
+    return r
+
+
+def rotateXMatrix(radians):
+    c = np.cos(radians)
+    s = np.sin(radians)
+    return np.array([[1, 0, 0, 0],
+                     [0, c, -s, 0],
+                     [0, s, c, 0],
+                     [0, 0, 0, 1]])
+
+
+def rotateYMatrix(radians):
+    c = np.cos(radians)
+    s = np.sin(radians)
+    return np.array([[c, 0, s, 0],
+                     [0, 1, 0, 0],
+                     [-s, 0, c, 0],
+                     [0, 0, 0, 1]])
+
+
+def rotateZMatrix(radians):
+    c = np.cos(radians)
+    s = np.sin(radians)
+    return np.array([[c, -s, 0, 0],
+                     [s, c, 0, 0],
+                     [0, 0, 1, 0],
+                     [0, 0, 0, 1]])
+
+
+def rotateMatrix(xrad, yrad, zrad):
+    return rotateXMatrix(xrad) @ rotateYMatrix(yrad) @ rotateZMatrix(zrad)
+
+
 class Cube(Wireframe):
     def __init__(self):
         super().__init__()
-        self.addNodes([(x, y, z) for x in (0, 1) for y in (0, 1) for z in (0, 1)])
-        self.addEdges([(n, n + 4) for n in range(0, 4)])
+        nodes = [(x, y, z) for x in (0, 1) for y in (0, 1) for z in (0, 1)]
+        self.addNodes(np.array(nodes))
+        self.addEdges([(n, n + 4) for n in range(4)])
         self.addEdges([(n, n + 1) for n in range(0, 8, 2)])
         self.addEdges([(n, n + 2) for n in (0, 1, 4, 5)])

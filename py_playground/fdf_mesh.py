@@ -1,6 +1,6 @@
 import numpy as np
-import wireframe_np
-import nodes_and_edges as pview
+import wireframe
+import ProjectionViewer as pview
 import tools
 from interpol import idw_mesh
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     points = np.vstack([points, tools.gen_borders(0, 2, 0, 2)])
     res = idw_mesh(points, 0, 2, 0, 2)
 
-    wr = wireframe_np.Wireframe_np()
+    wr = wireframe.Wireframe_np()
     wr.addNodes(res)
 
     pv = pview.ProjectionViewerNP(800, 800)
