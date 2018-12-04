@@ -12,6 +12,7 @@ class Wireframe_np:
 
     def addNodes(self, node_array):
         ones_col = np.ones((len(node_array), 1))
+
         ones_added = np.hstack((node_array, ones_col))
         self.nodes = np.vstack((self.nodes, ones_added))
 

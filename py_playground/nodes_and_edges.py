@@ -1,5 +1,6 @@
 import wireframe
 import wireframe_np
+import numpy as np
 import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
@@ -100,9 +101,9 @@ class ProjectionViewerNP:
     def __init__(self, width, height):
         pygame.init()
         self.width = width
-        self.ws = width / 2  # width scale
+        self.ws = width // 2  # width scale
         self.height = height
-        self.hs = height / 2  # height scale
+        self.hs = height // 2  # height scale
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Wireframe Display")
         self.background = (10, 10, 50)
@@ -112,7 +113,8 @@ class ProjectionViewerNP:
         self.displayEdges = True
         self.nodeColor = (255, 255, 255)
         self.edgeColor = (200, 200, 200)
-        self.nodeRadius = 4
+        self.nodeRadius = 1
+        self.wireframes_colors = {}
 
         self.key_to_function = {
             pygame.K_LEFT: (lambda x: x.translateAll([-10, 0, 0])),
@@ -129,9 +131,28 @@ class ProjectionViewerNP:
             pygame.K_x: (lambda x: x.rotateAll('Z', -0.1))
         }
 
+    def node_colors(self, nodes):
+        """ Calculate color gradient based on z coord of nodes """
+        zmin, zmax = nodes[:, 2].min(), nodes[:, 2].max()
+        start_color = np.array(self.background) + 5
+        end_color = np.array(self.nodeColor)
+        z = (nodes[:, 2] - zmin) / (zmax - zmin)
+        # indexing [:, None] is used to explicitly state second axis
+        c = (1 - z)[:, None] @ start_color[:, None].T + z[:, None] @ end_color[:, None].T
+        return c
+
+    def init_condition(self):
+        for wr_name, wr in self.wireframes.items():
+            colors = self.node_colors(wr.nodes)
+            self.wireframes_colors[wr_name] = colors
+        self.scaleAll([350, 350, 350])
+        self.rotateAll('X', -.95)
+        self.rotateAll('Y', -.35)
+
     def run(self):
         pygame.key.set_repeat(80)
         running = True
+        self.init_condition()
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -149,7 +170,7 @@ class ProjectionViewerNP:
 
         self.screen.fill(self.background)
 
-        for wr in self.wireframes.values():
+        for wr_name, wr in self.wireframes.items():
             if self.displayEdges:
                 for n1, n2 in wr.edges:
                     start_pos = wr.nodes[n1][:2]
@@ -158,9 +179,9 @@ class ProjectionViewerNP:
                                        start_pos,
                                        end_pos, 1)
             if self.displayNodes:
-                for node in wr.nodes:
-                    pygame.draw.circle(self.screen, self.nodeColor,
-                                       (int(node[0]), int(node[1])), self.nodeRadius, 0)
+                for i, node in enumerate(wr.nodes):
+                    pygame.draw.circle(self.screen, self.wireframes_colors[wr_name][i, :],
+                                       (self.ws + int(node[0]), self.hs + int(node[1])), self.nodeRadius, 0)
 
     def addWireframe(self, name, wireframe):
         self.wireframes[name] = wireframe
