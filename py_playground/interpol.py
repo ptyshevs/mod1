@@ -41,6 +41,6 @@ def idw_mesh(points, xmin=0, xmax=1, ymin=0, ymax=1, n_points=50):
     res = np.zeros((n_points ** 2, 3))
     for i in range(n_points):
         for j in range(n_points):
-            res[i * n_points + j, :] = x[i], y[j], e.estimate(x[i], y[j], sigma=.08)
+            res[i * n_points + j, :] = x[i], y[j], e.estimate(x[i], y[j], sigma=.2)
     return res
 
