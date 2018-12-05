@@ -12,9 +12,9 @@ if __name__ == '__main__':
     points = np.vstack([points, tools.gen_borders(0, 2, 0, 2)])
     res = idw_mesh(points, 0, 2, 0, 2)
 
-    wr = wireframe.Wireframe_np()
+    wr = wireframe.Wireframe()
     wr.addNodes(res)
 
     pv = pview.ProjectionViewerNP(800, 800)
-    pv.addWireframe('test', wr)
+    pv.addWireframe(wr)
     pv.run()

@@ -95,31 +95,26 @@ class ProjectionViewerNP:
 
     def init_condition(self):
         self.wireframe_col = self.node_colors(self.wireframe.nodes)
-        self.scale = [1, 1, 1]
+        self.scale = [100, 100, 100]
         self.view_angle = [-.95, -.35, 0]
         self.bias = [0, 0, 0]
+
+        cmin = np.hstack((self.wireframe.nodes[:, :3].min(axis=0), [0]))
+        cmax = np.hstack((self.wireframe.nodes[:, :3].max(axis=0), [0]))
+        # move center of coord. system by subtracting half of distance wrt each axis
+        self._center_half = (cmax - cmin) / 2
         # self.scaleAll([350, 350, 350])
         # self.rotateAll('X', -.95)
         # self.rotateAll('Y', -.35)
 
     def recalculate_transform(self):
         """ Recalculate coordinates of nodes based on the cumulative transformation """
-        print(f"bias: {self.bias}\nscale: {self.scale}\nrot: {self.view_angle}")
         bias_mat = wireframe.translationMatrix(*self.bias)
         rot_mat = wireframe.rotateMatrix(*self.view_angle)
         scale_mat = wireframe.scaleMatrix(*self.scale)
-        nodes = self.wireframe.nodes
-        cmin = np.hstack((nodes[:, :3].min(axis=0), [0]))
-        cmax = np.hstack((nodes[:, :3].max(axis=0), [0]))
-        print(cmin)
-        half = (cmax - cmin) / 2
-        self.tf_wireframe.nodes = (self.wireframe.nodes - half) @ rot_mat + cmin
-        self.tf_wireframe.nodes[:, :3] += self.bias
-        self.tf_wireframe.nodes[:, :3] *= self.scale
 
-        # self.tf_wireframe.transform(bias_mat)
-        # self.tf_wireframe.transform(rot_mat)
-        # self.tf_wireframe.transform(scale_mat)
+        self.tf_wireframe.nodes = (self.wireframe.nodes - self._center_half) @ \
+                                   rot_mat @ scale_mat @ bias_mat
 
     def run(self):
         pygame.key.set_repeat(80)
@@ -154,7 +149,7 @@ class ProjectionViewerNP:
         if self.displayNodes:
             for i, node in enumerate(self.tf_wireframe.nodes):
                 c = self.wireframe_col[i, :]
-                pygame.draw.circle(self.screen, self.nodeColor, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
+                pygame.draw.circle(self.screen, c, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
 
     def addWireframe(self, wireframe):
         """ Add wireframe to ProjectionViewer """
