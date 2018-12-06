@@ -9,13 +9,36 @@ def parse_file(filename):
         points += [[int(_) for _ in point.strip('()').split(',')] for point in line.split()]
     return np.array(points)
 
-def rescale(points, new_min=0.1, new_max=1):
+def rescale_old(points, new_min=0.1, new_max=1):
     """ Rescale each axis to be within the specified range """
     if len(points) == 1:
       return np.full_like(points, new_max)
     pmin = points.min(axis=0)
     pmax = points.max(axis=0) 
     return (points - pmin) / (pmax - pmin) * (new_max - new_min) + new_min
+
+def rescale(points):
+    """
+    Rescale points to [0, 1] range. Assuming positive coordinates
+    :param points:
+    :return:
+    """
+    return points / points.max(axis=0)
+
+def center(points):
+    """
+    Move x and y to the center. If points were rescaled, ie new range is [0, 1],
+    then this will move center from [0.5, 0.5] to [1, 1].
+    Height is left unchanged
+    :param points: map points
+    :return: rescaled points
+    """
+    if len(points) == 1:
+        return points
+    pmin = points[:, :-1].min(axis=0)
+    pmax = points[:, :-1].max(axis=0)
+    half = (pmax - pmin) / 2
+    return np.hstack((points[:, :-1] + half, points[:, -1][:, None]))
 
 def gen_borders(xmin=0, xmax=1, ymin=0, ymax=1, n_points=50):
     """ Generate border points """

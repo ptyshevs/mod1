@@ -5,10 +5,8 @@ import tools
 from interpol import idw_mesh
 
 if __name__ == '__main__':
-    points = tools.rescale(tools.parse_file('../resources/demo4.mod1'), 0.1, 0.9)
-    points[:, :-1] += 1  # to bias from the origin
-    if len(points) == 1:
-        points[:, 2] += 1
+    points = tools.center(tools.rescale(tools.parse_file('../resources/demo4.mod1')))
+    print(points)
     points = np.vstack([points, tools.gen_borders(0, 2, 0, 2)])
     res = idw_mesh(points, 0, 2, 0, 2, 100)
 

@@ -7,7 +7,7 @@ class Estimation:
         self.y = datay
         self.v = dataz
 
-    def estimate(self, x, y, using='ISD', sigma=.4):
+    def estimate(self, x, y, using='ISD', sigma=0):
         """
         Estimate point at coordinate x,y based on the input data for this
         class.
@@ -15,7 +15,7 @@ class Estimation:
         if using == 'ISD':  # inverse squared distance
             return self._isd(x, y, sigma=sigma)
 
-    def _isd(self, x, y, p=-2, sigma=.4):
+    def _isd(self, x, y, p=-2, sigma=0):
         d = np.sqrt((x - self.x) ** 2 + (y - self.y) ** 2 + sigma ** 2)
         if d.min() > 0:
             v = np.sum(self.v * d ** p / np.sum(d ** p))
@@ -41,6 +41,6 @@ def idw_mesh(points, xmin=0, xmax=1, ymin=0, ymax=1, n_points=50):
     res = np.zeros((n_points ** 2, 3))
     for i in range(n_points):
         for j in range(n_points):
-            res[i * n_points + j, :] = x[i], y[j], e.estimate(x[i], y[j], sigma=.2)
+            res[i * n_points + j, :] = x[i], y[j], e.estimate(x[i], y[j])
     return res
 
