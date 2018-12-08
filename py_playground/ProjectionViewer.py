@@ -33,6 +33,11 @@ class ProjectionViewerNP:
         self.scale = [1, 1, 1]  # scale in 3 axis
         self.bias = [0, 0, 0]  # bias in 3 axis
 
+        # default settings
+        self.scale = [350, 350, 350]
+        self.view_angle = [-.95, -.35, 0]
+        self.bias = [0, 0, 0]
+
         self.keys_supported = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN,
                                pygame.K_UP, pygame.K_EQUALS, pygame.K_MINUS,
                                pygame.K_q, pygame.K_w, pygame.K_a, pygame.K_s,
@@ -91,13 +96,25 @@ class ProjectionViewerNP:
         z = (nodes[:, 2] - zmin) / (zmax - zmin)
         # indexing [:, None] is used to explicitly state second axis
         c = (1 - z)[:, None] @ start_color[:, None].T + z[:, None] @ end_color[:, None].T
-        return c
+        self.wireframe_col = c
+        # return c
+
+    def cube_colors(self, cubes):
+        """ Calculate color from cubes """
+        n = cubes.shape[0]
+        col = np.zeros((n ** 3, 3))
+        terrain_col = (66, 244, 72)
+        empty_col = self.background
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    c = cubes[i, j, k]
+                    col[i * n ** 2 + j * n + k] = empty_col if c.state == 'empty' else terrain_col
+        self.wireframe_col = col
 
     def init_condition(self):
-        self.wireframe_col = self.node_colors(self.wireframe.nodes)
-        self.scale = [100, 100, 100]
-        self.view_angle = [-.95, -.35, 0]
-        self.bias = [0, 0, 0]
+        # self.wireframe_col = self.node_colors(self.wireframe.nodes)
+
 
         cmin = np.hstack((self.wireframe.nodes[:, :3].min(axis=0), [0]))
         cmax = np.hstack((self.wireframe.nodes[:, :3].max(axis=0), [0]))
@@ -145,11 +162,12 @@ class ProjectionViewerNP:
                 end_pos = self.tf_wireframe.nodes[n2][:2] + [self.ws, self.hs]
                 pygame.draw.aaline(self.screen, self.edgeColor,
                                    start_pos,
-                                   end_pos, 1)
+                                   end_pos, 2)
         if self.displayNodes:
             for i, node in enumerate(self.tf_wireframe.nodes):
                 c = self.wireframe_col[i, :]
-                pygame.draw.circle(self.screen, c, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
+                if np.all(c != self.background):
+                    pygame.draw.circle(self.screen, c, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
 
     def addWireframe(self, wireframe):
         """ Add wireframe to ProjectionViewer """
