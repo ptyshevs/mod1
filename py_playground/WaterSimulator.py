@@ -1,3 +1,4 @@
+import time
 import wireframe
 import numpy as np
 import contextlib
@@ -5,7 +6,7 @@ with contextlib.redirect_stdout(None):
     import pygame
 
 
-class ProjectionViewerNP:
+class WaterSimulator:
     """ Displays 3D objects on a Pygame screen"""
 
     def __init__(self, width, height):
@@ -22,11 +23,18 @@ class ProjectionViewerNP:
         self.tf_wireframe = None
         self.wireframe_col = None
 
+        self.hmap = None
+
+        self.emitter = None
+        self.particles = []
+
         # self.wireframes = {}
         self.displayNodes = True
         self.displayEdges = True
+        self.displayParticles = True
         self.nodeColor = (255, 255, 255)
         self.edgeColor = (200, 200, 200)
+        self.waterColor = (0, 0, 255)
         self.nodeRadius = 1
 
         self.view_angle = [0, 0, 0]  # view angle in 3 axis
@@ -42,6 +50,12 @@ class ProjectionViewerNP:
                                pygame.K_UP, pygame.K_EQUALS, pygame.K_MINUS,
                                pygame.K_q, pygame.K_w, pygame.K_a, pygame.K_s,
                                pygame.K_z, pygame.K_x)
+
+    def addHeightMap(self, hmap):
+        self.hmap = hmap
+
+    def addEmitter(self, emitter):
+        self.emitter = emitter
 
     def key_hooks(self, key):
         """ Map key to change in transformation matrix """
@@ -105,6 +119,7 @@ class ProjectionViewerNP:
         cmax = np.hstack((self.wireframe.nodes[:, :3].max(axis=0), [0]))
         # move center of coord. system by subtracting half of distance wrt each axis
         self._center_half = (cmax - cmin) / 2
+        self.time = time.clock()
         # self.scaleAll([350, 350, 350])
         # self.rotateAll('X', -.95)
         # self.rotateAll('Y', -.35)
@@ -115,8 +130,13 @@ class ProjectionViewerNP:
         rot_mat = wireframe.rotateMatrix(*self.view_angle)
         scale_mat = wireframe.scaleMatrix(*self.scale)
 
+        self.tf_mat = rot_mat @ scale_mat @ bias_mat
         self.tf_wireframe.nodes = (self.wireframe.nodes - self._center_half) @ \
-                                   rot_mat @ scale_mat @ bias_mat
+                                  self.tf_mat
+
+    def transform_node(self, node):
+        """ Transform single node (used for particle rendering) """
+        return (node - self._center_half) @ self.tf_mat
 
     def run(self):
         pygame.key.set_repeat(80)
@@ -124,6 +144,10 @@ class ProjectionViewerNP:
         self.init_condition()
         self.recalculate_transform()
         while running:
+            particle = self.emitter.emit()
+            if particle:
+                self.particles.append(particle)
+            self.update_particles()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -135,6 +159,11 @@ class ProjectionViewerNP:
                         self.recalculate_transform()
             self.display()
             pygame.display.flip()
+
+    def update_particles(self):
+
+        for particle in self.particles:
+            particle.step()
 
     def display(self):
         """ Draw the wireframes on the screen. """
@@ -154,6 +183,23 @@ class ProjectionViewerNP:
                 if np.all(c != self.background):
                     pygame.draw.circle(self.screen, c, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
 
+        if self.displayParticles:
+            for particle in self.particles:
+                idx = self.discritize(particle)
+                node = self.wireframe.nodes[idx]
+                node = self.transform_node(node)
+                x, y = int(self.ws + node[0]), int(self.hs + node[1])
+                pygame.draw.circle(self.screen, self.waterColor, (x, y), self.nodeRadius)
+
+    def discritize(self, particle):
+        """ Find node where this particle belongs """
+        x, y, z = particle.x, particle.y, particle.z
+        step = self.hmap.step
+        xi, yi, zi = int(x // step), int(y // step), int(z // step)
+        return xi * self.hmap.n ** 2 + yi * self.hmap.n + zi
+
+
+
     def addWireframe(self, wireframe):
         """ Add wireframe to ProjectionViewer """
         self.wireframe = wireframe
@@ -164,6 +210,6 @@ if __name__ == '__main__':
     # pv = ProjectionViewer(400, 300)
     # pv.addWireframe('cube', wireframe.Cube())
     # pv.run()
-    pv = ProjectionViewerNP(400, 300)
+    pv = WaterSimulator(400, 300)
     pv.addWireframe(wireframe.Cube())
     pv.run()

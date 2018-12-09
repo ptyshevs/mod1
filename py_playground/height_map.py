@@ -28,6 +28,25 @@ class DynamicCube:
     def __init__(self, x, y, z, dx=0, dy=0, dz=0):
         pass
 
+class HeightMap:
+    def __init__(self, points, n_points, cmin, cmax):
+        c = np.linspace(cmin, cmax, n_points)
+        hmap = np.empty((n_points, n_points, n_points), dtype=object)
+        step = c[1] - c[0]
+
+        e = Estimation(points[:, 0], points[:, 1], points[:, 2])
+        for i in range(n_points):
+            for j in range(n_points):
+                z_int = e.estimate(c[i], c[j], sigma=0.6)
+                z = int(z_int / step)  # index of interpolated terrain cube
+                for k in range(n_points):
+                    if k != z or z == 0:
+                        hmap[i, j, k] = Cube(c[i], c[j], c[k])
+                    else:
+                        hmap[i, j, k] = Cube(c[i], c[j], c[k], 'terrain')
+        self.hmap = hmap
+        self.n = n_points
+        self.step = step
 
 def height_map(points, n_points, cmin, cmax):
     c = np.linspace(cmin, cmax, n_points)
