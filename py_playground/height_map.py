@@ -16,6 +16,18 @@ class Cube:
     def __repr__(self):
         return f"[{self.x:.2f}, {self.y:.2f}, {self.z:.2f}] - {self.state}"
 
+    @property
+    def coords(self):
+        return [self.x, self.y, self.z]
+
+    @coords.setter
+    def coords(self, val):
+        self.x, self.y, self.z = val
+
+class DynamicCube:
+    def __init__(self, x, y, z, dx=0, dy=0, dz=0):
+        pass
+
 
 def height_map(points, n_points, cmin, cmax):
     c = np.linspace(cmin, cmax, n_points)

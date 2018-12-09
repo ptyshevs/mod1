@@ -115,7 +115,6 @@ class ProjectionViewerNP:
     def init_condition(self):
         # self.wireframe_col = self.node_colors(self.wireframe.nodes)
 
-
         cmin = np.hstack((self.wireframe.nodes[:, :3].min(axis=0), [0]))
         cmax = np.hstack((self.wireframe.nodes[:, :3].max(axis=0), [0]))
         # move center of coord. system by subtracting half of distance wrt each axis
@@ -165,7 +164,10 @@ class ProjectionViewerNP:
                                    end_pos, 2)
         if self.displayNodes:
             for i, node in enumerate(self.tf_wireframe.nodes):
-                c = self.wireframe_col[i, :]
+                if self.wireframe_col:
+                    c = self.wireframe_col[i, :]
+                else:
+                    c = self.nodeColor
                 if np.all(c != self.background):
                     pygame.draw.circle(self.screen, c, (int(self.ws + node[0]), int(self.hs + node[1])), self.nodeRadius, 0)
 
