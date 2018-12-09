@@ -14,7 +14,7 @@ class Cube:
         self.state = state
 
     def __repr__(self):
-        return f"{self.z[2]:.2f} - {self.state}"
+        return f"[{self.x:.2f}, {self.y:.2f}, {self.z:.2f}] - {self.state}"
 
 
 def height_map(points, n_points, cmin, cmax):
