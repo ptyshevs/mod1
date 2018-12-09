@@ -11,7 +11,7 @@ if __name__ == '__main__':
     cmin = 0
     cmax = 2
     n_points = 100  # very slow
-    n_points = 20
+    n_points = 40
 
     points = center(rescale(parse_file('../resources/demo1.mod1')))
     points = np.vstack([points, gen_borders(cmin, cmax, cmin, cmax)])
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     wr.addNodes(nodes)
     wr.addEdges(edges)
     ws = WaterSimulator(800, 800)
-    ws.addEmitter(Emitter(cmin, cmax, 0.01))
+    ws.addEmitter(Emitter(cmin, cmax, 1))
     ws.addWireframe(wr)
     ws.addHeightMap(hmap)
     ws.cube_colors(hmap.hmap)

@@ -42,6 +42,7 @@ class WaterSimulator:
         self.bias = [0, 0, 0]  # bias in 3 axis
 
         # default settings
+        self.time_step = .0003
         self.scale = [350, 350, 350]
         self.view_angle = [-.95, -.35, 0]
         self.bias = [0, 0, 0]
@@ -161,9 +162,36 @@ class WaterSimulator:
             pygame.display.flip()
 
     def update_particles(self):
-
+        """ """
         for particle in self.particles:
-            particle.step()
+            x, y, z = particle.x, particle.y, particle.z
+            old_location = self.discritize(particle, False)
+            self.hmap.hmap[old_location].state = 'empty'
+            # print(self.hmap.hmap[ijk])
+            if x + particle.dx < self.hmap.cmin or x + particle.dx > self.hmap.cmax:
+                particle.dx = 0  # maybe bounce? (multiplying by -1)
+            if y + particle.dy < self.hmap.cmin or y + particle.dy > self.hmap.cmax:
+                particle.dy = 0
+            if z + particle.dz < self.hmap.cmin or z + particle.dz > self.hmap.cmax:
+                particle.dz = 0
+            i1, j1, k1 = self.discritize(particle + particle.grad, False)
+            next_cube = self.hmap.hmap[i1, j1, k1]
+            if not next_cube.is_empty():
+                particle.grad = np.zeros_like(particle.grad)
+                # calculate gradient
+                # partial derivative in x axis
+                # neighbour_cube = self.hmap.hmap[i1 + 1, j1, k1]
+                # terrain_level = self.hmap.find_terrain(i1 + 1, j1, k1)
+                # if terrain_level != -1:
+                #     dzdx = k1 - terrain_level
+                # print("WTF:", next_cube, "Terrain level:", terrain_level, "dz/dx:", dzdx)
+                pass
+            # print(self.hmap.hmap[i1, j1, k1])
+            particle.coords += particle.grad
+            particle.grad += (0, 0, -9.81 * self.time_step)
+            new_location = self.discritize(particle, False)
+            self.hmap.hmap[new_location].state = 'water'
+
 
     def display(self):
         """ Draw the wireframes on the screen. """
@@ -186,18 +214,19 @@ class WaterSimulator:
         if self.displayParticles:
             for particle in self.particles:
                 idx = self.discritize(particle)
-                node = self.wireframe.nodes[idx]
+                node = self.wireframe.nodes[idx] + self.hmap.step / 2  # move circle into the center of a cube
                 node = self.transform_node(node)
                 x, y = int(self.ws + node[0]), int(self.hs + node[1])
-                pygame.draw.circle(self.screen, self.waterColor, (x, y), self.nodeRadius)
+                pygame.draw.circle(self.screen, self.waterColor, (x, y), 4)
 
-    def discritize(self, particle):
+    def discritize(self, particle, D1=True):
         """ Find node where this particle belongs """
-        x, y, z = particle.x, particle.y, particle.z
         step = self.hmap.step
-        xi, yi, zi = int(x // step), int(y // step), int(z // step)
-        return xi * self.hmap.n ** 2 + yi * self.hmap.n + zi
-
+        xi, yi, zi = [int(_ / step) for _ in particle.coords]
+        if D1:
+            return xi * self.hmap.n ** 2 + yi * self.hmap.n + zi
+        else:
+            return xi, yi, zi
 
 
     def addWireframe(self, wireframe):

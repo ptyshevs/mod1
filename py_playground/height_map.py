@@ -24,9 +24,10 @@ class Cube:
     def coords(self, val):
         self.x, self.y, self.z = val
 
-class DynamicCube:
-    def __init__(self, x, y, z, dx=0, dy=0, dz=0):
-        pass
+    def is_empty(self):
+        return self.state == 'empty'
+
+
 
 class HeightMap:
     def __init__(self, points, n_points, cmin, cmax):
@@ -47,6 +48,21 @@ class HeightMap:
         self.hmap = hmap
         self.n = n_points
         self.step = step
+        self.cmin = cmin
+        self.cmax = cmax
+
+    def find_terrain(self, i, j, k):
+        """ Find terrain in the given col. -1 if no terrain """
+        if self.hmap[i, j, k].state == 'terrain':
+            return k
+        else:
+            for m in range(k - 1, 0, -1):
+                if self.hmap[i, j, m].state == 'terrain':
+                    return m
+            for m in range(k + 1, self.n):
+                if self.hmap[i, j, m].state == 'terrain':
+                    return m
+        return -1
 
 def height_map(points, n_points, cmin, cmax):
     c = np.linspace(cmin, cmax, n_points)
