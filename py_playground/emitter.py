@@ -135,6 +135,10 @@ class Emitter:
                              " point must match ")
         self.origin = coords
 
+    def reset(self):
+        self.n_emitted = 0
+        self.time = -1
+
 
 if __name__ == '__main__':
     e = Emitter(0, 2, 1, n_coords=2, pmax=10)
