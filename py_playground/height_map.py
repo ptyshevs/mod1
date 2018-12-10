@@ -28,7 +28,6 @@ class Cube:
         return self.state == 'empty'
 
 
-
 class HeightMap:
     def __init__(self, points, n_points, cmin, cmax):
         c = np.linspace(cmin, cmax, n_points)

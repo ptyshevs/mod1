@@ -3,12 +3,15 @@ import numpy as np
 
 
 class Particle:
-    def __init__(self, coords, grad=np.zeros((3,))):
-        self.coords = coords
+    def __init__(self, coords, grad=np.zeros((3,), dtype=np.float64)):
+        self.coords = coords.astype(np.float64)
         self.grad = grad
 
     def __repr__(self):
         return f"Particle [{self.coords.round(2)}] -> {self.grad.round(2)}"
+
+    def copy(self):
+        return Particle(self.coords.copy(), self.grad.copy())
 
     @property
     def x(self):
@@ -83,6 +86,7 @@ class Emitter:
         self.range = cmax - cmin
         self.n_emitted = 0
         self.n_max = pmax
+        self.origin = None
 
     def emit(self):
         """
@@ -94,19 +98,47 @@ class Emitter:
             # initialize timer
             self.time = time.clock()
             self.n_emitted += 1
+            if self.origin is None:
+                coords = np.random.rand(self.n_coords)
+                if self.mode == 'rain':
+                    coords[-1] = 1
+                elif self.mode == 'groundwater':  # underground source
+                    coords[-1] = 0
+            else:
+                coords = self.origin
+            return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords))
+
+    def give(self):
+        """
+        Give particle, regardless of time limit
+        :return:
+        """
+        if self.origin is None:
             coords = np.random.rand(self.n_coords)
             if self.mode == 'rain':
                 coords[-1] = 1
             elif self.mode == 'groundwater':  # underground source
                 coords[-1] = 0
-            return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords))
+            return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords, np.float64))
+        else:
+            return Particle(self.origin, np.zeros(self.n_coords, np.float64))
 
     def can_emit(self):
         return self.n_emitted < self.n_max
 
+    def set_origin(self, coords):
+        """ Origin specifies starting point of a particle emitted. It controls
+            all coordinates except the last one"""
+        if coords.shape[0] != self.n_coords:
+            raise ValueError(f"Number of dimensions of the Emitter"
+                             f" {self.n_coords} and origin {coords.shape[0]}"
+                             " point must match ")
+        self.origin = coords
+
 
 if __name__ == '__main__':
     e = Emitter(0, 2, 1, n_coords=2, pmax=10)
+    e.set_origin(np.zeros((2,)))
     while e.can_emit():
         r = e.emit()
         if r:
