@@ -104,9 +104,9 @@ class Emitter:
                     coords[-1] = 1
                 elif self.mode == 'groundwater':  # underground source
                     coords[-1] = 0
+                return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords))
             else:
-                coords = self.origin
-            return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords))
+                return Particle(self.origin, np.zeros(self.n_coords))
 
     def give(self):
         """
