@@ -219,6 +219,7 @@ class WaterSimulator:
                 x, y = int(self.ws + node[0]), int(self.hs + node[1])
                 pygame.draw.circle(self.screen, self.waterColor, (x, y), 4)
 
+
     def discritize(self, particle, D1=True):
         """ Find node where this particle belongs """
         step = self.hmap.step

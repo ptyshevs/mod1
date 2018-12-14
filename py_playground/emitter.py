@@ -6,9 +6,11 @@ class Particle:
     def __init__(self, coords, grad=np.zeros((3,), dtype=np.float64)):
         self.coords = coords.astype(np.float64)
         self.grad = grad
+        self.decay = 25  # parameter that controls brownian motion decay for colliding particle
+        self.is_stationary = False
 
     def __repr__(self):
-        return f"Particle [{self.coords.round(2)}] -> {self.grad.round(2)}"
+        return f"Particle [{self.coords.round(5)}] -> {self.grad.round(5)}"
 
     def copy(self):
         return Particle(self.coords.copy(), self.grad.copy())
