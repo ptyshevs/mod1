@@ -106,7 +106,13 @@ class Emitter:
                     coords[-1] = 1
                 elif self.mode == 'groundwater':  # underground source
                     coords[-1] = 0
-                return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords))
+                elif self.mode == 'wave':
+                    if not self.origin:
+                        raise ValueError("Please provide origin point for a wave to appear from")
+                    # pour from the top
+                    coords[-1] = 1
+
+                return Particle(self.cmin + coords * self.range, np.zeros(self.n_coords, np.float64))
             else:
                 return Particle(self.origin, np.zeros(self.n_coords))
 
