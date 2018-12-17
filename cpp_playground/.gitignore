@@ -2,3 +2,6 @@
 /.build
 /Packages
 /*.xcodeproj
+mod1
+*.o
+.vscode

@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vpopovyc <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: vpopovyc <vpopovyc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/12/09 17:42:51 by vpopovyc          #+#    #+#              #
-#    Updated: 2018/12/09 17:42:51 by vpopovyc         ###   ########.fr        #
+#    Updated: 2018/12/17 14:18:19 by vpopovyc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 EXEC = mod1
 
-SRCFILENAME := main.cpp
+SRCFILENAME := main.cpp parsing.cpp
 
 SRC = $(addprefix core/, $(SRCFILENAME))
 
@@ -20,7 +20,7 @@ OBJ = $(SRC:.cpp=.o)
 
 CC = clang++
 
-CCFLAGS = -Wall -Wextra -Werror -std=c++1z
+CCFLAGS = -Wall -Wextra -Werror -std=c++1z -fvisibility=hidden
 
 MOD1INC = -I. -Iglm-0.9.9.3
 
