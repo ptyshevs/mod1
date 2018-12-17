@@ -10,11 +10,72 @@
 #                                                                              #
 # **************************************************************************** #
 
+# -----------------------------------------------------------
+# Frameworks
+
+FRAMEWORKS = -framework OpenGL -framework SDL2
+
+FRAMEWORKSPATH = -F /Library/Frameworks
+
+# -----------------------------------------------------------
+# Libraries
+
+# libGLEW
+
+LIBGLEWBIN = libs/libglew/src/lib/libGLEW.a
+
+LIBGLEWINC = libs/libglew/src/include
+
+LIBGLEW = libs/libglew/src/lib
+
+# libglm
+
+LIBGLMINC = libs/libglm
+
+# libLodePNG
+
+LIBLODEPNGBIN = libs/liblodepng/libLodePNG.a
+
+LIBLODEINC = libs/liblodepng
+
+LIBLODEPNG = libs/liblodepng
+
+# -----------------------------------------------------------
+# Compiler rules
+
+LIBS = -lGLEW -lLodePNG
+
+LIBSDIR = -L$(LIBGLEW) -L$(LIBLODEPNG)
+
+LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC)
+
+# -----------------------------------------------------------
+
+glew.all:
+	@echo  "\x1b[32mlibglew   compiles...\x1b[0m"
+	@make -C libs/libglew/src glew.lib.static
+
+glew.clean:
+	@make -C libs/libglew/src distclean
+
+lode.all:
+	@echo  "\x1b[32mliblodepng   compiles...\x1b[0m"
+	@make -C libs/liblodepng/ all
+
+lode.clean:
+	@make -C libs/liblodepng/ clean
+
+lode.fclean:
+	@make -C libs/liblodepng/ fclean
+
+lode.re:
+	@make -C libs/liblodepng/ re
+
 EXEC = mod1
 
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp
 
-SRC = $(addprefix core/, $(SRCFILENAME))
+SRC = $(addprefix src/, $(SRCFILENAME))
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -22,15 +83,19 @@ CC = clang++
 
 CCFLAGS = -Wall -Wextra -Werror -std=c++1z -fvisibility=hidden
 
-MOD1INC = -I. -Iglm-0.9.9.3
+MOD1INC = -Iinc
+
+$(LIBGLEWBIN): glew.all
+
+$(LIBLODEPNGBIN): lode.all
 
 all: $(EXEC)
 
-$(EXEC): $(OBJ)
-	$(CC) $(CCFLAGS) $(OBJ) -o $(EXEC)
+$(EXEC): $(LIBGLEWBIN) $(LIBLODEPNGBIN) $(OBJ)
+	$(CC) $(CCFLAGS) $(FRMPATH) $(FRAMEWORKS) $(LIBSDIR) $(LIBS) $(OBJ) -o $(EXEC)
 
 %.o:%.cpp
-	$(CC) $(CCFLAGS) $(MOD1INC) -o $@ -c $<
+	$(CC) $(CCFLAGS) $(MOD1INC) $(LIBSINC) $(FRAMEWORKSPATH) -o $@ -c $<
 
 clean:
 	@rm -rf $(OBJ)
@@ -38,6 +103,7 @@ clean:
 fclean: clean
 	@rm -rf $(EXEC)
 
-re: fclean all
+re: lode.fclean glew.clean fclean all
 
 .phony: all clean fclean re
+
