@@ -6,13 +6,13 @@
 #    By: vpopovyc <vpopovyc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/12/09 17:42:51 by vpopovyc          #+#    #+#              #
-#    Updated: 2018/12/17 14:18:19 by vpopovyc         ###   ########.fr        #
+#    Updated: 2018/12/17 16:55:27 by vpopovyc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 EXEC = mod1
 
-SRCFILENAME := main.cpp parsing.cpp
+SRCFILENAME := main.cpp parsing.cpp mapgen.cpp
 
 SRC = $(addprefix core/, $(SRCFILENAME))
 
