@@ -32,11 +32,6 @@
 bool inputIsGood(int ac, char *av[]);
 std::vector<glm::vec3> readFile(char *filePath);
 
-
-// mapgen.cpp
-
-std::vector<glm::vec3> generate_map(const std::vector<glm::vec3> control_points);
-
 // sdl_gl_init.cpp
 // OpenGL & SDL
 
@@ -54,14 +49,23 @@ struct SDLCore {
 	SDL_Event		event;
 };
 
-struct IGLItem {
+struct GLItem {
     GLuint vao;
     GLuint vbo;
     GLuint ibo;
     GLuint tex;
     GLsizei idx_num;
     GLuint shader_program;
+    glm::mat4 model;
+    std::function<void (const glm::mat4 &vp)> fill_uniforms;
 };
 
 SDLCore	sdl_gl_init(void);
 void	deinit(SDLCore &core);
+
+// compileshaders.cpp
+GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
+
+// mapgen.cpp
+
+GLItem generate_map(const std::vector<glm::vec3> control_points);

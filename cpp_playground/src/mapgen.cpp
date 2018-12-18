@@ -36,7 +36,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
     return indexes;
 }
 
-std::vector<glm::vec3> generate_map(const std::vector<glm::vec3> control_points) {
+GLItem generate_map(const std::vector<glm::vec3> control_points) {
     // Generate points
     // It should be done using OpenCL
     (void)control_points;
@@ -52,5 +52,28 @@ std::vector<glm::vec3> generate_map(const std::vector<glm::vec3> control_points)
     // Generate triangulated indices for mesh opt rendering
     std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
-    return map;
+    // Create object suitable for rendering
+    GLItem map_item;
+
+    map_item.model = glm::mat4(1.0f);
+    map_item.idx_num = map_render_indices.size() * 3;
+    map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+                                              "src/shaders/ground_fragment.glsl");
+    map_item.fill_uniforms = [&](const glm::mat4 &vp) {
+        auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
+        auto mvp = vp * map_item.model;
+        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+    };
+    glGenBuffers(1, &map_item.vbo);
+	glGenBuffers(1, &map_item.ibo);
+	glGenVertexArrays(1, &map_item.vao);
+	glBindVertexArray(map_item.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo);
+	glBufferData(GL_ARRAY_BUFFER, map.size() * sizeof(glm::vec3), map.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid*)0);
+	glBindVertexArray(0);
+    return map_item;
 }
