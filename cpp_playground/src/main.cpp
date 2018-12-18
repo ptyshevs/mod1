@@ -23,16 +23,23 @@ int main(int ac, char *av[]) {
 
             auto map = generate_map(controlPointsArray);
 
-            for (size_t i = 0; i < 400; i++)
+            
+            auto core = sdl_gl_init();
+
+            while(1)
             {
-                for (size_t j = 0; j < 400; j++)
-                {
-                    auto &point = map[i * 400 + j];
-                    std::cout << point.x << " " << point.y << " " << point.z << " | ";
-                }
-                std::cout << std::endl;
+                SDL_PollEvent(&(core.event));
+                auto keystate = SDL_GetKeyboardState(NULL);
+
+                if ((core.event.type == SDL_QUIT) || keystate[SDL_SCANCODE_ESCAPE])
+                    break;
             }
+
+            deinit(core);
+
         } catch (std::exception &e) {
+
+            
             std::cout << e.what() << std::endl;
         }
         

@@ -35,15 +35,33 @@ std::vector<glm::vec3> readFile(char *filePath);
 
 // mapgen.cpp
 
-class IGLItem {
-    /*
+std::vector<glm::vec3> generate_map(const std::vector<glm::vec3> control_points);
+
+// sdl_gl_init.cpp
+// OpenGL & SDL
+
+# define GL3_PROTOTYPES 1
+# include <GL/glew.h>
+# include <SDL2/SDL.h>
+
+# define WINY		720
+# define WINX		1280
+# define WINNAME	"mod1"
+
+struct SDLCore {
+	SDL_Window		*win;
+	SDL_GLContext	ctx;
+	SDL_Event		event;
+};
+
+struct IGLItem {
     GLuint vao;
     GLuint vbo;
     GLuint ibo;
     GLuint tex;
     GLsizei idx_num;
     GLuint shader_program;
-    */
 };
 
-std::vector<glm::vec3> generate_map(const std::vector<glm::vec3> control_points);
+SDLCore	sdl_gl_init(void);
+void	deinit(SDLCore &core);
