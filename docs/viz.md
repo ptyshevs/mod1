@@ -20,3 +20,7 @@ Code: -
 
 This is probably the most simple solution, but it is very "poor-looking" in code.
 Code: + (C)
+
+[Real-time Water Simulation in Games](https://is.muni.cz/th/mfkg2/master-thesis.pdf)
+
+This article gives an overview of common approaches
