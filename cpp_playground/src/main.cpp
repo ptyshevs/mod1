@@ -26,15 +26,8 @@ int main(int ac, char *av[]) {
 
             auto camera = GLCamera();
 
-            bool shouldRotateMap = true;
-
             while(1)
             {
-                // Custom events
-                if (shouldRotateMap) {
-                    map.model = glm::rotate(map.model, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-                }
-
                 // Event handle
 
                 SDL_PollEvent(&(core.event));
@@ -47,9 +40,11 @@ int main(int ac, char *av[]) {
                     camera.pos += camera.speed * camera.dir;
                 if (keystate[SDL_SCANCODE_S])
                     camera.pos -= camera.speed * camera.dir;
-                if (keystate[SDL_SCANCODE_R]) {
-                    shouldRotateMap = !shouldRotateMap;
-		            SDL_Delay(200);
+                if (keystate[SDL_SCANCODE_E]) {
+                    map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+                }
+                if (keystate[SDL_SCANCODE_Q]) {
+                    map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
                 }
 
                 // Actual render
