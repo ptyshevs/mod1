@@ -36,10 +36,64 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
     return indexes;
 }
 
-GLItem generate_map(const std::vector<glm::vec3> control_points) {
+/*
+** Setup opencl
+** Clamp controll points values on map dimensions -> todo
+** Modify map
+*/
+
+void interpolate_using_controll_points(std::vector<glm::vec3> cp, std::vector<glm::vec3> &map) {
+
+    auto cl = CLCore();
+
+    cl_host_part(cl);
+    cl_compile_kernel(cl, "src/kernels/idw_kernel.cl", "idw_kernel");
+
+    cl_mem cl_map = clCreateBuffer(cl.context, CL_MEM_READ_WRITE, map.size() * sizeof(glm::vec3), NULL, NULL);
+    cl_mem cl_cp = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, cp.size() * sizeof(glm::vec3), NULL, NULL);
+    cl_mem cl_cp_size = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, sizeof(size_t), NULL, NULL);
+    cl_mem cl_map_size = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, sizeof(size_t), NULL, NULL);
+
+    int err;
+    err = clEnqueueWriteBuffer(cl.queue, cl_map, CL_TRUE, 0, map.size() * sizeof(glm::vec3), map.data(), 0, NULL, NULL);
+    err |= clEnqueueWriteBuffer(cl.queue, cl_cp, CL_TRUE, 0, cp.size() * sizeof(glm::vec3), cp.data(), 0, NULL, NULL);
+    auto cp_size = cp.size();
+    err |= clEnqueueWriteBuffer(cl.queue, cl_cp_size, CL_TRUE, 0, sizeof(size_t), &cp_size, 0, NULL, NULL);
+    auto map_size = map.size();
+    err |= clEnqueueWriteBuffer(cl.queue, cl_map_size, CL_TRUE, 0, sizeof(size_t), &map_size, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error" << __LINE__ << "[" << err << "]\n";
+        exit(1);
+    }
+
+    err = clSetKernelArg(cl.kernel, 0, sizeof(cl_cp), &cl_cp);
+    err |= clSetKernelArg(cl.kernel, 1, sizeof(cl_cp_size), &cl_cp_size);
+    err |= clSetKernelArg(cl.kernel, 2, sizeof(cl_map), &cl_map);
+    err |= clSetKernelArg(cl.kernel, 3, sizeof(cl_map_size), &cl_map_size);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error" << __LINE__ << "[" << err << "]\n";
+        exit(1);
+    }
+
+    size_t  global_work_size = map.size();
+    err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error" << __LINE__ << "[" << err << "]\n";
+        exit(1);
+    }
+
+    clFinish(cl.queue);
+
+    err = clEnqueueReadBuffer(cl.queue, cl_map, CL_TRUE, 0, map.size() * sizeof(glm::vec3), map.data(), 0, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error" << __LINE__ << "[" << err << "]\n";
+        exit(1);
+    }
+}
+
+GLItem generate_map(std::vector<glm::vec3> control_points) {
     // Generate points
     // It should be done using OpenCL
-    (void)control_points;
     std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
     for (size_t i = 0; i < sl; i++) {
         for (size_t j = 0; j < sl; j++) {
@@ -51,6 +105,12 @@ GLItem generate_map(const std::vector<glm::vec3> control_points) {
 
     // Generate triangulated indices for mesh opt rendering
     std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
+
+
+    // Interpolate stuff
+    interpolate_using_controll_points(control_points, map);
+
+
 
     // Create object suitable for rendering
     GLItem map_item;

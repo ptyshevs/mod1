@@ -64,8 +64,24 @@ SDLCore	sdl_gl_init(void);
 void	deinit(SDLCore &core);
 
 // compileshaders.cpp
+char	*reader(const char *path);
 GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
 
 // mapgen.cpp
 
-GLItem generate_map(const std::vector<glm::vec3> control_points);
+#include "OpenCL/opencl.h"
+
+struct CLCore {
+    cl_device_id        device;
+    cl_context          context;
+    cl_command_queue    queue;
+    cl_program          program;
+    cl_kernel           kernel;
+};
+
+GLItem generate_map(std::vector<glm::vec3> control_points);
+
+// cl_init.cpp
+
+void    cl_host_part(CLCore &cl_core);
+void    cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);

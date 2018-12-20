@@ -13,7 +13,7 @@
 # -----------------------------------------------------------
 # Frameworks
 
-FRAMEWORKS = -framework OpenGL -framework SDL2
+FRAMEWORKS = -framework OpenGL -framework SDL2 -framework OpenCL
 
 FRAMEWORKSPATH = -F /Library/Frameworks
 
@@ -54,7 +54,7 @@ LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC)
 EXEC = mod1
 
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp sdl_gl_init.cpp \
-				compileshaders.cpp
+				compileshaders.cpp cl_init.cpp
 
 SRC = $(addprefix src/, $(SRCFILENAME))
 
