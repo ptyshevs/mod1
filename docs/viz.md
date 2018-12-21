@@ -23,4 +23,9 @@ Code: + (C)
 
 [Real-time Water Simulation in Games](https://is.muni.cz/th/mfkg2/master-thesis.pdf)
 
-This article gives an overview of common approaches
+This article gives an overview of common approaches and describes implementation details of Cellular Automata approach.
+
+[Fluid Simulation Course Notes](https://www.cs.ubc.ca/~rbridson/fluidsimulation/fluids_notes.pdf)
+
+Broad overview of the whole topic of incompressible fluid simulation
+
