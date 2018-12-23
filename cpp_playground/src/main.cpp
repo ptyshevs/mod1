@@ -40,12 +40,10 @@ int main(int ac, char *av[]) {
                     camera.pos += camera.speed * camera.dir;
                 if (keystate[SDL_SCANCODE_S])
                     camera.pos -= camera.speed * camera.dir;
-                if (keystate[SDL_SCANCODE_E]) {
+                if (keystate[SDL_SCANCODE_E])
                     map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-                }
-                if (keystate[SDL_SCANCODE_Q]) {
+                if (keystate[SDL_SCANCODE_Q])
                     map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-                }
 
                 // Actual render
 
