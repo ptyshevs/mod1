@@ -13,7 +13,7 @@
 #include <core.hpp>
 
 static const size_t sl = 100;
-static const size_t hf_sl = 50;
+static const size_t hf_sl = sl / 2;
 
 /*
 ** Generate map here
@@ -33,7 +33,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
              indexes.emplace_back(p+sl, p+1, p+sl+1);
          }
      }
-     indexes.emplace_back(0, 1, 2);
+//     indexes.emplace_back(0, 1, 2);
     return indexes;
 }
 
@@ -99,16 +99,20 @@ double	idw(std::vector<glm::vec3> control_points, glm::vec3 point)
 	double w = 0;
 	double num = 0;
 	double denom = 0;
+	double min_y = INT_MAX;
 
 	for (glm::vec3 cp: control_points)
 	{
 		d = glm::pow(cp.x - point.x, 2) + glm::pow(cp.z - point.z, 2);
 		d = glm::sqrt(d);
+		d = glm::pow(d, 1.3); // sigma-smoothing
 		w = glm::pow(d, -2);
 		num += w * cp.y;
+		if (cp.y > min_y)
+			min_y = cp.y;
 		denom += w;
 	}
-	return (denom > 0 ? num/denom : 0);
+	return (denom > 0 ? num/denom : min_y);
 }
 
 
@@ -175,8 +179,7 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
         auto mvp = vp * points_item.model;
         glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     };
-//    std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7}};
-	std::vector<glm::ivec3> indices;
+    std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7}};
     glGenBuffers(1, &points_item.vbo);
     glGenBuffers(1, &points_item.ibo);
     glGenVertexArrays(1, &points_item.vao);
@@ -184,8 +187,8 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
     glBindVertexArray(points_item.vao);
     glBindBuffer(GL_ARRAY_BUFFER, points_item.vbo);
     glBufferData(GL_ARRAY_BUFFER, control_points.size() * sizeof(glm::vec3), control_points.data(), GL_DYNAMIC_DRAW);
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
-//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid *)0);
     glBindVertexArray(0);
