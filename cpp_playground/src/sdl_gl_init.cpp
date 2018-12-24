@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   core.hpp                                           :+:      :+:    :+:   */
+/*   sdl_gl_init.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vpopovyc <vpopovyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:41:59 by vpopovyc          #+#    #+#             */
-/*   Updated: 2018/12/17 19:24:08 by vpopovyc         ###   ########.fr       */
+/*   Updated: 2018/12/24 20:47:23 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ SDLCore	sdl_gl_init(void) {
 	glewExperimental = 1;
 	glewInit();
 	SDL_GL_SetSwapInterval(1);
-	glClearColor(0.863, 0.863, 0.863, 1.0);
+	glClearColor(0.1, 0.1, 0.1, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(core.win);
 	gl_version_info();

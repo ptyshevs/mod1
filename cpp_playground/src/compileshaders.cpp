@@ -18,6 +18,7 @@ char	*reader(const char *path)
 	long	size;
 	char	*data;
 
+	std::cout << path << std::endl;
 	assert((fp = fopen(path, "r")));
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);

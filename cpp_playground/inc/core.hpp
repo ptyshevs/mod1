@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   core.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vpopovyc <vpopovyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:41:59 by vpopovyc          #+#    #+#             */
-/*   Updated: 2018/12/17 19:24:08 by vpopovyc         ###   ########.fr       */
+/*   Updated: 2018/12/24 21:06:26 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ struct CLCore {
 };
 
 GLItem generate_map(std::vector<glm::vec3> control_points);
+GLItem generate_control_points(std::vector<glm::vec3> control_points);
+
 
 // cl_init.cpp
 
