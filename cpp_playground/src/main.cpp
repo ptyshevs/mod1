@@ -15,7 +15,7 @@
 
 void draw(GLItem /*item*/, const glm::mat4 &/*vp*/);
 
-void    process_input(GLCamera camera, GLItem map, bool *quit)
+void    process_input(GLCamera &camera, GLItem &map, GLItem &points, bool *quit)
 {
     auto keystate = SDL_GetKeyboardState(NULL);
     
@@ -26,9 +26,15 @@ void    process_input(GLCamera camera, GLItem map, bool *quit)
     else if (keystate[SDL_SCANCODE_S])
         camera.pos -= camera.speed * camera.dir;
     else if (keystate[SDL_SCANCODE_E])
+	{
         map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+        points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
     else if (keystate[SDL_SCANCODE_Q])
+	{
         map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+        points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
 }
 
 int main(int ac, char *av[]) {
@@ -46,28 +52,28 @@ int main(int ac, char *av[]) {
             std::cout << e.what() << std::endl;
             return (1);
         }
-
+//	normalize_cp(controlPointsArray);
     auto core = sdl_gl_init();
 
     auto map = generate_map(controlPointsArray);
     auto points = generate_control_points(controlPointsArray);
 
     auto camera = GLCamera();
-
-    while(1)
+    glPointSize(3);
+    while(!quit)
     {
         // Event handle
         SDL_PollEvent(&(core.event));
-        process_input(camera, map, &quit);
-        if ((core.event.type == SDL_QUIT) || quit)
-            break;
+        process_input(camera, map, points, &quit);
+        if (core.event.type == SDL_QUIT)
+            quit = true;
 
         // Actual render
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         camera.frameStart();
-        // draw(map, camera.vp());
+        draw(map, camera.vp());
         draw(points, camera.vp());
         camera.frameEnd();
 
@@ -83,8 +89,9 @@ void draw(GLItem item, const glm::mat4 &vp)
     glUseProgram(item.shader_program);
     item.fill_uniforms(vp);
     glBindVertexArray(item.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
-    // glDrawElements(GL_TRIANGLES, item.idx_num, GL_UNSIGNED_INT, 0);
+     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
+//    glDrawArrays(GL_TRIANGLES, 0, item.idx_num);
+	glDrawArrays(GL_POINTS, 0, item.idx_num);
+//     glDrawElements(GL_TRIANGLES, item.idx_num, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

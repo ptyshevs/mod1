@@ -12,28 +12,28 @@
 
 #include <core.hpp>
 
-static const size_t sl = 400;
-static const size_t hf_sl = 200;
+static const size_t sl = 100;
+static const size_t hf_sl = 50;
 
 /*
 ** Generate map here
-** It should be a function that renturn continius array of block pos 400x400x1
+** It should be a function that return continuous array of block pos 400x400x1
 */
 
 std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 
     std::vector<glm::ivec3> indexes;
 
-    // indexes.reserve(sl*sl/8);
+     indexes.reserve(sl*sl/8);
 
-    // for (size_t i = 0; i < sl - 1; i++) {
-    //     for (size_t j = 0; j < sl - 1; j++) {
-    //         int p = i * sl +j;
-    //         indexes.emplace_back(p, p+1, p+sl);
-    //         indexes.emplace_back(p+sl, p+1, p+sl+1);
-    //     }
-    // }
-    // indexes.emplace_back(0, 1, 2);
+     for (size_t i = 0; i < sl - 1; i++) {
+         for (size_t j = 0; j < sl - 1; j++) {
+             int p = i * sl +j;
+             indexes.emplace_back(p, p+1, p+sl);
+             indexes.emplace_back(p+sl, p+1, p+sl+1);
+         }
+     }
+     indexes.emplace_back(0, 1, 2);
     return indexes;
 }
 
@@ -43,7 +43,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 ** Modify map
 */
 
-void interpolate_using_controll_points(std::vector<glm::vec3> cp, std::vector<glm::vec3> &map) {
+void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map) {
 
     // auto cl = CLCore();
 
@@ -90,10 +90,31 @@ void interpolate_using_controll_points(std::vector<glm::vec3> cp, std::vector<gl
     //     std::cout << "Error" << __LINE__ << "[" << err << "]\n";
     //     exit(1);
     // }
-    map = cp;
+//    map = cp;
 }
 
+double	idw(std::vector<glm::vec3> control_points, glm::vec3 point)
+{
+	double d = 0;
+	double w = 0;
+	double num = 0;
+	double denom = 0;
+
+	for (glm::vec3 cp: control_points)
+	{
+		d = glm::pow(cp.x - point.x, 2) + glm::pow(cp.z - point.z, 2);
+		d = glm::sqrt(d);
+		w = glm::pow(d, -2);
+		num += w * cp.y;
+		denom += w;
+	}
+	return (denom > 0 ? num/denom : 0);
+}
+
+
 GLItem generate_map(std::vector<glm::vec3> control_points) {
+	// todo: generate border points
+	// todo: normalize control points
     // Generate points
     // It should be done using OpenCL
     std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
@@ -102,6 +123,7 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
             auto &point = map[i * sl + j];
             point.x = (float)i - hf_sl;
             point.z = (float)j - hf_sl;
+            point.y = idw(control_points, point);
         }
     }
 
@@ -153,7 +175,8 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
         auto mvp = vp * points_item.model;
         glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     };
-    std::vector<glm::ivec3> indices;
+//    std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7}};
+	std::vector<glm::ivec3> indices;
     glGenBuffers(1, &points_item.vbo);
     glGenBuffers(1, &points_item.ibo);
     glGenVertexArrays(1, &points_item.vao);
@@ -161,8 +184,8 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
     glBindVertexArray(points_item.vao);
     glBindBuffer(GL_ARRAY_BUFFER, points_item.vbo);
     glBufferData(GL_ARRAY_BUFFER, control_points.size() * sizeof(glm::vec3), control_points.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid *)0);
     glBindVertexArray(0);

@@ -48,7 +48,7 @@ SDLCore	sdl_gl_init(void) {
 	glewExperimental = 1;
 	glewInit();
 	SDL_GL_SetSwapInterval(1);
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.863, 0.863, 0.863, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(core.win);
 	gl_version_info();
