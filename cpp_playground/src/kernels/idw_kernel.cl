@@ -18,7 +18,7 @@ float inverse_distance_weighting(float3 a, float3 b, float s)
     float3 diff = a - b;
     diff *= diff;
     float sqsum = diff.x + diff.z;
-    return 1 / pow(sqsum, (1 + s));
+    return 1 / (pow(sqsum, (1 + s)) + 0.0001f);
 }
 
 
@@ -46,11 +46,11 @@ __kernel void idw_kernel(__global float *control_points,
                                                     control_points[index + 1],
                                                     control_points[index + 2] };
 
-        float w = inverse_distance_weighting(current_point, current_control_point, 0.1f);
+        float w = inverse_distance_weighting(current_point, current_control_point, 0.3f);
 
         denom += w;
         num += w * current_control_point.y;
     }
 
-    write_map[offset + 1] = num / (denom + 0.1f);
+    write_map[offset + 1] = num / denom;
 }

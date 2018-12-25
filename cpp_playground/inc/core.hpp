@@ -17,9 +17,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 // number of points per axis
-# define sl 100
+# define sl 400
 // half the number (used for centering in NDC
-# define hf_sl 50
+# define hf_sl 200
 
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
@@ -84,7 +84,6 @@ struct CLCore {
     cl_kernel           kernel;
 };
 
-<<<<<<< HEAD
 struct Cell
 {
 	int		id;
@@ -93,7 +92,6 @@ struct Cell
 public:
 	Cell(int id, bool is_solid, float volume) : id(id), is_solid(is_solid), volume(volume) {};
 };
-
 
 struct Water: GLItem
 {
@@ -114,18 +112,14 @@ private:
 };
 
 
-GLItem	generate_map(std::vector<glm::vec3> control_points, Water &water);
+GLItem	generate_map(std::vector<glm::vec3> control_points);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
-=======
 typedef struct  s_constants {
     cl_int      map_size;
     cl_int      cp_size;
 }               t_constants;
-
-GLItem generate_map(std::vector<glm::vec3> control_points);
->>>>>>> ~ opencl stuff for ground done
 
 // cl_init.cpp
 

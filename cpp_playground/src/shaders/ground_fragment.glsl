@@ -13,20 +13,10 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-<<<<<<< HEAD
-	color = vec4(pos.y / 50.0f, pos.y/ 50.0f, pos.y/ 50.0f, 1.0f);
-//     float u = (pos.x + 200.0f) / 400.0f;
-//     float v = (pos.z + 200.0f) / 400.0f;
+  // color = vec4(pos.y / 100.0f + 0.5f, pos.y / 100.0f + 0.5f, pos.y / 50.0f + 0.2f, 1.0f);
 
-//     color = mix(vec4(checker(u, v), 1.0f), pos, 0.2);
-=======
-  color = vec4(pos.y / 50.0f, pos.y / 50.0f, pos.y / 50.0f, 1.0f);
-
-  /*
     float u = (pos.x + 200.0f) / 400.0f;
     float v = (pos.z + 200.0f) / 400.0f;
 
-    color = mix(vec4(checker(u, v), 1.0f), pos, 0.2);
-*/
->>>>>>> ~ opencl stuff for ground done
+    color = vec4(checker(u, v), 1.0f);
 }

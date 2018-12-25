@@ -12,9 +12,6 @@
 
 #include <core.hpp>
 
-//static const size_t sl = 400;
-//static const size_t hf_sl = sl / 2;
-
 /*
 ** Generate map here
 ** It should be a function that return continuous array of block pos 400x400x1
@@ -35,13 +32,6 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 	}
 	return indexes;
 }
-
-//std::vector<glm::ivec3> cp_indices(void)
-//{
-//	std::vector<glm::ivec3>	ind;
-//
-//	ind.reserve()
-//}
 
 /*
 ** Setup opencl
@@ -127,7 +117,6 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
     // Generate triangulated indices for mesh opt rendering
     std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
-
     // Interpolate stuff
     interpolate_using_controll_points(control_points, map);
 
@@ -136,8 +125,8 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
 
 	map_item.model = glm::mat4(1.0f);
 	map_item.idx_num = map_render_indices.size() * 3;
-	map_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
-												 "cpp_playground/src/shaders/ground_fragment.glsl");
+	map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+												 "src/shaders/ground_fragment.glsl");
 	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
 		auto mvp = vp * map_item.model;
@@ -163,8 +152,8 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 
 	points_item.model = glm::mat4(1.0f);
 	points_item.idx_num = control_points.size() * 3;
-	points_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
-												 "cpp_playground/src/shaders/ground_fragment.glsl");
+	points_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+												 "src/shaders/ground_fragment.glsl");
 	points_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(points_item.shader_program, "MVP");
 		auto mvp = vp * points_item.model;

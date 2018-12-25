@@ -28,8 +28,8 @@ Water	instance_water(void)
 //									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
 	w.model = glm::mat4(1.0f);
 	w.idx_num = w.indices.size() * 3;
-	w.shader_program = compile_shaders("cpp_playground/src/shaders/water_vertex.glsl",
-			"cpp_playground/src/shaders/water_fragment.glsl");
+	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
+			"src/shaders/water_fragment.glsl");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
         auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
         auto mvp = vp * w.model;
@@ -110,7 +110,7 @@ int main(int ac, char *av[]) {
 
 	auto water = instance_water();
 
-	auto map = generate_map(controlPointsArray, water);
+	auto map = generate_map(controlPointsArray);
 	auto points = generate_control_points(controlPointsArray);
 
 	auto camera = GLCamera();
@@ -124,7 +124,7 @@ int main(int ac, char *av[]) {
 			quit = true;
 
 		// Simulation step
-		water.update_particles();
+		// water.update_particles();
 
 		// Actual render
 
@@ -133,7 +133,7 @@ int main(int ac, char *av[]) {
 		camera.frameStart();
 		draw(map, camera.vp(), GL_TRIANGLES);
 		draw(points, camera.vp(), GL_POINTS);
-		draw(water, camera.vp(), GL_POINTS);
+		// draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
 		SDL_GL_SwapWindow(core.win);
