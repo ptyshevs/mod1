@@ -13,8 +13,9 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-     float u = (pos.x + 200.0f) / 400.0f;
-     float v = (pos.z + 200.0f) / 400.0f;
+	color = vec4(pos.y / 50.0f, pos.y/ 50.0f, pos.y/ 50.0f, 1.0f);
+//     float u = (pos.x + 200.0f) / 400.0f;
+//     float v = (pos.z + 200.0f) / 400.0f;
 
-     color = mix(vec4(checker(u, v), 1.0f), pos, 0.2);
+//     color = mix(vec4(checker(u, v), 1.0f), pos, 0.2);
 }

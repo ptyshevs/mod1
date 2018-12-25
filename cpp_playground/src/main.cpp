@@ -43,9 +43,11 @@ void	Water::update_buffer()
 {
 	glBindVertexArray(this->glitem.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->glitem.vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->particles.size() * sizeof(glm::vec3), this->particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->particles.size() * sizeof(glm::vec3),
+			this->particles.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->glitem.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3), this->indices.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3),
+			this->indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
 	glBindVertexArray(0);
@@ -87,7 +89,7 @@ Water	instance_water(void)
 
 void draw(GLItem item, const glm::mat4 &vp, GLenum type);
 
-void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, bool *quit)
+void	process_input(GLCamera &camera, HeightMap &map, GLItem &points, Water &water, bool *quit)
 {
 	auto keystate = SDL_GetKeyboardState(NULL);
 
