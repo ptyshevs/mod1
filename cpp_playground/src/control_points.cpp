@@ -98,7 +98,7 @@ void	show_points(std::vector<glm::vec3> &cpoints)
 
 void 	add_borders(std::vector<glm::vec3> &cpoints)
 {
-	for (int i = 0; i < sl; i += 8)
+	for (int i = 0; i < sl; i ++)
 	{
 		cpoints.emplace_back(i - hf_sl, 0, -hf_sl);
 		cpoints.emplace_back(-hf_sl, 0, i - hf_sl);

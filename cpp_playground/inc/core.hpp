@@ -93,22 +93,27 @@ public:
 	Cell(int id, bool is_solid, float volume) : id(id), is_solid(is_solid), volume(volume) {};
 };
 
-struct HeightMap: GLItem {
-public:
-	std::vector<Cell>		height_map; // pseudo-3D height map, each cell contains volume of water
-	std::vector<glm::vec3>	water_cells; // vector of cells with non-zero volume
 
-	Cell	&address(int x, int y, int z) {
-		return (this->height_map[x * sl * sl + y * sl + z]);
-	}
-	glm::vec3 to_coords(int x, int y, int z)
-	{
-		return (glm::vec3(x, y, z) - (float)hf_sl);
-	}
+struct Water: GLItem
+{
+public:
+	std::vector<Cell> hmap;
+	std::vector<glm::ivec3> particles;
+	std::vector<glm::vec3> indices;
+	int		mode; // rain, wave of underground
+
+	void	update_particles();
+private:
+	void	update_buffer();
+
+	Cell	&address(int x, int y, int z);
+	glm::vec3 to_coords(int x, int y, int z);
 	void	show_hmap(void);
+	void	add_volume(int x, int y, int z, float volume);
 };
 
-HeightMap	generate_map(std::vector<glm::vec3> control_points);
+
+GLItem	generate_map(std::vector<glm::vec3> control_points, Water &water);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 

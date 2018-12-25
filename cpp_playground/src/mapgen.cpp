@@ -121,28 +121,9 @@ double	idw(std::vector<glm::vec3> control_points, glm::vec3 point)
 	return (denom > 0 ? num/denom : min_y);
 }
 
-void	HeightMap::show_hmap()
+GLItem generate_map(std::vector<glm::vec3> control_points, Water &water)
 {
-	for (int i = 0; i < sl; i++)
-	{
-		for (int j = 0; j < sl; j++)
-		{
-			for (int k = 0; k < sl; k++)
-			{
-				Cell c= this->address(i, j, k);
-
-				std::cout << "id: " << c.id;
-				std::cout << " 3D coords: [" << i << " " << j << " " << k << "] ";
-				std::cout << " is_solid: " << c.is_solid << std::endl;
-			}
-		}
-
-	}
-}
-
-HeightMap generate_map(std::vector<glm::vec3> control_points)
-{
-	HeightMap hmap;
+	GLItem map_item;
 
 	// Generate points
 	// It should be done using OpenCL
@@ -156,15 +137,10 @@ HeightMap generate_map(std::vector<glm::vec3> control_points)
 			for (size_t k = 0; k < sl; k++)
 			{
 				float v = (float)k - (int)hf_sl;
-				hmap.height_map.emplace_back(i * sl * sl + j * sl + k, v <= point.y, 0.0f);
+				water.hmap.emplace_back(i * sl * sl + j * sl + k, v <= point.y, 0.0f);
 			}
 		}
 	}
-	Cell c = hmap.address(50, 50, 50);
-	std::cout << "id: " << c.id;
-//	std::cout << " 3D coords: [" << i << " " << j << " " << k << "] ";
-	std::cout << " is_solid: " << c.is_solid << std::endl;//	hmap.show_hmap();
-	std::cout << glm::to_string(hmap.to_coords(50, 50, 50)) << std::endl;
 	// Generate triangulated indices for mesh opt rendering
 	std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 	// std::vector<glm::ivec3> map_render_indices = {0, 1, 2};
@@ -176,27 +152,27 @@ HeightMap generate_map(std::vector<glm::vec3> control_points)
 	// Create object suitable for rendering
 //    GLItem map_item;
 
-	hmap.model = glm::mat4(1.0f);
-	hmap.idx_num = map_render_indices.size() * 3;
-	hmap.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
+	map_item.model = glm::mat4(1.0f);
+	map_item.idx_num = map_render_indices.size() * 3;
+	map_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
 												 "cpp_playground/src/shaders/ground_fragment.glsl");
-	hmap.fill_uniforms = [&](const glm::mat4 &vp) {
-		auto mvp_id = glGetUniformLocation(hmap.shader_program, "MVP");
-		auto mvp = vp * hmap.model;
+	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
+		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
+		auto mvp = vp * map_item.model;
 		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
 	};
-	glGenBuffers(1, &hmap.vbo);
-	glGenBuffers(1, &hmap.ibo);
-	glGenVertexArrays(1, &hmap.vao);
-	glBindVertexArray(hmap.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, hmap.vbo);
+	glGenBuffers(1, &map_item.vbo);
+	glGenBuffers(1, &map_item.ibo);
+	glGenVertexArrays(1, &map_item.vao);
+	glBindVertexArray(map_item.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo);
 	glBufferData(GL_ARRAY_BUFFER, map.size() * sizeof(glm::vec3), map.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hmap.ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid*)0);
 	glBindVertexArray(0);
-	return hmap;
+	return map_item;
 }
 
 GLItem generate_control_points(std::vector<glm::vec3> control_points)

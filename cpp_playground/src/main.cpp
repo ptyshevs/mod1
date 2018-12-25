@@ -15,71 +15,34 @@
 #include "limits.h"
 
 
-struct Water
-{
-public:
-	GLItem glitem;
-	GLuint	n_particles;
-	std::vector<glm::vec3> particles;
-	std::vector<glm::vec3> indices;
-	int		mode; // rain, wave of underground
-
-	void	update_particles();
-private:
-	void	update_buffer();
-};
-
-void	Water::update_particles()
-{
-	for (glm::vec3 &particle: this->particles)
-	{
-		if (particle.y > -hf_sl)
-			particle.y -= 0.1; // gravity
-	}
-	this->update_buffer();
-}
-
-void	Water::update_buffer()
-{
-	glBindVertexArray(this->glitem.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, this->glitem.vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->particles.size() * sizeof(glm::vec3),
-			this->particles.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->glitem.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3),
-			this->indices.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
-	glBindVertexArray(0);
-}
 
 Water	instance_water(void)
 {
 	Water w;
 
-	w.n_particles = 1;
-	w.particles.emplace_back(10, hf_sl, 0);
-	w.indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7},
-									   {6, 7, 8}, {7, 8, 9}, {8, 9, 10}, {9, 10, 11}, {10, 11, 12},
-									   {11, 12, 13}, {12, 13, 14}, {13, 14, 15}, {14, 15, 16}, {15, 16, 17},
-									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
-	w.glitem.model = glm::mat4(1.0f);
-	w.glitem.idx_num = w.indices.size() * 3;
-	w.glitem.shader_program = compile_shaders("cpp_playground/src/shaders/water_vertex.glsl",
+//	w.n_particles = 1;
+//	w.particles.emplace_back(10, hf_sl, 0);
+//	w.indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7},
+//									   {6, 7, 8}, {7, 8, 9}, {8, 9, 10}, {9, 10, 11}, {10, 11, 12},
+//									   {11, 12, 13}, {12, 13, 14}, {13, 14, 15}, {14, 15, 16}, {15, 16, 17},
+//									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
+	w.model = glm::mat4(1.0f);
+	w.idx_num = w.indices.size() * 3;
+	w.shader_program = compile_shaders("cpp_playground/src/shaders/water_vertex.glsl",
 			"cpp_playground/src/shaders/water_fragment.glsl");
-	w.glitem.fill_uniforms = [&](const glm::mat4 &vp) {
-        auto mvp_id = glGetUniformLocation(w.glitem.shader_program, "MVP");
-        auto mvp = vp * w.glitem.model;
+	w.fill_uniforms = [&](const glm::mat4 &vp) {
+        auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
+        auto mvp = vp * w.model;
         glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     };
 
-	glGenBuffers(1, &w.glitem.vbo);
-	glGenBuffers(1, &w.glitem.ibo);
-	glGenVertexArrays(1, &w.glitem.vao);
-	glBindVertexArray(w.glitem.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, w.glitem.vbo);
+	glGenBuffers(1, &w.vbo);
+	glGenBuffers(1, &w.ibo);
+	glGenVertexArrays(1, &w.vao);
+	glBindVertexArray(w.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
 	glBufferData(GL_ARRAY_BUFFER, w.particles.size() * sizeof(glm::vec3), w.particles.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, w.glitem.ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, w.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, w.indices.size() * sizeof(glm::ivec3), w.indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
@@ -89,7 +52,7 @@ Water	instance_water(void)
 
 void draw(GLItem item, const glm::mat4 &vp, GLenum type);
 
-void	process_input(GLCamera &camera, HeightMap &map, GLItem &points, Water &water, bool *quit)
+void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, bool *quit)
 {
 	auto keystate = SDL_GetKeyboardState(NULL);
 
@@ -103,25 +66,25 @@ void	process_input(GLCamera &camera, HeightMap &map, GLItem &points, Water &wate
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		water.glitem.model = glm::rotate(water.glitem.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	else if (keystate[SDL_SCANCODE_Q])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		water.glitem.model = glm::rotate(water.glitem.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	else if (keystate[SDL_SCANCODE_UP])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		water.glitem.model = glm::rotate(water.glitem.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 	else if (keystate[SDL_SCANCODE_DOWN])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		water.glitem.model = glm::rotate(water.glitem.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 
@@ -145,9 +108,10 @@ int main(int ac, char *av[]) {
 	prepare_control_points(controlPointsArray);
 	auto core = sdl_gl_init();
 
-	auto map = generate_map(controlPointsArray);
-	auto points = generate_control_points(controlPointsArray);
 	auto water = instance_water();
+
+	auto map = generate_map(controlPointsArray, water);
+	auto points = generate_control_points(controlPointsArray);
 
 	auto camera = GLCamera();
 	glPointSize(3);
@@ -169,7 +133,7 @@ int main(int ac, char *av[]) {
 		camera.frameStart();
 		draw(map, camera.vp(), GL_TRIANGLES);
 		draw(points, camera.vp(), GL_POINTS);
-		draw(water.glitem, camera.vp(), GL_POINTS);
+		draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
 		SDL_GL_SwapWindow(core.win);
@@ -184,7 +148,13 @@ void draw(GLItem item, const glm::mat4 &vp, GLenum type)
 	glUseProgram(item.shader_program);
 	item.fill_uniforms(vp);
 	glBindVertexArray(item.vao);
-	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
-	glDrawElements(type, item.idx_num, GL_UNSIGNED_INT, NULL);
+	if (type == GL_POINTS)
+	{
+		glDrawArrays(GL_POINTS, 0, item.idx_num);
+	} else
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
+		glDrawElements(type, item.idx_num, GL_UNSIGNED_INT, NULL);
+	}
 	glBindVertexArray(0);
 }
