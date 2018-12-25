@@ -137,7 +137,9 @@ GLItem generate_map(std::vector<glm::vec3> control_points, Water &water)
 			for (size_t k = 0; k < sl; k++)
 			{
 				float v = (float)k - (int)hf_sl;
-				water.hmap.emplace_back(i * sl * sl + j * sl + k, v <= point.y, 0.0f);
+				water.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl,
+												  (float)j - (int)hf_sl,
+												  (float)k - (int)hf_sl), v <= point.y, 0.0f);
 			}
 		}
 	}
@@ -188,10 +190,6 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 		auto mvp = vp * points_item.model;
 		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
 	};
-	std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7},
-									   {6, 7, 8}, {7, 8, 9}, {8, 9, 10}, {9, 10, 11}, {10, 11, 12},
-									   {11, 12, 13}, {12, 13, 14}, {13, 14, 15}, {14, 15, 16}, {15, 16, 17},
-									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
 	glGenBuffers(1, &points_item.vbo);
 	glGenBuffers(1, &points_item.ibo);
 	glGenVertexArrays(1, &points_item.vao);
@@ -199,8 +197,6 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 	glBindVertexArray(points_item.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, points_item.vbo);
 	glBufferData(GL_ARRAY_BUFFER, control_points.size() * sizeof(glm::vec3), control_points.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid *)0);
 	glBindVertexArray(0);

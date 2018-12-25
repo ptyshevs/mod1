@@ -22,8 +22,8 @@ void	Water::show_hmap()
 			{
 				Cell c= this->address(i, j, k);
 
-				std::cout << "id: " << c.id;
-				std::cout << " 3D coords: [" << i << " " << j << " " << k << "] ";
+				std::cout << " 3D coords: [" << glm::to_string(c.pos);
+				std::cout << "]: " << c.volume;
 				std::cout << " is_solid: " << c.is_solid << std::endl;
 			}
 		}
@@ -63,12 +63,13 @@ void	Water::update_buffer()
 {
 	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->particles.size() * sizeof(glm::vec3),
-			this->particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->hmap.size() * sizeof(Cell),
+			this->hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3),
 			this->indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
 	glBindVertexArray(0);
 }

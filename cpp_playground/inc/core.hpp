@@ -86,11 +86,11 @@ struct CLCore {
 
 struct Cell
 {
-	int		id;
-	bool	is_solid;
-	float	volume;
+	glm::vec3	pos;
+	bool		is_solid;
+	float		volume;
 public:
-	Cell(int id, bool is_solid, float volume) : id(id), is_solid(is_solid), volume(volume) {};
+	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
 };
 
 

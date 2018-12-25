@@ -41,11 +41,11 @@ Water	instance_water(void)
 	glGenVertexArrays(1, &w.vao);
 	glBindVertexArray(w.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
-	glBufferData(GL_ARRAY_BUFFER, w.particles.size() * sizeof(glm::vec3), w.particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, w.hmap.size() * sizeof(Cell), w.hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, w.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, w.indices.size() * sizeof(glm::ivec3), w.indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
 	glBindVertexArray(0);
 	return (w);
 }
