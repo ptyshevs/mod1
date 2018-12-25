@@ -84,6 +84,7 @@ struct CLCore {
     cl_kernel           kernel;
 };
 
+<<<<<<< HEAD
 struct Cell
 {
 	int		id;
@@ -117,6 +118,14 @@ GLItem	generate_map(std::vector<glm::vec3> control_points, Water &water);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
+=======
+typedef struct  s_constants {
+    cl_int      map_size;
+    cl_int      cp_size;
+}               t_constants;
+
+GLItem generate_map(std::vector<glm::vec3> control_points);
+>>>>>>> ~ opencl stuff for ground done
 
 // cl_init.cpp
 
