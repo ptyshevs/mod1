@@ -12,8 +12,8 @@
 
 #include <core.hpp>
 
-static const size_t sl = 100;
-static const size_t hf_sl = sl / 2;
+//static const size_t sl = 400;
+//static const size_t hf_sl = sl / 2;
 
 /*
 ** Generate map here
@@ -28,7 +28,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 
      for (size_t i = 0; i < sl - 1; i++) {
          for (size_t j = 0; j < sl - 1; j++) {
-             int p = i * sl +j;
+             int p = i * (int)sl + j;
              indexes.emplace_back(p, p+1, p+sl);
              indexes.emplace_back(p+sl, p+1, p+sl+1);
          }
@@ -36,6 +36,13 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 //     indexes.emplace_back(0, 1, 2);
     return indexes;
 }
+
+//std::vector<glm::ivec3> cp_indices(void)
+//{
+//	std::vector<glm::ivec3>	ind;
+//
+//	ind.reserve()
+//}
 
 /*
 ** Setup opencl
@@ -125,8 +132,8 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
     for (size_t i = 0; i < sl; i++) {
         for (size_t j = 0; j < sl; j++) {
             auto &point = map[i * sl + j];
-            point.x = (float)i - hf_sl;
-            point.z = (float)j - hf_sl;
+            point.x = (float)i - (int)hf_sl;
+            point.z = (float)j - (int)hf_sl;
             point.y = idw(control_points, point);
         }
     }
@@ -179,7 +186,10 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
         auto mvp = vp * points_item.model;
         glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     };
-    std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7}};
+    std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7},
+									   {6, 7, 8}, {7, 8, 9}, {8, 9, 10}, {9, 10, 11}, {10, 11, 12},
+									   {11, 12, 13}, {12, 13, 14}, {13, 14, 15}, {14, 15, 16}, {15, 16, 17},
+									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
     glGenBuffers(1, &points_item.vbo);
     glGenBuffers(1, &points_item.ibo);
     glGenVertexArrays(1, &points_item.vao);

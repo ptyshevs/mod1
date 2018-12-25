@@ -6,16 +6,13 @@
 /*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:40:21 by vpopovyc          #+#    #+#             */
-/*   Updated: 2018/12/24 21:11:32 by ptyshevs         ###   ########.fr       */
+/*   Updated: 2018/12/25 13:20:21 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <core.hpp>
 #include <camera.hpp>
 #include "limits.h"
-
-static const size_t sl = 100;
-static const size_t hf_sl = sl / 2;
 
 void draw(GLItem item, const glm::mat4 &vp, GLenum type);
 
@@ -26,9 +23,9 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, bool *quit)
 	if (keystate[SDL_SCANCODE_ESCAPE])
 		*quit = true;
 	else if (keystate[SDL_SCANCODE_W])
-		camera.pos += camera.speed * camera.dir;
+		camera.pos += 0.1 * camera.speed * camera.dir;
 	else if (keystate[SDL_SCANCODE_S])
-		camera.pos -= camera.speed * camera.dir;
+		camera.pos -= 0.1 * camera.speed * camera.dir;
 	else if (keystate[SDL_SCANCODE_E])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -39,79 +36,18 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, bool *quit)
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-}
-
-void rescale(std::vector<glm::vec3> &cpoints)
-{
-	float x_max, y_max, z_max;
-
-	x_max = INT_MIN;
-	y_max = INT_MIN;
-	z_max = INT_MIN;
-
-	for (glm::vec3 cpoint: cpoints)
+	else if (keystate[SDL_SCANCODE_UP])
 	{
-		if (cpoint.x > x_max)
-			x_max = cpoint.x;
-		if (cpoint.y > y_max)
-			y_max = cpoint.y;
-		if (cpoint.z > z_max)
-			z_max = cpoint.z;
+		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	for (int i = 0; i < cpoints.size(); ++i)
+	else if (keystate[SDL_SCANCODE_DOWN])
 	{
-		auto &point = cpoints[i];
-		point.x /= x_max;
-		point.y /= y_max;
-		point.z /= z_max;
+		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 
-/*
- * Change x and z, leaving y unchanged
- */
-void center(std::vector<glm::vec3> &cpoints)
-{
-	if (cpoints.size() == 1)
-		return ;
-	for (glm::vec3 &cp: cpoints)
-	{
-		cp.x += 0.5f;
-		cp.z += 0.5f;
-	}
-}
-
-void scale_back(std::vector<glm::vec3> &cpoints)
-{
-	if (cpoints.size() == 1)
-		return ;
-	for (glm::vec3 &cp: cpoints)
-	{
-		cp *= sl;
-		cp -= hf_sl;
-	}
-}
-
-
-void	show_points(std::vector<glm::vec3> &cpoints)
-{
-	std::cout << "Control points:" << std::endl;
-	for (glm::vec3 cp: cpoints)
-	{
-		std::cout << glm::to_string(cp) << std::endl;
-	}
-}
-
-void 	add_borders(std::vector<glm::vec3> &cpoints)
-{
-	for (int i = 0; i < sl; i++)
-	{
-		cpoints.emplace_back(i - (int)hf_sl, 0, 0);
-		cpoints.emplace_back(0, i - (int)hf_sl, 0);
-		cpoints.emplace_back((int)hf_sl, i - (int)hf_sl, 0);
-		cpoints.emplace_back(i - (int)hf_sl, (int)hf_sl, 0);
-	}
-}
 
 int main(int ac, char *av[]) {
 	bool quit = false;
@@ -128,23 +64,8 @@ int main(int ac, char *av[]) {
 			std::cout << e.what() << std::endl;
 			return (1);
 		}
-//	normalize_cp(controlPointsArray);
-// add borders
 
-	show_points(controlPointsArray);
-
-	rescale(controlPointsArray);
-	center(controlPointsArray);
-	scale_back(controlPointsArray);
-	std::cout << "After" << std::endl;
-	show_points(controlPointsArray);
-	std::cout << "After borders" << std::endl;
-	add_borders(controlPointsArray);
-//	controlPointsArray.emplace_back(50, 50, 50);
-//	controlPointsArray.emplace_back(50, 100, 50);
-//	controlPointsArray.emplace_back(50, 150, 50);
-//	add_borders(controlPointsArray);
-	show_points(controlPointsArray);
+	prepare_control_points(controlPointsArray);
 	auto core = sdl_gl_init();
 
 	auto map = generate_map(controlPointsArray);

@@ -16,6 +16,11 @@
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL
 
+// number of points per axis
+# define sl 200
+// half the number (used for centering in NDC
+# define hf_sl 100
+
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
 #include <glm/glm.hpp>
@@ -81,6 +86,7 @@ struct CLCore {
 
 GLItem generate_map(std::vector<glm::vec3> control_points);
 GLItem generate_control_points(std::vector<glm::vec3> control_points);
+void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
 
 // cl_init.cpp
