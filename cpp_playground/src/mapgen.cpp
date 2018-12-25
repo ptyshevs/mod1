@@ -12,6 +12,9 @@
 
 #include <core.hpp>
 
+//static const size_t sl = 400;
+//static const size_t hf_sl = sl / 2;
+
 /*
 ** Generate map here
 ** It should be a function that return continuous array of block pos 400x400x1
@@ -33,6 +36,13 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 	return indexes;
 }
 
+//std::vector<glm::ivec3> cp_indices(void)
+//{
+//	std::vector<glm::ivec3>	ind;
+//
+//	ind.reserve()
+//}
+
 /*
 ** Setup opencl
 ** Clamp controll points values on map dimensions -> todo
@@ -44,7 +54,7 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
     auto cl = CLCore();
 
     cl_host_part(cl);
-    cl_compile_kernel(cl, "src/kernels/idw_kernel.cl", "idw_kernel");
+    cl_compile_kernel(cl, "cpp_playground/src/kernels/idw_kernel.cl", "idw_kernel");
 
     int err = CL_SUCCESS;
 
@@ -102,7 +112,7 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
     clReleaseContext(cl.context);
 }
 
-GLItem generate_map(std::vector<glm::vec3> control_points) {
+GLItem generate_map(std::vector<glm::vec3> control_points, Water &water) {
     // Generate points
     // It should be done using OpenCL
     std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
@@ -111,6 +121,13 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
             auto &point = map[i * sl + j];
             point.x = (float)i - hf_sl;
             point.z = (float)j - hf_sl;
+			for (size_t k = 0; k < sl; k++)
+			{
+				float v = (float)k - (int)hf_sl;
+				water.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl,
+												  (float)j - (int)hf_sl,
+												  (float)k - (int)hf_sl), v <= point.y, 0.0f); // fix here to use interpolated y
+			}
         }
     }
 
@@ -125,8 +142,8 @@ GLItem generate_map(std::vector<glm::vec3> control_points) {
 
 	map_item.model = glm::mat4(1.0f);
 	map_item.idx_num = map_render_indices.size() * 3;
-	map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
-												 "src/shaders/ground_fragment.glsl");
+	map_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
+												 "cpp_playground/src/shaders/ground_fragment.glsl");
 	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
 		auto mvp = vp * map_item.model;
@@ -152,17 +169,13 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 
 	points_item.model = glm::mat4(1.0f);
 	points_item.idx_num = control_points.size() * 3;
-	points_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
-												 "src/shaders/ground_fragment.glsl");
+	points_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
+												 "cpp_playground/src/shaders/ground_fragment.glsl");
 	points_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(points_item.shader_program, "MVP");
 		auto mvp = vp * points_item.model;
 		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
 	};
-	std::vector<glm::ivec3> indices = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}, {4, 5, 6}, {5, 6, 7},
-									   {6, 7, 8}, {7, 8, 9}, {8, 9, 10}, {9, 10, 11}, {10, 11, 12},
-									   {11, 12, 13}, {12, 13, 14}, {13, 14, 15}, {14, 15, 16}, {15, 16, 17},
-									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
 	glGenBuffers(1, &points_item.vbo);
 	glGenBuffers(1, &points_item.ibo);
 	glGenVertexArrays(1, &points_item.vao);
@@ -170,8 +183,6 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 	glBindVertexArray(points_item.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, points_item.vbo);
 	glBufferData(GL_ARRAY_BUFFER, control_points.size() * sizeof(glm::vec3), control_points.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, points_item.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(glm::ivec3), indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid *)0);
 	glBindVertexArray(0);

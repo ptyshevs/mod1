@@ -28,8 +28,8 @@ Water	instance_water(void)
 //									   {16, 17, 18}, {17, 18, 19}, {18, 19, 20}, {19, 20, 21}};
 	w.model = glm::mat4(1.0f);
 	w.idx_num = w.indices.size() * 3;
-	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
-			"src/shaders/water_fragment.glsl");
+	w.shader_program = compile_shaders("cpp_playground/src/shaders/water_vertex.glsl",
+			"cpp_playground/src/shaders/water_fragment.glsl");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
         auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
         auto mvp = vp * w.model;
@@ -41,11 +41,11 @@ Water	instance_water(void)
 	glGenVertexArrays(1, &w.vao);
 	glBindVertexArray(w.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
-	glBufferData(GL_ARRAY_BUFFER, w.particles.size() * sizeof(glm::vec3), w.particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, w.hmap.size() * sizeof(Cell), w.hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, w.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, w.indices.size() * sizeof(glm::ivec3), w.indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
 	glBindVertexArray(0);
 	return (w);
 }
@@ -110,7 +110,7 @@ int main(int ac, char *av[]) {
 
 	auto water = instance_water();
 
-	auto map = generate_map(controlPointsArray);
+	auto map = generate_map(controlPointsArray, water);
 	auto points = generate_control_points(controlPointsArray);
 
 	auto camera = GLCamera();

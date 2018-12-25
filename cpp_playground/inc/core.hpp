@@ -86,11 +86,11 @@ struct CLCore {
 
 struct Cell
 {
-	int		id;
-	bool	is_solid;
-	float	volume;
+	glm::vec3	pos;
+	bool		is_solid;
+	float		volume;
 public:
-	Cell(int id, bool is_solid, float volume) : id(id), is_solid(is_solid), volume(volume) {};
+	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
 };
 
 struct Water: GLItem
@@ -112,7 +112,7 @@ private:
 };
 
 
-GLItem	generate_map(std::vector<glm::vec3> control_points);
+GLItem	generate_map(std::vector<glm::vec3> control_points, Water &water);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
