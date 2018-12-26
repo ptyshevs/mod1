@@ -1,7 +1,7 @@
 #version 410 core
 
 in vec4 pos;
-//in bool is_solid;
+//in int is_solid;
 in float volume;
 
 out vec4 color;
@@ -17,7 +17,7 @@ vec3 checker(in float u, in float v)
 void main() {
 //     float u = (pos.x + 200.0f) / 400.0f;
 //     float v = (pos.z + 200.0f) / 400.0f;
-	if (volume == 0.0f)
+	if (volume < 0.5f)
 	{
 	color = vec4(1.0f, 0.0f, 0.0f, 0.2f);
 	}

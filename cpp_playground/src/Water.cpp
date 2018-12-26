@@ -43,9 +43,11 @@ Cell	&Water::address(int x, int y, int z)
 
 void	Water::add_volume(int x, int y, int z, float volume)
 {
-	Cell &c = this->address(x, y, z);
-	if (c.is_solid)
-		return ;
+	Cell &c = this->address(x, z, y);
+//	if (c.is_solid)
+//	{
+//		return ;
+//	}
 	c.volume += volume;
 }
 
@@ -63,19 +65,16 @@ void	Water::update_buffer()
 {
 	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->hmap.size() * sizeof(Cell),
-			this->hmap.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->hmap.size() * sizeof(Cell), this->hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3),
-			this->indices.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3), this->indices.data(), GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
-//	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
+	glVertexAttribPointer(1, 1, GL_INT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(int)));
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 }

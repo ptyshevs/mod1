@@ -17,9 +17,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 // number of points per axis
-# define sl 100
+# define sl 10
 // half the number (used for centering in NDC
-# define hf_sl 50
+# define hf_sl 5
 
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
@@ -87,7 +87,7 @@ struct CLCore {
 struct Cell
 {
 	glm::vec3	pos;
-	bool		is_solid;
+	int			is_solid;
 	float		volume;
 public:
 	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
@@ -95,6 +95,7 @@ public:
 
 struct Water: GLItem
 {
+	GLuint	vbo2;
 public:
 	std::vector<Cell>		hmap;
 	std::vector<glm::ivec3>	particles;
@@ -102,13 +103,14 @@ public:
 	int		mode; // rain, wave of underground
 
 	void	update_particles();
-private:
-	void	update_buffer();
-
 	Cell	&address(int x, int y, int z);
 	glm::vec3 to_coords(int x, int y, int z);
 	void	show_hmap(void);
 	void	add_volume(int x, int y, int z, float volume);
+private:
+	void	update_buffer();
+
+
 };
 
 

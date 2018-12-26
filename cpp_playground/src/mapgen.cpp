@@ -54,7 +54,7 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
     auto cl = CLCore();
 
     cl_host_part(cl);
-    cl_compile_kernel(cl, "cpp_playground/src/kernels/idw_kernel.cl", "idw_kernel");
+    cl_compile_kernel(cl, "src/kernels/idw_kernel.cl", "idw_kernel");
 
     int err = CL_SUCCESS;
 
@@ -142,8 +142,8 @@ GLItem generate_map(std::vector<glm::vec3> control_points, Water &water) {
 
 	map_item.model = glm::mat4(1.0f);
 	map_item.idx_num = map_render_indices.size() * 3;
-	map_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
-												 "cpp_playground/src/shaders/ground_fragment.glsl");
+	map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+												 "src/shaders/ground_fragment.glsl");
 	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
 		auto mvp = vp * map_item.model;
@@ -169,8 +169,8 @@ GLItem generate_control_points(std::vector<glm::vec3> control_points)
 
 	points_item.model = glm::mat4(1.0f);
 	points_item.idx_num = control_points.size() * 3;
-	points_item.shader_program = compile_shaders("cpp_playground/src/shaders/ground_vertex.glsl",
-												 "cpp_playground/src/shaders/ground_fragment.glsl");
+	points_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+												 "src/shaders/ground_fragment.glsl");
 	points_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(points_item.shader_program, "MVP");
 		auto mvp = vp * points_item.model;

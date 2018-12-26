@@ -1,7 +1,8 @@
 #version 410 core
 
 layout (location = 0) in vec3 position;
-layout (location = 1) in float in_volume;
+layout (location = 1) in int  is_solid;
+layout (location = 2) in float in_volume;
 
 out vec4 pos;
 //out bool is_solid;
