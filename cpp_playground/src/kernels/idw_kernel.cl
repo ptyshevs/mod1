@@ -10,8 +10,6 @@ typedef struct {
 float inverse_distance_weighting(float3 a, float3 b, float s);
 /*
 */
-// float3 toFloat3(__global float *data, size_t offset);
-// float3 toFloat3(__global float * /* data */, size_t /* offset */);
 
 float inverse_distance_weighting(float3 a, float3 b, float s)
 {
@@ -20,8 +18,6 @@ float inverse_distance_weighting(float3 a, float3 b, float s)
     float sqsum = diff.x + diff.z;
     return 1 / (pow(sqsum, (1 + s)) + 0.0001f);
 }
-
-
 
 __kernel void idw_kernel(__global float *control_points,
                          __global float *read_map,

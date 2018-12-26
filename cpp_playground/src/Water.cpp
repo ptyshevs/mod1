@@ -53,28 +53,31 @@ void	Water::add_volume(int x, int y, int z, float volume)
 
 void	Water::update_particles()
 {
-	for (glm::ivec3 &particle: this->particles)
-	{
-		if (particle.y > -hf_sl)
-			particle.y -= 1; // gravity
-	}
-	this->update_buffer();
-}
+	// To be 1000% sure that GL is finished it's work
+	glFinish();
+	// Swap buffers
+	state = !state;
 
-void	Water::update_buffer()
-{
-	glBindVertexArray(this->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->hmap.size() * sizeof(Cell), this->hmap.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(glm::ivec3), this->indices.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
-	glVertexAttribPointer(1, 1, GL_INT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(int)));
+	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
+	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+	int err = 0;
+	err = clSetKernelArg(cl.kernel, state ? 0 : 1, sizeof(cl_vbo), &cl_vbo);
+	err = clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
+	if (err != CL_SUCCESS) {
+        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+        exit(1);
+    }
 
-	glBindVertexArray(0);
+    size_t  global_work_size = sl * sl * sl;
+    err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+        exit(1);
+    }
+
+	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
+	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
+
+    clFinish(cl.queue);
 }

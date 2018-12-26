@@ -17,9 +17,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 // number of points per axis
-# define sl 10
+# define sl 200
 // half the number (used for centering in NDC
-# define hf_sl 5
+# define hf_sl 100
 
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
@@ -63,6 +63,7 @@ struct GLItem {
     GLuint shader_program;
     glm::mat4 model;
     std::function<void (const glm::mat4 &vp)> fill_uniforms;
+	virtual ~GLItem() = default;
 };
 
 SDLCore	sdl_gl_init(void);
@@ -74,7 +75,10 @@ GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
 
 // mapgen.cpp
 
-#include "OpenCL/opencl.h"
+#include <OpenGL/OpenGL.h>
+#include <OpenCL/cl.h>
+#include <OpenCL/cl_gl.h>
+#include <OpenCL/cl_gl_ext.h>
 
 struct CLCore {
     cl_device_id        device;
@@ -82,6 +86,18 @@ struct CLCore {
     cl_command_queue    queue;
     cl_program          program;
     cl_kernel           kernel;
+};
+
+struct CLGLDoubleBufferedItem: GLItem {
+	// CL ctx, queue, kernel
+	CLCore cl;
+	// GL second vbo buffer
+	GLuint vbo2;
+	// CL shared vbo's
+	cl_mem cl_vbo;
+	cl_mem cl_vbo2;
+	// Determine buffer that be next
+	bool state = false;
 };
 
 struct Cell
@@ -93,9 +109,8 @@ public:
 	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
 };
 
-struct Water: GLItem
+struct Water: CLGLDoubleBufferedItem
 {
-	GLuint	vbo2;
 public:
 	std::vector<Cell>		hmap;
 	std::vector<glm::ivec3>	particles;
@@ -114,7 +129,7 @@ private:
 };
 
 
-GLItem	generate_map(std::vector<glm::vec3> control_points, Water &water);
+GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
@@ -123,7 +138,18 @@ typedef struct  s_constants {
     cl_int      cp_size;
 }               t_constants;
 
+/*
+** CL Interop
+*/
+typedef struct {
+    cl_float x;
+    cl_float y;
+    cl_float z;
+    cl_int is_solid;
+    cl_float in_volume;
+} t_cell;
+
 // cl_init.cpp
 
-void    cl_host_part(CLCore &cl_core);
+void     cl_host_part(CLCore &cl_core, bool wGLInterop = false);
 void    cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);

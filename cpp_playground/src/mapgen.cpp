@@ -12,9 +12,6 @@
 
 #include <core.hpp>
 
-//static const size_t sl = 400;
-//static const size_t hf_sl = sl / 2;
-
 /*
 ** Generate map here
 ** It should be a function that return continuous array of block pos 400x400x1
@@ -35,13 +32,6 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 	}
 	return indexes;
 }
-
-//std::vector<glm::ivec3> cp_indices(void)
-//{
-//	std::vector<glm::ivec3>	ind;
-//
-//	ind.reserve()
-//}
 
 /*
 ** Setup opencl
@@ -112,7 +102,7 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
     clReleaseContext(cl.context);
 }
 
-GLItem generate_map(std::vector<glm::vec3> control_points, Water &water) {
+GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap) {
     // Generate points
     // It should be done using OpenCL
     std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
@@ -124,9 +114,9 @@ GLItem generate_map(std::vector<glm::vec3> control_points, Water &water) {
 			for (size_t k = 0; k < sl; k++)
 			{
 				float v = (float)k - (int)hf_sl;
-				water.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl,
-												  (float)j - (int)hf_sl,
-												  (float)k - (int)hf_sl), v <= point.y, 0.0f); // fix here to use interpolated y
+				hmap.emplace_back(glm::vec3((float)i - (int)hf_sl,
+										    (float)j - (int)hf_sl,
+											(float)k - (int)hf_sl), v <= point.y, 0.0f); // fix here to use interpolated y
 			}
         }
     }

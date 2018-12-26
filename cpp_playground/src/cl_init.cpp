@@ -17,27 +17,41 @@
 ** queue with selected context to specific device
 */
 
-void     cl_host_part(CLCore &cl_core)
+void     cl_host_part(CLCore &cl_core, bool wGLInterop)
 {
     int err;  
     // Get platform and device to use
     err = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &(cl_core.device), NULL);
     if (err != CL_SUCCESS)
     {
-        write(1, "error code 1\n", 13);
+        std::cout << "Error: line " << __LINE__ << ": no valid GPU's found.\n";
         exit(1);
     }
+
+    // Shared context for OpenGl-OpenCL interop
+    CGLContextObj glContext = CGLGetCurrentContext();
+    CGLShareGroupObj shareGroup = CGLGetShareGroup(glContext);
+
+    cl_context_properties properties[] = {
+        CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
+        (cl_context_properties)shareGroup,
+        0
+    };
+
     // Create context
-    cl_core.context = clCreateContext(0, 1, &cl_core.device, NULL, NULL, &err);
+    if (wGLInterop)
+        cl_core.context = clCreateContext(properties, 1, &cl_core.device, NULL, NULL, &err);
+    else
+        cl_core.context = clCreateContext(0, 1, &cl_core.device, NULL, NULL, &err);
     if (!cl_core.context || err != CL_SUCCESS)
     {
-        write(1, "error code 2\n", 13);
+        std::cout << "Error: line " << __LINE__ << ": failed to create context.\n";
         exit(1);
     }
     // Create command queue
     cl_core.queue = clCreateCommandQueue(cl_core.context, cl_core.device, 0, &err);
     if (!cl_core.queue || err != CL_SUCCESS) {
-        write(1, "error code 3\n", 13);
+        std::cout << "Error: line " << __LINE__ << ": failed to create command queue.\n";
         exit(1);
     }
 }
