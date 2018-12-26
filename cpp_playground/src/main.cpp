@@ -121,6 +121,28 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 	}
 }
 
+int		to1D(int x, int y, int z)
+{
+	x = x + hf_sl;
+//	y = y;
+	z = z + hf_sl;
+	int v = (sl * (sl / 4) * x) + sl * y + z;
+	std::cout << "1d offset: " << v << std::endl;
+	return (v);
+}
+
+glm::vec3		to3D(int n)
+{
+	int x = n / (sl * (sl / 4)) - hf_sl;
+//	int x = n % (sl * sl);
+	n -= (x + hf_sl) * (sl * (sl / 4));
+	int y = n / (sl);
+	int z = n % (sl) - hf_sl;
+	glm::vec3 f(x, y, z);
+	std::cout << "3d coords: " << glm::to_string(f) << std::endl;
+	return (f);
+}
+
 
 int main(int ac, char *av[]) {
 	bool quit = false;
@@ -142,11 +164,18 @@ int main(int ac, char *av[]) {
 	auto core = sdl_gl_init();
 
 	std::vector<Cell> hmap;
-	hmap.reserve(sizeof(Cell) * sl * sl * sl);
-
+	hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
 	auto map = generate_map(controlPointsArray, hmap);
 
 	hmap.shrink_to_fit();
+
+
+	int offset = to1D(0, hf_sl / 2 - 15, 0);
+	hmap[offset].volume += 1;
+	to3D(offset);
+	hmap[to1D(-hf_sl, 1, -hf_sl)].volume += 1;
+	hmap[to1D(-hf_sl, 1, -hf_sl + 1)].volume += 1;
+	hmap[to1D(-hf_sl, 1, -hf_sl + 2)].volume += 1;
 
 	auto water = instance_water(hmap);
 
@@ -154,7 +183,7 @@ int main(int ac, char *av[]) {
 
 	auto camera = GLCamera();
 
-	// glPointSize(3);
+	 glPointSize(3);
 	while(!quit)
 	{
 		// Event handle

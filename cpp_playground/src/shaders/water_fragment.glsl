@@ -15,5 +15,8 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-	color = vec4(0.0, 0.0, volume, 1.0f);
+	if (volume < 0.0001f)
+		discard ;
+	else
+		color = vec4(0.0, 0.0, volume, 1.0f);
 }
