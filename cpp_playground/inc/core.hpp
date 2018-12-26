@@ -17,9 +17,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 // number of points per axis
-# define sl 400
+# define sl 100
 // half the number (used for centering in NDC
-# define hf_sl 200
+# define hf_sl 50
 
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
@@ -96,9 +96,9 @@ public:
 struct Water: GLItem
 {
 public:
-	std::vector<Cell> hmap;
-	std::vector<glm::ivec3> particles;
-	std::vector<glm::vec3> indices;
+	std::vector<Cell>		hmap;
+	std::vector<glm::ivec3>	particles;
+	std::vector<glm::vec3>	indices;
 	int		mode; // rain, wave of underground
 
 	void	update_particles();

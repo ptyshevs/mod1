@@ -71,5 +71,11 @@ void	Water::update_buffer()
 	glEnableVertexAttribArray(0);
 //	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), 0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
+//	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
 	glBindVertexArray(0);
 }

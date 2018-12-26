@@ -44,8 +44,14 @@ Water	instance_water(void)
 	glBufferData(GL_ARRAY_BUFFER, w.hmap.size() * sizeof(Cell), w.hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, w.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, w.indices.size() * sizeof(glm::ivec3), w.indices.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
+//	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(bool)));
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+//	glEnableVertexAttribArray(2);
+
 	glBindVertexArray(0);
 	return (w);
 }
@@ -86,6 +92,18 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
+	else if (keystate[SDL_SCANCODE_LEFT])
+	{
+		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+	}
+	else if (keystate[SDL_SCANCODE_RIGHT])
+	{
+		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+	}
 }
 
 
@@ -111,6 +129,7 @@ int main(int ac, char *av[]) {
 	auto water = instance_water();
 
 	auto map = generate_map(controlPointsArray, water);
+	water.idx_num = water.hmap.size();
 	auto points = generate_control_points(controlPointsArray);
 
 	auto camera = GLCamera();
@@ -124,7 +143,7 @@ int main(int ac, char *av[]) {
 			quit = true;
 
 		// Simulation step
-		// water.update_particles();
+		water.update_particles();
 
 		// Actual render
 
@@ -133,7 +152,7 @@ int main(int ac, char *av[]) {
 		camera.frameStart();
 		draw(map, camera.vp(), GL_TRIANGLES);
 		draw(points, camera.vp(), GL_POINTS);
-		// draw(water, camera.vp(), GL_POINTS);
+		draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
 		SDL_GL_SwapWindow(core.win);
