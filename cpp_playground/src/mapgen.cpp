@@ -111,13 +111,6 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
             auto &point = map[i * sl + j];
             point.x = (float)i - hf_sl;
             point.z = (float)j - hf_sl;
-			for (size_t k = 0; k < sl; k++)
-			{
-				float v = (float)k - (int)hf_sl;
-				hmap.emplace_back(glm::vec3((float)i - (int)hf_sl,
-										    (float)j - (int)hf_sl,
-											(float)k - (int)hf_sl), v <= point.y, 0.0f); // fix here to use interpolated y
-			}
         }
     }
 
@@ -127,6 +120,21 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
     // Interpolate stuff
     interpolate_using_controll_points(control_points, map);
 
+    // Remap interpolated map on height map
+    for (size_t i = 0; i < sl; i++)
+    {
+        for (size_t j = hf_sl; j < hf_sl/2 + hf_sl; j++)
+        {
+            for (size_t k = 0; k < sl; k++)
+            {
+                auto &point = map[i * sl + k];
+                float v = (float)j - (int)hf_sl;
+                hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j - (int)hf_sl, (float)k - (int)hf_sl),
+                                  v <= point.y,
+                                  0.0f);
+            }
+        }
+    }
     // Create object suitable for rendering
     GLItem map_item;
 

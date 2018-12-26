@@ -146,13 +146,15 @@ int main(int ac, char *av[]) {
 
 	auto map = generate_map(controlPointsArray, hmap);
 
+	hmap.shrink_to_fit();
+
 	auto water = instance_water(hmap);
 
 	auto points = generate_control_points(controlPointsArray);
 
 	auto camera = GLCamera();
 
-	glPointSize(3);
+	// glPointSize(3);
 	while(!quit)
 	{
 		// Event handle

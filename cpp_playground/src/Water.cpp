@@ -51,6 +51,8 @@ void	Water::add_volume(int x, int y, int z, float volume)
 	c.volume += volume;
 }
 
+static const size_t  global_work_size = (sl * hf_sl/2 * sl);
+
 void	Water::update_particles()
 {
 	// To be 1000% sure that GL is finished it's work
@@ -69,7 +71,6 @@ void	Water::update_particles()
         exit(1);
     }
 
-    size_t  global_work_size = sl * sl * sl;
     err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
     if (err != CL_SUCCESS) {
         std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";

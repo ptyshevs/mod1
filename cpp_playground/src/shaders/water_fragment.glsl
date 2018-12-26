@@ -15,8 +15,5 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-	if (pos.y < 0.0f || pos.y > 20.0f) {
-		discard;
-	}
 	color = vec4(0.0, 0.0, volume, 1.0f);
 }
