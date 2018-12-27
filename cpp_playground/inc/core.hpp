@@ -109,27 +109,36 @@ public:
 	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
 };
 
+#define EMITER_RAIN 1
+#define EMITER_WAVE 2
+#define EMITER_UNDERGROUND 4
+
+struct Emiter: CLCore {
+	void	emit(cl_mem &cl_vbo);
+	void 	prepare_emit(CLCore &core);
+	int		type; // rain, wave of underground
+	int 	pps; // particles per second
+	cl_mem  cl_emiter;
+};
+
 struct Water: CLGLDoubleBufferedItem
 {
 public:
 	std::vector<Cell>		hmap;
 	std::vector<glm::ivec3>	particles;
 	std::vector<glm::vec3>	indices;
-	int		mode; // rain, wave of underground
+
+	Emiter emiter;
 
 	void	update_particles();
 	Cell	&address(int x, int y, int z);
 	glm::vec3 to_coords(int x, int y, int z);
 	void	show_hmap(void);
 	void	add_volume(int x, int y, int z, float volume);
-private:
-	void	update_buffer();
-
-
+	void	emit(void);
 };
 
-
-GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
+GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 
@@ -148,6 +157,12 @@ typedef struct {
     cl_int is_solid;
     cl_float in_volume;
 } t_cell;
+
+typedef struct {
+    cl_int type;
+    cl_uint pps;
+	cl_uint seed;
+} t_emiter;
 
 // cl_init.cpp
 

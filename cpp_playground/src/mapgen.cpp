@@ -120,7 +120,7 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
     // Interpolate stuff
     interpolate_using_controll_points(control_points, map);
 
-    // Remap interpolated map on height map
+    // Remap interpolated map on height
     for (size_t i = 0; i < sl; i++)
     {
         for (size_t j = hf_sl; j < hf_sl/2 + hf_sl; j++)

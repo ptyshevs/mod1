@@ -54,7 +54,8 @@ LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC)
 EXEC = mod1
 
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp sdl_gl_init.cpp \
-				compileshaders.cpp cl_init.cpp control_points.cpp Water.cpp
+				compileshaders.cpp cl_init.cpp control_points.cpp Water.cpp \
+				Emiter.cpp
 
 SRC = $(addprefix src/, $(SRCFILENAME))
 

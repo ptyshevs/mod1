@@ -51,6 +51,15 @@ void	Water::add_volume(int x, int y, int z, float volume)
 	c.volume += volume;
 }
 
+void 	Water::emit(void) {
+	static uint last_emit_time = SDL_GetTicks();
+
+	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emiter.pps)) {
+		emiter.emit(state ? cl_vbo : cl_vbo2);
+		last_emit_time = SDL_GetTicks();
+	}
+}
+
 static const size_t  global_work_size = (sl * hf_sl/2 * sl);
 
 void	Water::update_particles()
@@ -62,10 +71,13 @@ void	Water::update_particles()
 
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
+	
+	// Emit some water
+	emit();
 
 	int err = 0;
 	err = clSetKernelArg(cl.kernel, state ? 0 : 1, sizeof(cl_vbo), &cl_vbo);
-	err = clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
+	err |= clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
 	if (err != CL_SUCCESS) {
         std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
         exit(1);

@@ -24,7 +24,6 @@ Water	instance_water(std::vector<Cell> &hmap)
     cl_host_part(cl, true);
     cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
 
-
 	w.hmap = hmap;
 	w.idx_num = sl * sl * sl;
 	w.model = glm::mat4(1.0f);
@@ -42,7 +41,7 @@ Water	instance_water(std::vector<Cell> &hmap)
 
 	glBindVertexArray(w.vao);
 
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(0); 
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
@@ -70,6 +69,11 @@ Water	instance_water(std::vector<Cell> &hmap)
     }
 	w.cl = cl;
 
+	auto emiter = Emiter();
+	emiter.prepare_emit(cl);
+
+	w.emiter = emiter;
+
 	return (w);
 }
 
@@ -79,41 +83,41 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 
 	if (keystate[SDL_SCANCODE_ESCAPE])
 		*quit = true;
-	else if (keystate[SDL_SCANCODE_W])
+	if (keystate[SDL_SCANCODE_W])
 		camera.pos += 0.1 * camera.speed * camera.dir;
-	else if (keystate[SDL_SCANCODE_S])
+	if (keystate[SDL_SCANCODE_S])
 		camera.pos -= 0.1 * camera.speed * camera.dir;
-	else if (keystate[SDL_SCANCODE_E])
+	if (keystate[SDL_SCANCODE_E])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_Q])
+	if (keystate[SDL_SCANCODE_Q])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_UP])
+	if (keystate[SDL_SCANCODE_UP])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_DOWN])
+	if (keystate[SDL_SCANCODE_DOWN])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_LEFT])
+	if (keystate[SDL_SCANCODE_LEFT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-	else if (keystate[SDL_SCANCODE_RIGHT])
+	if (keystate[SDL_SCANCODE_RIGHT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -154,7 +158,7 @@ int main(int ac, char *av[]) {
 
 	auto camera = GLCamera();
 
-	// glPointSize(3);
+	glPointSize(3);
 	while(!quit)
 	{
 		// Event handle
@@ -165,7 +169,7 @@ int main(int ac, char *av[]) {
 
 		// Simulation step
 		water.update_particles();
-
+		
 		// Actual render
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

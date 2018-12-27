@@ -20,5 +20,5 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
 
     const t_cell prev_cell = prev_state[offset];
 
-    next_state[offset].in_volume = prev_cell.in_volume + 0.005f;
+    next_state[offset].in_volume = prev_cell.in_volume;
 }
