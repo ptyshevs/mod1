@@ -111,14 +111,16 @@ int main(int ac, char *av[]) {
 
 
 	int offset = to1D(0, hf_sl / 2 - 15, 0);
-	hmap[offset].volume += 2;
+	hmap[offset].volume += 1;
 	hmap[to1D(1, hf_sl / 2 - 15, 0)].volume += 1;
 
-	to3D(offset);
-	hmap[to1D(-hf_sl, 1, -hf_sl)].volume += 1;
-	hmap[to1D(-hf_sl, 1, -hf_sl + 1)].volume += 1;
-	hmap[to1D(-hf_sl, 1, -hf_sl + 2)].volume += 1;
-
+//	to3D(offset);
+//	hmap[to1D(-hf_sl, 1, -hf_sl)].volume += 1;
+//	hmap[to1D(-hf_sl, 1, -hf_sl + 1)].volume += 1;
+//	hmap[to1D(-hf_sl, 1, -hf_sl + 2)].volume += 1;
+	hmap[to1D(0, 1, hf_sl - 1)].volume += 20;
+	hmap[to1D(1, 1, hf_sl - 1)].volume += 3;
+	hmap[to1D(2, 1, hf_sl - 1)].volume += 10;
 	auto water = instance_water(hmap);
 
 	auto points = generate_control_points(controlPointsArray);

@@ -1,8 +1,8 @@
 #define sl 200
 #define hf_sl 100
 #define eps 0.0001f
-#define VMAX 2.0f
-#define dt 0.99f
+#define VMAX 1.0f
+#define dt 0.3f
 
 /*
 */
@@ -39,7 +39,9 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
     float v_out = 0;
     if (cell.is_solid)
         return ;
-    if (cell.y > 0 && v > eps)
+    if (v > VMAX)
+        v_out += (v - VMAX) * dt;
+    if (cell.y > 0)
     {
         t_cell below = prev_state[to_address(cell.x, cell.y - 1.0f, cell.z)];
         if (!below.is_solid && below.V < VMAX)
@@ -47,19 +49,23 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
             // flow to below
             v_out += v * dt;
         }
+        if (!below.is_solid && below.V > VMAX)
+            v_in += (below.V - VMAX) * dt;
     }
-    if (cell.y < hf_sl / 2 && v <= VMAX)
+    if (cell.y < hf_sl / 2)
     {
         t_cell above = prev_state[to_address(cell.x, cell.y + 1.0f, cell.z)];
-        if (above.V > 0)
+        if (above.V > 0 && v < VMAX)
             v_in += above.V * dt;
         // if (above.V > 0)
         // {
         //     v_in += 1 * dt;
         // }
     }
+
     if (v_in > eps || v_out > eps)
     {
         next_state[offset].V = v + (v_in - v_out);
+        // next_state[offset].V = clamp(next_state[offset].V, 0.0f, VMAX);
     }
 }
