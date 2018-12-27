@@ -22,7 +22,7 @@ Water	instance_water(std::vector<Cell> &hmap)
 
 
 	w.hmap = hmap;
-	w.idx_num = sl * sl * sl;
+	w.idx_num = sl * sl * (sl / 4);
 	w.model = glm::mat4(1.0f);
 	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
 									   "src/shaders/water_fragment.glsl");
@@ -108,7 +108,7 @@ void	Water::add_volume(int x, int y, int z, float volume)
 	c.volume += volume;
 }
 
-static const size_t  global_work_size = (sl * hf_sl/2 * sl);
+static const size_t  global_work_size = (sl * (hf_sl / 2) * sl);
 
 void	Water::update_particles()
 {

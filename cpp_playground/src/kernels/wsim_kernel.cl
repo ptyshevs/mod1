@@ -1,8 +1,8 @@
 #define sl 200
 #define hf_sl 100
 #define eps 0.0001f
-#define VMAX 1.0f
-#define dt 1.0f
+#define VMAX 2.0f
+#define dt 0.99f
 
 /*
 */
@@ -33,37 +33,33 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
 {
     size_t offset = get_global_id(0);
 
-    const t_cell prev_cell = prev_state[offset];
-    float v = prev_cell.V;
+    const t_cell cell = prev_state[offset];
+    float v = cell.V;
     float v_in = 0;
     float v_out = 0;
-    if (prev_cell.is_solid)
+    if (cell.is_solid)
         return ;
-    // if (prev_cell.V > 1.0f) // excess
-    //     v_out = prev_cell.V - 1.0f; // assume to pass all the excess above
-    // if (prev_cell.V <= eps)
-    //     next_state[offset].V = 0.0f;
-    if (prev_cell.y > 0 && v > 0)
+    if (cell.y > 0 && v > eps)
     {
-        size_t below_idx = to_address(prev_cell.x, prev_cell.y - 1, prev_cell.z);
-        if (!prev_state[below_idx].is_solid && prev_state[below_idx].V < v)
-            v_out += (v - prev_state[below_idx].V) * dt;
+        t_cell below = prev_state[to_address(cell.x, cell.y - 1.0f, cell.z)];
+        if (!below.is_solid && below.V < VMAX)
+        {
+            // flow to below
+            v_out += v * dt;
+        }
     }
-    // if (prev_cell.y < hf_sl / 2)
-    // {
-    //     size_t aidx = to_address(prev_cell.x, prev_cell.y + 1, prev_cell.z);
-    //     if (prev_state[aidx].V > v)
-    //         v_in += (prev_state[aidx].V - v) * dt;
-    // }
-    if (fabs(v_in - v_out) != 0)
+    if (cell.y < hf_sl / 2 && v <= VMAX)
     {
-        next_state[offset].V += v_in - v_out;
+        t_cell above = prev_state[to_address(cell.x, cell.y + 1.0f, cell.z)];
+        if (above.V > 0)
+            v_in += above.V * dt;
+        // if (above.V > 0)
+        // {
+        //     v_in += 1 * dt;
+        // }
     }
-
-    // if (next_state[offset].V <= eps)
-        // next_state[offset].V = 0.0f;
-        // t_cell above = to_address(prev_state, prev_cell.x, clamp(prev_cell.y + 1, 0, hf_sl / 2 - 1), prev_cell.z);
-    // if (above.in_volume > 0 && prev_cell.in_volume < 1)
-    //     next_state[offset].in_volume += (1 - prev_cell.in_volume) - above.in_volume;
-    // next_state[offset].in_volume = prev_cell.in_volume + 0.005f;
+    if (v_in > eps || v_out > eps)
+    {
+        next_state[offset].V = v + (v_in - v_out);
+    }
 }

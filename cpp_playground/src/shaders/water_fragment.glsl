@@ -4,7 +4,7 @@
 #define eps 0.0001f
 
 in vec4 pos;
-//in int is_solid;
+
 in float volume;
 
 out vec4 color;
@@ -18,12 +18,18 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-	if (abs(volume) < eps)
+  if (pos.y < 0 || pos.y >= hf_sl / 2 - 1)
+    color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  else
+  {
+	if (abs(volume) < 0.01f)
 		discard ;
   if (volume < 0)
-    color = vec4(-volume, 0.0f, 0.0f, 1.0f);
+    color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+  if (volume <= eps)
+    discard ;
   if (volume >= eps)
-	  color = vec4(0.0, 0.0, volume, 1.0f);
-  else
-    color = vec4(0.0, 1.0f, 0.0, 1.0f);
+	  color = vec4(0.0f, 0.0f, volume, 1.0f);
+    // color = vec4(0.0, 1.0f, 0.0, 1.0f);
+  }
 }

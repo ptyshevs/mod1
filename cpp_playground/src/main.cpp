@@ -23,41 +23,41 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 
 	if (keystate[SDL_SCANCODE_ESCAPE])
 		*quit = true;
-	else if (keystate[SDL_SCANCODE_W])
+	if (keystate[SDL_SCANCODE_W])
 		camera.pos += 0.1 * camera.speed * camera.dir;
-	else if (keystate[SDL_SCANCODE_S])
+	if (keystate[SDL_SCANCODE_S])
 		camera.pos -= 0.1 * camera.speed * camera.dir;
-	else if (keystate[SDL_SCANCODE_E])
+	if (keystate[SDL_SCANCODE_E])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_Q])
+	if (keystate[SDL_SCANCODE_Q])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_UP])
+	if (keystate[SDL_SCANCODE_UP])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_DOWN])
+	if (keystate[SDL_SCANCODE_DOWN])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	else if (keystate[SDL_SCANCODE_LEFT])
+	if (keystate[SDL_SCANCODE_LEFT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-	else if (keystate[SDL_SCANCODE_RIGHT])
+	if (keystate[SDL_SCANCODE_RIGHT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -70,7 +70,6 @@ int		to1D(int x, int y, int z)
 	x = x + hf_sl;
 	z = z + hf_sl;
 	int v = (sl * (sl / 4) * x) + sl * y + z;
-	std::cout << "1d offset: " << v << std::endl;
 	return (v);
 }
 
@@ -81,7 +80,6 @@ glm::vec3		to3D(int n)
 	int y = n / (sl);
 	int z = n % (sl) - hf_sl;
 	glm::vec3 f(x, y, z);
-	std::cout << "3d coords: " << glm::to_string(f) << std::endl;
 	return (f);
 }
 
@@ -113,7 +111,9 @@ int main(int ac, char *av[]) {
 
 
 	int offset = to1D(0, hf_sl / 2 - 15, 0);
-	hmap[offset].volume += 1;
+	hmap[offset].volume += 2;
+	hmap[to1D(1, hf_sl / 2 - 15, 0)].volume += 1;
+
 	to3D(offset);
 	hmap[to1D(-hf_sl, 1, -hf_sl)].volume += 1;
 	hmap[to1D(-hf_sl, 1, -hf_sl + 1)].volume += 1;
@@ -143,7 +143,7 @@ int main(int ac, char *av[]) {
 
 		camera.frameStart();
 		draw(map, camera.vp(), GL_TRIANGLES);
-		draw(points, camera.vp(), GL_POINTS);
+//		draw(points, camera.vp(), GL_POINTS);
 		draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
