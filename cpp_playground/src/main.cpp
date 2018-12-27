@@ -68,7 +68,6 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 int		to1D(int x, int y, int z)
 {
 	x = x + hf_sl;
-//	y = y;
 	z = z + hf_sl;
 	int v = (sl * (sl / 4) * x) + sl * y + z;
 	std::cout << "1d offset: " << v << std::endl;
@@ -78,7 +77,6 @@ int		to1D(int x, int y, int z)
 glm::vec3		to3D(int n)
 {
 	int x = n / (sl * (sl / 4)) - hf_sl;
-//	int x = n % (sl * sl);
 	n -= (x + hf_sl) * (sl * (sl / 4));
 	int y = n / (sl);
 	int z = n % (sl) - hf_sl;

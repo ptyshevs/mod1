@@ -1,4 +1,7 @@
 #version 410 core
+#define sl 200
+#define hf_sl 100
+#define eps 0.0001f
 
 in vec4 pos;
 //in int is_solid;
@@ -15,8 +18,12 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-	if (volume < 0.0001f)
+	if (abs(volume) < eps)
 		discard ;
-	else
-		color = vec4(0.0, 0.0, volume, 1.0f);
+  if (volume < 0)
+    color = vec4(-volume, 0.0f, 0.0f, 1.0f);
+  if (volume >= eps)
+	  color = vec4(0.0, 0.0, volume, 1.0f);
+  else
+    color = vec4(0.0, 1.0f, 0.0, 1.0f);
 }

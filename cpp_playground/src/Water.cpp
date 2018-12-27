@@ -16,9 +16,9 @@ Water	instance_water(std::vector<Cell> &hmap)
 {
 	Water w;
 
-    auto cl = CLCore();
-    cl_host_part(cl, true);
-    cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
+	auto cl = CLCore();
+	cl_host_part(cl, true);
+	cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
 
 
 	w.hmap = hmap;
@@ -27,10 +27,10 @@ Water	instance_water(std::vector<Cell> &hmap)
 	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
 									   "src/shaders/water_fragment.glsl");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
-        auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
-        auto mvp = vp * w.model;
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-    };
+		auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
+		auto mvp = vp * w.model;
+		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+	};
 
 	glGenBuffers(1, &w.vbo);
 	glGenBuffers(1, &w.vbo2);
@@ -61,9 +61,9 @@ Water	instance_water(std::vector<Cell> &hmap)
 	w.cl_vbo = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
 	w.cl_vbo2 = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo2, &err);
 	if (err != CL_SUCCESS) {
-        std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
-        exit(1);
-    }
+		std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
+		exit(1);
+	}
 	w.cl = cl;
 
 	return (w);
@@ -122,20 +122,20 @@ void	Water::update_particles()
 
 	int err = 0;
 	err = clSetKernelArg(cl.kernel, state ? 0 : 1, sizeof(cl_vbo), &cl_vbo);
-	err = clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
+	err |= clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
 	if (err != CL_SUCCESS) {
-        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-        exit(1);
-    }
+		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+		exit(1);
+	}
 
-    err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-    if (err != CL_SUCCESS) {
-        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-        exit(1);
-    }
+	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	if (err != CL_SUCCESS) {
+		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+		exit(1);
+	}
 
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
-    clFinish(cl.queue);
+	clFinish(cl.queue);
 }
