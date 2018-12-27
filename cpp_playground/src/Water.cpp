@@ -16,21 +16,20 @@ Water	instance_water(std::vector<Cell> &hmap)
 {
 	Water w;
 
-	auto cl = CLCore();
-	cl_host_part(cl, true);
-	cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
-
+    auto cl = CLCore();
+    cl_host_part(cl, true);
+    cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
 
 	w.hmap = hmap;
-	w.idx_num = sl * sl * (sl / 4);
+	w.idx_num = sl * sl * sl;
 	w.model = glm::mat4(1.0f);
 	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
 									   "src/shaders/water_fragment.glsl");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
-		auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
-		auto mvp = vp * w.model;
-		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-	};
+        auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
+        auto mvp = vp * w.model;
+        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+    };
 
 	glGenBuffers(1, &w.vbo);
 	glGenBuffers(1, &w.vbo2);
@@ -61,10 +60,15 @@ Water	instance_water(std::vector<Cell> &hmap)
 	w.cl_vbo = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
 	w.cl_vbo2 = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo2, &err);
 	if (err != CL_SUCCESS) {
-		std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
-		exit(1);
-	}
+        std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
+        exit(1);
+    }
 	w.cl = cl;
+
+	auto emiter = Emiter();
+	emiter.prepare_emit(cl);
+
+	w.emiter = emiter;
 
 	return (w);
 }
@@ -108,7 +112,16 @@ void	Water::add_volume(int x, int y, int z, float volume)
 	c.volume += volume;
 }
 
-static const size_t  global_work_size = (sl * (hf_sl / 2) * sl);
+void 	Water::emit(void) {
+	static uint last_emit_time = SDL_GetTicks();
+
+	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emiter.pps)) {
+		emiter.emit(state ? cl_vbo : cl_vbo2);
+		last_emit_time = SDL_GetTicks();
+	}
+}
+
+static const size_t  global_work_size = (sl * hf_sl/2 * sl);
 
 void	Water::update_particles()
 {
@@ -120,22 +133,25 @@ void	Water::update_particles()
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
+	// Emit some water
+	emit();
+
 	int err = 0;
 	err = clSetKernelArg(cl.kernel, state ? 0 : 1, sizeof(cl_vbo), &cl_vbo);
 	err |= clSetKernelArg(cl.kernel, state ? 1 : 0, sizeof(cl_vbo2), &cl_vbo2);
 	if (err != CL_SUCCESS) {
-		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-		exit(1);
-	}
+        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+        exit(1);
+    }
 
-	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-	if (err != CL_SUCCESS) {
-		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-		exit(1);
-	}
+    err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+        exit(1);
+    }
 
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
-	clFinish(cl.queue);
+    clFinish(cl.queue);
 }

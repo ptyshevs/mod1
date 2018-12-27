@@ -125,7 +125,8 @@ int main(int ac, char *av[]) {
 
 	auto camera = GLCamera();
 
-	 glPointSize(3);
+	 glPointSize(4);
+//	glPointSize(3);
 	while(!quit)
 	{
 		// Event handle
