@@ -72,7 +72,7 @@ GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath)
 	glAttachShader(shader_program, vertex_shader);
 	glAttachShader(shader_program, fragment_shader);
 	glLinkProgram(shader_program);
-	check_compile_errors(shader_program, vertex_shader, fragment_shader);
+	check_compile_errors(shader_program, fragment_shader, vertex_shader);
 	glDeleteShader(fragment_shader);
 	glDeleteShader(vertex_shader);
 	free(*(void**)&vert_shader);
