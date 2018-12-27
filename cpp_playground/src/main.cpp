@@ -16,62 +16,6 @@
 
 void draw(GLItem &item, const glm::mat4 &vp, GLenum type);
 
-Water	instance_water(std::vector<Cell> &hmap)
-{
-	Water w;
-
-    auto cl = CLCore();
-    cl_host_part(cl, true);
-    cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
-
-
-	w.hmap = hmap;
-	w.idx_num = sl * sl * sl;
-	w.model = glm::mat4(1.0f);
-	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
-									   "src/shaders/water_fragment.glsl");
-	w.fill_uniforms = [&](const glm::mat4 &vp) {
-        auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
-        auto mvp = vp * w.model;
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-    };
-
-	glGenBuffers(1, &w.vbo);
-	glGenBuffers(1, &w.vbo2);
-	glGenVertexArrays(1, &w.vao);
-
-	glBindVertexArray(w.vao);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
-	glBufferData(GL_ARRAY_BUFFER, w.hmap.size() * sizeof(Cell), w.hmap.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
-	glVertexAttribPointer(1, 1, GL_INT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(int)));
-
-	glBindBuffer(GL_ARRAY_BUFFER, w.vbo2);
-	glBufferData(GL_ARRAY_BUFFER, w.hmap.size() * sizeof(Cell), w.hmap.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Cell), 0);
-	glVertexAttribPointer(1, 1, GL_INT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, sizeof(Cell), (void *)(sizeof(float) * 3 + sizeof(int)));
-	
-	glBindVertexArray(0);
-
-	int err = 0;
-
-	w.cl_vbo = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
-	w.cl_vbo2 = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, w.vbo2, &err);
-	if (err != CL_SUCCESS) {
-        std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
-        exit(1);
-    }
-	w.cl = cl;
-
-	return (w);
-}
 
 void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, bool *quit)
 {

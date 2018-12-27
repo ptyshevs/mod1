@@ -122,16 +122,13 @@ public:
 	glm::vec3 to_coords(int x, int y, int z);
 	void	show_hmap(void);
 	void	add_volume(int x, int y, int z, float volume);
-private:
-	void	update_buffer();
-
-
 };
 
 
-GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
+GLItem	generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
+Water	instance_water(std::vector<Cell> &hmap);
 
 typedef struct  s_constants {
     cl_int      map_size;
