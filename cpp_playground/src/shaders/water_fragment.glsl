@@ -18,10 +18,7 @@ vec3 checker(in float u, in float v)
 }
 
 void main() {
-	if (abs(volume) < 0.1f)
+	if (abs(volume) <= (pos.y / (hf_sl / 2)))
 		discard ;
-  if (volume < 0)
-    color = vec4(-volume, 1.0f, 0.0f, 1.0f);
-  else
-	  color = vec4(0.0f, 0.0f, volume, 1.0f);
+	color = vec4(0.0f, 0.0f, 0.3f + volume, 1.0f);
 }

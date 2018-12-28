@@ -1,5 +1,5 @@
 #version 410 core
-
+#define hf_sl 100
 layout (location = 0) in vec3 position;
 layout (location = 1) in int  is_solid;
 layout (location = 2) in float in_volume;
@@ -13,4 +13,5 @@ void main() {
     gl_Position = MVP * vec4(position, 1.0f);
     pos = vec4(position, 1.0f);
     volume = in_volume;
+    gl_PointSize = ceil(hf_sl - (position.y / (hf_sl / 2) * 10));
 }
