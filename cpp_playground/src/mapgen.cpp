@@ -143,7 +143,22 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
 		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
 		auto mvp = vp * map_item.model;
 		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+
+		auto albedo = glGetUniformLocation(map_item.shader_program, "albedo");
+		auto normal  = glGetUniformLocation(map_item.shader_program, "normal");
+		auto ao = glGetUniformLocation(map_item.shader_program, "ao");
+		auto rough  = glGetUniformLocation(map_item.shader_program, "rough");
+
+		glUniform1i(albedo, 0);
+		glUniform1i(normal, 1);
+		glUniform1i(ao, 2);
+		glUniform1i(rough, 3);
 	};
+	map_item.tex = load_texture("src/textures/layered-rock-albedo.png");
+	map_item.tex_n = load_texture("src/textures/layered-rock-normal.png");
+	map_item.tex_ao = load_texture("src/textures/layered-rock-ao.png");
+	map_item.tex_r = load_texture("src/textures/layered-rock-rough.png");
+
 	glGenBuffers(1, &map_item.vbo);
 	glGenBuffers(1, &map_item.ibo);
 	glGenVertexArrays(1, &map_item.vao);

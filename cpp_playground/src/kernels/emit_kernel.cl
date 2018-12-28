@@ -28,6 +28,15 @@ typedef struct {
 */
 void it_s_raining_man(__global t_cell *cell, size_t seed);
 
+void havaji(__global t_cell *cell);
+
+void underdog(__global t_cell *cell);
+
+/*
+*/
+
+size_t place_in_corner_with_offset(__global t_cell *cell, size_t offset, size_t y_offset);
+
 size_t to_address(float x, float y, float z);
 
 size_t rand(size_t seed);
@@ -41,18 +50,50 @@ __kernel void emit_kernel(__global t_cell *cell,
 
     if (_emiter.type == EMITER_RAIN) {
         it_s_raining_man(cell, (size_t)_emiter.seed);
+    } else if (_emiter.type == EMITER_WAVE) {
+        havaji(cell);
+    } else if (_emiter.type == EMITER_UNDERGROUND) {
+        underdog(cell);
     }
 }
 
 void it_s_raining_man(__global t_cell *cell, size_t seed)
 {
-    float foo = ((float)(seed % sl)) - hf_sl;
-    float foo2 = ((float)(rand(seed) % sl)) - hf_sl;
+    for (size_t i = 0; i < RAIN_PPI; i++) {
+        float foo = ((float)(seed % sl)) - hf_sl;
+        float foo2 = ((float)(rand(seed) % sl)) - hf_sl;
 
-    size_t offset = to_address((float)foo,
-                               (float)hf_hf_sl - 1,
-                               (float)foo2);
-    cell[offset].in_volume += 1.0f;
+        size_t offset = to_address((float)foo,
+                                (float)hf_hf_sl - 1,
+                                (float)foo2);
+        cell[offset].in_volume += 1.0f;
+    }
+}
+
+void havaji(__global t_cell *cell)
+{
+    for (int i = -hf_sl; i < hf_sl; i++) {
+        size_t offset = to_address(-hf_sl, 1.0f, (float)i - 1);
+        cell[offset].in_volume += 1.0f;
+    }
+}
+
+void underdog(__global t_cell *cell)
+{
+    place_in_corner_with_offset(cell, 1, 1);
+    place_in_corner_with_offset(cell, 2, 1);
+}
+
+size_t place_in_corner_with_offset(__global t_cell *cell, size_t offset, size_t y_offset)
+{
+    size_t _offset = to_address((float)hf_sl - offset, (float)y_offset, (float)hf_sl - offset);
+    cell[_offset].in_volume += 1.0f;
+    _offset = to_address((float)hf_sl - offset, (float)y_offset, (float)-hf_sl + offset);
+    cell[_offset].in_volume += 1.0f;
+    _offset = to_address((float)-hf_sl + offset, (float)y_offset, (float)-hf_sl + offset);
+    cell[_offset].in_volume += 1.0f;
+    _offset = to_address((float)-hf_sl + offset, (float)y_offset, (float)hf_sl - offset);
+    cell[_offset].in_volume += 1.0f;
 }
 
 
