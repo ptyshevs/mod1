@@ -49,9 +49,9 @@ void it_s_raining_man(__global t_cell *cell, size_t seed)
     float foo = ((float)(seed % sl)) - hf_sl;
     float foo2 = ((float)(rand(seed) % sl)) - hf_sl;
 
-    size_t offset = to_address((float)foo - 1,
+    size_t offset = to_address((float)foo,
                                (float)hf_hf_sl - 1,
-                               (float)foo2 - 1);
+                               (float)foo2);
     cell[offset].in_volume += 1.0f;
 }
 
