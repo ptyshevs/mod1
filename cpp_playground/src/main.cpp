@@ -63,6 +63,25 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
+	if (keystate[SDL_SCANCODE_1])
+	{
+		water.emiter.type = EMITER_RAIN;
+		water.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_2])
+	{
+		water.emiter.type = EMITER_WAVE;
+		water.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_3])
+	{
+		water.emiter.type = EMITER_UNDERGROUND;
+		water.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_KP_MINUS])
+		water.emiter.pps = abs(water.emiter.pps + 100);
+	if (keystate[SDL_SCANCODE_KP_PLUS])
+		water.emiter.pps = abs(water.emiter.pps - 100);
 }
 
 int		to1D(int x, int y, int z)
