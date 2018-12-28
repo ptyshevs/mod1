@@ -73,15 +73,15 @@ void it_s_raining_man(__global t_cell *cell, size_t seed)
 void havaji(__global t_cell *cell)
 {
     for (int i = -hf_sl; i < hf_sl; i++) {
-        size_t offset = to_address(-hf_sl, 1.0f, (float)i - 1);
+        size_t offset = to_address(-hf_sl, 1.0f, (float)i);
         cell[offset].in_volume += 1.0f;
     }
 }
 
 void underdog(__global t_cell *cell)
 {
-    place_in_corner_with_offset(cell, 1, 1);
-    place_in_corner_with_offset(cell, 2, 1);
+    place_in_corner_with_offset(cell, 0, 1);
+    place_in_corner_with_offset(cell, 0, 1);
 }
 
 size_t place_in_corner_with_offset(__global t_cell *cell, size_t offset, size_t y_offset)

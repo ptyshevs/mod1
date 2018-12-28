@@ -18,7 +18,7 @@ void Emiter::prepare_emit(CLCore &core) {
     }
     
     pps = 10; // Once in a sec
-    type = EMITER_UNDERGROUND;
+    type = EMITER_RAIN;
 
     srand(time(NULL));
 }

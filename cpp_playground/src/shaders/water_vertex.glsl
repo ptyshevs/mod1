@@ -13,5 +13,4 @@ void main() {
     gl_Position = MVP * vec4(position, 1.0f);
     pos = vec4(position, 1.0f);
     volume = in_volume;
-    gl_PointSize = ceil(hf_sl - (position.y / (hf_sl / 2) * 10));
 }
