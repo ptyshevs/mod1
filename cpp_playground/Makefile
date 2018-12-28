@@ -55,7 +55,7 @@ EXEC = mod1
 
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp sdl_gl_init.cpp \
 				compileshaders.cpp cl_init.cpp control_points.cpp Water.cpp \
-				Emiter.cpp
+				Emiter.cpp textures.cpp
 
 SRC = $(addprefix src/, $(SRCFILENAME))
 

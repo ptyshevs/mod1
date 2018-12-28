@@ -2,21 +2,24 @@
 
 in vec4 pos;
 
+in vec4 world_normal;
+
+in vec2 uv;
+
+uniform sampler2D albedo;
+
+uniform sampler2D ao;
+uniform sampler2D rough;
+
 out vec4 color;
 
-vec3 checker(in float u, in float v)
-{
-  float checkSize = 50;
-  float fmodResult = mod(floor(checkSize * u) + floor(checkSize * v), 2.0);
-  float fin = max(sign(fmodResult), 0.0);
-  return vec3(fin, fin, fin);
-}
+const float gamma = 1/2.2;
+const vec4 light_position = vec4(0.0f, 40.0f, 0.0f, 1.0f);
 
 void main() {
-  color = vec4(pos.y / 100.0f + 0.5f, pos.y / 100.0f + 0.5f, pos.y / 50.0f + 0.2f, 1.0f);
+    vec4 light_ray = normalize(light_position - pos);
+    vec4 diffuse = max(dot(light_ray, world_normal), 0.0f) * texture(rough, uv);
+    vec4 ambient = texture(albedo, uv);
 
-    // float u = (pos.x + 200.0f) / 400.0f;
-    // float v = (pos.z + 200.0f) / 400.0f;
-
-    // color = vec4(checker(u, v), 1.0f);
+    color = mix(texture(albedo, uv) * diffuse, ambient, 0.8f);
 }

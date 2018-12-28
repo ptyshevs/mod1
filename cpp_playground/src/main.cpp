@@ -181,6 +181,27 @@ void draw(GLItem &item, const glm::mat4 &vp, GLenum type)
 	glUseProgram(item.shader_program);
 	item.fill_uniforms(vp);
 	glBindVertexArray(item.vao);
+
+	if (item.tex) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, item.tex);
+	}
+
+	if (item.tex_n) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, item.tex_n);
+	}
+
+	if (item.tex_ao) {
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, item.tex_ao);
+	}
+
+	if (item.tex_r) {
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, item.tex_r);
+	}
+
 	if (type == GL_POINTS)
 	{
 		try {

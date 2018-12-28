@@ -59,6 +59,9 @@ struct GLItem {
     GLuint vbo;
     GLuint ibo;
     GLuint tex;
+	GLuint tex_n;
+	GLuint tex_ao;
+	GLuint tex_r;
     GLsizei idx_num;
     GLuint shader_program;
     glm::mat4 model;
@@ -169,3 +172,9 @@ typedef struct {
 
 void     cl_host_part(CLCore &cl_core, bool wGLInterop = false);
 void    cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);
+
+// textures.cpp
+
+#include <lodepng.h>
+
+GLuint	load_texture(const char *tex_file_name);

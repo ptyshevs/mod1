@@ -12,9 +12,9 @@
 
 NAME = libLodePNG.a
 
-SRC = lodepng.c
+SRC = lodepng.cpp
 
-OBJ = $(SRC:.c=.o)
+OBJ = $(SRC:.cpp=.o)
 
 CFLAGS = -Wall -Wextra -Werror -O3
 
