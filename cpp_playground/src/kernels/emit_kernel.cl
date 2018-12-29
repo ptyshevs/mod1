@@ -80,8 +80,12 @@ void havaji(__global t_cell *cell)
 
 void underdog(__global t_cell *cell)
 {
-    place_in_corner_with_offset(cell, 0, 1);
-    place_in_corner_with_offset(cell, 0, 1);
+	cell[to_address(-hf_sl, 1.0f, -hf_sl)].in_volume += 1.0f;
+	cell[to_address(-hf_sl, 1.0f, hf_sl - 1)].in_volume += 1.0f;
+	cell[to_address(hf_sl - 1, 1.0f, hf_sl - 1)].in_volume += 1.0f;
+	cell[to_address(hf_sl - 1, 1.0f, -hf_sl)].in_volume += 1.0f;
+//    place_in_corner_with_offset(cell, 0, 1);
+//    place_in_corner_with_offset(cell, 0, 1);
 }
 
 size_t place_in_corner_with_offset(__global t_cell *cell, size_t offset, size_t y_offset)

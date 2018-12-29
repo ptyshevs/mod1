@@ -1,7 +1,7 @@
 #version 410 core
 #define sl 200
 #define hf_sl 100
-#define eps 0.001f
+#define eps 0.0001f
 
 in vec4 pos;
 
@@ -25,5 +25,5 @@ void main() {
   // else if (volume > 1)
   //   color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
   // else
-	color = vec4(0.0f, 0.0f, 0.8f + volume, 0.01f);
+	color = vec4(0.0f, 0.0f, 0.6f + volume, 0.01f);
 }
