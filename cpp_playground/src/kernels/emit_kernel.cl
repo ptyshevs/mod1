@@ -1,6 +1,7 @@
 #define EMITER_RAIN 1
 #define EMITER_WAVE 2
 #define EMITER_UNDERGROUND 4
+#define EMITER_BOUNDARIES 8
 
 #define RAIN_PPI 4
 
@@ -32,6 +33,8 @@ void havaji(__global t_cell *cell);
 
 void underdog(__global t_cell *cell);
 
+void boundaries(__global t_cell *cell);
+
 /*
 */
 
@@ -54,6 +57,8 @@ __kernel void emit_kernel(__global t_cell *cell,
         havaji(cell);
     } else if (_emiter.type == EMITER_UNDERGROUND) {
         underdog(cell);
+    } else if (_emiter.type == EMITER_BOUNDARIES) {
+    	boundaries(cell);
     }
 }
 
@@ -76,6 +81,17 @@ void havaji(__global t_cell *cell)
         size_t offset = to_address(-hf_sl, 1.0f, (float)i);
         cell[offset].in_volume += 1.0f;
     }
+}
+
+void boundaries(__global t_cell *cell)
+{
+	for (int i = 0; i < sl; i ++)
+	{
+		cell[to_address(i - (float)hf_sl, 1.0f, -(float)hf_sl)].in_volume += 1.0f;
+		cell[to_address(-(float)hf_sl, 1.0f, i - (float)hf_sl)].in_volume += 1.0f;
+		cell[to_address((float)hf_sl - 1, 1.0f, i - (float)hf_sl)].in_volume += 1.0f;
+		cell[to_address(i - (float)hf_sl, 1.0f, (float)hf_sl - 1)].in_volume += 1.0f;
+	}
 }
 
 void underdog(__global t_cell *cell)

@@ -115,6 +115,7 @@ public:
 #define EMITER_RAIN 1
 #define EMITER_WAVE 2
 #define EMITER_UNDERGROUND 4
+#define EMITER_BOUNDARIES 8
 
 struct Emiter: CLCore {
 	void	emit(cl_mem &cl_vbo);

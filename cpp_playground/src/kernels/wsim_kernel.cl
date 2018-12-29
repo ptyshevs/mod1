@@ -110,32 +110,32 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
     {
         t_cell left = prev_state[to_address(cell.x - 1, cell.y, cell.z)];
         if (!left.is_solid)
-            v_new += (left.V - v) / N;
+            v_new += clamp(left.V - v, -VMAX, VMAX) / N;
     }
     if (cell.x < (hf_sl - 1))
     {
         t_cell right = prev_state[to_address(cell.x + 1, cell.y, cell.z)];
         if (!right.is_solid)
-            v_new += (right.V - v) / N;
+            v_new += clamp(right.V - v, -VMAX, VMAX) / N;
     }
     if (cell.z > -hf_sl)
     {
         t_cell back = prev_state[to_address(cell.x, cell.y, cell.z - 1)];
         if (!back.is_solid)
-            v_new += (back.V - v) / N;
+            v_new += clamp(back.V - v, -VMAX, VMAX) / N;
     }
     if (cell.z < (hf_sl - 1))
     {
         t_cell front = prev_state[to_address(cell.x, cell.y, cell.z + 1)];
         if (!front.is_solid)
-            v_new += (front.V - v) / N;
+            v_new += clamp(front.V - v, -VMAX, VMAX) / N;
     }
     /*
     END SIDEWAYS
     */
     // clamp prevents "exploding"
     if (fabs(v_new) > eps)
-        next_state[offset].V = v + clamp(v_new, -VMAX, 1.28f * VMAX);
+        next_state[offset].V = v + clamp(v_new, -VMAX, 1.35f * VMAX);
     else
         next_state[offset].V = v;
 }

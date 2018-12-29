@@ -78,10 +78,16 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 		water.emiter.type = EMITER_UNDERGROUND;
 		water.emiter.pps = 1000;
 	}
+	if (keystate[SDL_SCANCODE_4] && !water.snow)
+	{
+		water.emiter.type = EMITER_BOUNDARIES;
+		water.emiter.pps = 1000;
+	}
 	if (keystate[SDL_SCANCODE_KP_MINUS])
 		water.emiter.pps = abs(water.emiter.pps + 100);
 	if (keystate[SDL_SCANCODE_KP_PLUS])
 		water.emiter.pps = abs(water.emiter.pps - 100);
+
 }
 
 int		to1D(int x, int y, int z)
