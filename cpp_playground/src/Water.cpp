@@ -12,19 +12,33 @@
 
 #include "core.hpp"
 
-Water	instance_water(std::vector<Cell> &hmap)
+Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode)
 {
 	Water w;
 
     auto cl = CLCore();
     cl_host_part(cl, true);
-    cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
+    if (snow)
+    	cl_compile_kernel(cl, "src/kernels/wsim_snow.cl", "wsim_kernel");
+    else if (explode)
+    	cl_compile_kernel(cl, "src/kernels/wsim_explode.cl", "wsim_kernel");
+    else
+    	cl_compile_kernel(cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
 
 	w.hmap = hmap;
-	w.idx_num = sl * sl * sl;
+	w.idx_num = sl * sl * sl / 4;
+	w.snow = snow;
+	w.explode = explode;
 	w.model = glm::mat4(1.0f);
-	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
-									   "src/shaders/water_fragment.glsl");
+	if (snow)
+		w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
+											"src/shaders/snow_fragment.glsl");
+	else if (explode)
+		w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
+											"src/shaders/explode_fragment.glsl");
+	else
+		w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
+										   "src/shaders/water_fragment.glsl");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
         auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
         auto mvp = vp * w.model;

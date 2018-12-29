@@ -37,7 +37,7 @@ bool inputIsGood(int ac, char *av[])
 {
     bool inputIsGood = false;
 
-    if (ac == 2)
+    if (ac == 2 || ac == 3)
     {
         inputIsGood = hasValidExtenstion(av[1]) && isReadable(av[1]);
     }

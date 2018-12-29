@@ -68,12 +68,12 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 		water.emiter.type = EMITER_RAIN;
 		water.emiter.pps = 1000;
 	}
-	if (keystate[SDL_SCANCODE_2])
+	if (keystate[SDL_SCANCODE_2] && !water.snow)
 	{
 		water.emiter.type = EMITER_WAVE;
 		water.emiter.pps = 1000;
 	}
-	if (keystate[SDL_SCANCODE_3])
+	if (keystate[SDL_SCANCODE_3] && !water.snow)
 	{
 		water.emiter.type = EMITER_UNDERGROUND;
 		water.emiter.pps = 1000;
@@ -102,11 +102,31 @@ glm::vec3		to3D(int n)
 	return (f);
 }
 
+void	show_usage(void)
+{
+	std::cout << "usage: ./mod1 file.mod1 [--expode|--snow]" << std::endl;
+}
+
+bool	is_snowing(int ac, char **av)
+{
+	return (ac == 3 && !strcmp(av[2], "--snow"));
+}
+
+bool	exploding(int ac, char **av)
+{
+	return (ac == 3 && !strcmp(av[2], "--explode"));
+}
+
 
 int main(int ac, char *av[]) {
 	bool quit = false;
 	std::vector<glm::vec3> controlPointsArray;
 
+	if (ac == 1)
+	{
+		show_usage();
+		return (1);
+	}
 	if (!inputIsGood(ac, av))
 	{
 		std::cout << "File is not readable\n";
@@ -118,7 +138,16 @@ int main(int ac, char *av[]) {
 			std::cout << e.what() << std::endl;
 			return (1);
 		}
-
+	bool snow = is_snowing(ac, av);
+	bool explode = exploding(ac, av);
+//	std::cout << "Snowing: " << snow << std::endl;
+//	std::cout << "Exploding: " << explode << std::endl;
+	if (ac == 3 && !snow && !explode)
+	{
+		std::cout << "Bad argument" << std::endl;
+		show_usage();
+		return (1);
+	}
 	prepare_control_points(controlPointsArray);
 	auto core = sdl_gl_init();
 
@@ -128,7 +157,7 @@ int main(int ac, char *av[]) {
 
 	hmap.shrink_to_fit();
 
-	auto water = instance_water(hmap);
+	auto water = instance_water(hmap, snow, explode);
 
 	auto points = generate_control_points(controlPointsArray);
 
