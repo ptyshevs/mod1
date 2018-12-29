@@ -135,7 +135,7 @@ __kernel void wsim_kernel(__global t_cell *prev_state,
     */
     // clamp prevents "exploding"
     if (fabs(v_new) > eps)
-        next_state[offset].V = v + clamp(v_new, -VMAX, 1.35f * VMAX);
+        next_state[offset].V = v + clamp(v_new, -VMAX, 1.25f * VMAX);
     else
         next_state[offset].V = v;
 }
