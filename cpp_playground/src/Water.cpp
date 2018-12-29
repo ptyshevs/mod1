@@ -99,7 +99,6 @@ void	Water::show_hmap()
 
 				std::cout << " 3D coords: [" << glm::to_string(c.pos);
 				std::cout << "]: " << c.volume;
-				std::cout << " is_solid: " << c.is_solid << std::endl;
 			}
 		}
 

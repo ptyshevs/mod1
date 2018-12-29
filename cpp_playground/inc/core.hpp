@@ -106,10 +106,9 @@ struct CLGLDoubleBufferedItem: GLItem {
 struct Cell
 {
 	glm::vec3	pos;
-	int			is_solid;
 	float		volume;
 public:
-	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
+	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), volume(volume) {};
 };
 
 #define EMITER_RAIN 1
@@ -143,7 +142,7 @@ public:
 	void	emit(void);
 };
 
-GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
+GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4> &hmap);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode);

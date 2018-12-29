@@ -28,7 +28,7 @@ __kernel void idw_kernel(__global float *control_points,
 
     if (get_global_id(0) >= (size_t)_constants.map_size) { return; }
 
-    size_t offset = get_global_id(0) * 3;
+    size_t offset = get_global_id(0) * 4;
 
     float3 current_point = (float3) {   read_map[offset],
                                         read_map[offset + 1],

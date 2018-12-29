@@ -39,7 +39,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 ** Modify map
 */
 
-void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map)
+void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<glm::vec4> &map)
 {
 	auto cl = CLCore();
 
@@ -48,8 +48,8 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 
 	int err = CL_SUCCESS;
 
-	cl_mem cl_read_map = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, map.size() * sizeof(glm::vec3), NULL, &err);
-	cl_mem cl_write_map = clCreateBuffer(cl.context, CL_MEM_WRITE_ONLY, map.size() * sizeof(glm::vec3), NULL, &err);
+	cl_mem cl_read_map = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, map.size() * sizeof(glm::vec4), NULL, &err);
+	cl_mem cl_write_map = clCreateBuffer(cl.context, CL_MEM_WRITE_ONLY, map.size() * sizeof(glm::vec4), NULL, &err);
 	cl_mem cl_cp = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, cp.size() * sizeof(glm::vec3), NULL, &err);
 	cl_mem cl_constants = clCreateBuffer(cl.context, CL_MEM_READ_ONLY, sizeof(t_constants), NULL, &err);
 	if (err != CL_SUCCESS) {
@@ -58,8 +58,8 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 	}
 
 	t_constants constants = (t_constants){ (cl_int)map.size(), (cl_int)cp.size() };
-	err = clEnqueueWriteBuffer(cl.queue, cl_read_map, CL_TRUE, 0, map.size() * sizeof(glm::vec3), map.data(), 0, NULL, NULL);
-	err |= clEnqueueWriteBuffer(cl.queue, cl_write_map, CL_TRUE, 0, map.size() * sizeof(glm::vec3), map.data(), 0, NULL, NULL);
+	err = clEnqueueWriteBuffer(cl.queue, cl_read_map, CL_TRUE, 0, map.size() * sizeof(glm::vec4), map.data(), 0, NULL, NULL);
+	err |= clEnqueueWriteBuffer(cl.queue, cl_write_map, CL_TRUE, 0, map.size() * sizeof(glm::vec4), map.data(), 0, NULL, NULL);
 	err |= clEnqueueWriteBuffer(cl.queue, cl_cp, CL_TRUE, 0, cp.size() * sizeof(glm::vec3), cp.data(), 0, NULL, NULL);
 	err |= clEnqueueWriteBuffer(cl.queue, cl_constants, CL_TRUE, 0, sizeof(t_constants), &constants, 0, NULL, NULL);
 	if (err != CL_SUCCESS) {
@@ -85,7 +85,7 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 
 	clFinish(cl.queue);
 
-	err = clEnqueueReadBuffer(cl.queue, cl_write_map, CL_TRUE, 0, map.size() * sizeof(glm::vec3), map.data(), 0, NULL, NULL);
+	err = clEnqueueReadBuffer(cl.queue, cl_write_map, CL_TRUE, 0, map.size() * sizeof(glm::vec4), map.data(), 0, NULL, NULL);
 	if (err != CL_SUCCESS) {
 		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
 		exit(1);
@@ -102,11 +102,10 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 	clReleaseContext(cl.context);
 }
 
-GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap) {
-	std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
+GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4> &hmap) {
 	for (size_t i = 0; i < sl; i++) {
 		for (size_t j = 0; j < sl; j++) {
-			auto &point = map[i * sl + j];
+			auto &point = hmap[i * sl + j];
 			point.x = (float)i - hf_sl;
 			point.z = (float)j - hf_sl;
 		}
@@ -116,22 +115,10 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
 	std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
 	// Interpolate stuff
-	interpolate_using_controll_points(control_points, map);
+	interpolate_using_controll_points(control_points, hmap);
 
 	// Remap interpolated map on height map
-	for (size_t i = 0; i < sl; i++)
-	{
-		for (size_t j = 0; j < hf_sl / 2; j++)
-		{
-			for (size_t k = 0; k < sl; k++)
-			{
-				auto &point = map[i * sl + k];
-				hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
-								  (float)j <= point.y,
-								  0.0f);
-			}
-		}
-	}
+
 	// Create object suitable for rendering
 	GLItem map_item;
 
@@ -164,37 +151,11 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
 	glGenVertexArrays(1, &map_item.vao);
 	glBindVertexArray(map_item.vao);
 	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo);
-	glBufferData(GL_ARRAY_BUFFER, map.size() * sizeof(glm::vec3), map.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, hmap.size() * sizeof(glm::vec4), hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec4), (GLvoid*)0);
 	glBindVertexArray(0);
 	return map_item;
-}
-
-GLItem generate_control_points(std::vector<glm::vec3> control_points)
-{
-	GLItem points_item;
-
-	points_item.model = glm::mat4(1.0f);
-	points_item.idx_num = control_points.size() * 3;
-	points_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
-												 "src/shaders/ground_fragment.glsl");
-	points_item.fill_uniforms = [&](const glm::mat4 &vp) {
-		auto mvp_id = glGetUniformLocation(points_item.shader_program, "MVP");
-		auto mvp = vp * points_item.model;
-		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-	};
-	glGenBuffers(1, &points_item.vbo);
-	glGenBuffers(1, &points_item.ibo);
-	glGenVertexArrays(1, &points_item.vao);
-
-	glBindVertexArray(points_item.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, points_item.vbo);
-	glBufferData(GL_ARRAY_BUFFER, control_points.size() * sizeof(glm::vec3), control_points.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid *)0);
-	glBindVertexArray(0);
-	return (points_item);
 }

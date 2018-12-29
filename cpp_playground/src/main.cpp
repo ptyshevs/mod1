@@ -17,7 +17,7 @@
 void draw(GLItem &item, const glm::mat4 &vp, GLenum type);
 
 
-void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, bool *quit)
+void	process_input(GLCamera &camera, GLItem &map, bool *quit)
 {
 	auto keystate = SDL_GetKeyboardState(NULL);
 
@@ -30,63 +30,63 @@ void	process_input(GLCamera &camera, GLItem &map, GLItem &points, Water &water, 
 	if (keystate[SDL_SCANCODE_E])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	if (keystate[SDL_SCANCODE_Q])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	if (keystate[SDL_SCANCODE_UP])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 	if (keystate[SDL_SCANCODE_DOWN])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 	if (keystate[SDL_SCANCODE_LEFT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	if (keystate[SDL_SCANCODE_RIGHT])
 	{
 		map.model = glm::rotate(map.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
-		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
-		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+//		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
+//		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-	if (keystate[SDL_SCANCODE_1])
-	{
-		water.emiter.type = EMITER_RAIN;
-		water.emiter.pps = 1000;
-	}
-	if (keystate[SDL_SCANCODE_2] && !water.snow)
-	{
-		water.emiter.type = EMITER_WAVE;
-		water.emiter.pps = 1000;
-	}
-	if (keystate[SDL_SCANCODE_3] && !water.snow)
-	{
-		water.emiter.type = EMITER_UNDERGROUND;
-		water.emiter.pps = 1000;
-	}
-	if (keystate[SDL_SCANCODE_4] && !water.snow)
-	{
-		water.emiter.type = EMITER_BOUNDARIES;
-		water.emiter.pps = 1000;
-	}
-	if (keystate[SDL_SCANCODE_KP_MINUS])
-		water.emiter.pps = abs(water.emiter.pps + 100);
-	if (keystate[SDL_SCANCODE_KP_PLUS])
-		water.emiter.pps = abs(water.emiter.pps - 100);
+//	if (keystate[SDL_SCANCODE_1])
+//	{
+//		water.emiter.type = EMITER_RAIN;
+//		water.emiter.pps = 1000;
+//	}
+//	if (keystate[SDL_SCANCODE_2] && !water.snow)
+//	{
+//		water.emiter.type = EMITER_WAVE;
+//		water.emiter.pps = 1000;
+//	}
+//	if (keystate[SDL_SCANCODE_3] && !water.snow)
+//	{
+//		water.emiter.type = EMITER_UNDERGROUND;
+//		water.emiter.pps = 1000;
+//	}
+//	if (keystate[SDL_SCANCODE_4] && !water.snow)
+//	{
+//		water.emiter.type = EMITER_BOUNDARIES;
+//		water.emiter.pps = 1000;
+//	}
+//	if (keystate[SDL_SCANCODE_KP_MINUS])
+//		water.emiter.pps = abs(water.emiter.pps + 100);
+//	if (keystate[SDL_SCANCODE_KP_PLUS])
+//		water.emiter.pps = abs(water.emiter.pps - 100);
 
 }
 
@@ -157,30 +157,27 @@ int main(int ac, char *av[]) {
 	prepare_control_points(controlPointsArray);
 	auto core = sdl_gl_init();
 
-	std::vector<Cell> hmap;
-	hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
+	std::vector<glm::vec4> hmap(sl * sl, glm::vec4(0.0f));
 	auto map = generate_map(controlPointsArray, hmap);
 
-	hmap.shrink_to_fit();
-
-	auto water = instance_water(hmap, snow, explode);
-
-	auto points = generate_control_points(controlPointsArray);
-
+//	hmap.shrink_to_fit();
+//
+//	auto water = instance_water(hmap, snow, explode);
+//
+//	auto points = generate_control_points(controlPointsArray);
+//
 	auto camera = GLCamera();
-
-	 glPointSize(4);
-//	glPointSize(3);
+//
 	while(!quit)
 	{
 		// Event handle
 		SDL_PollEvent(&(core.event));
-		process_input(camera, map, points, water, &quit);
+		process_input(camera, map, &quit);
 		if (core.event.type == SDL_QUIT)
 			quit = true;
 
-		// Simulation step
-		water.update_particles();
+//		// Simulation step
+//		water.update_particles();
 
 		// Actual render
 
@@ -189,7 +186,7 @@ int main(int ac, char *av[]) {
 		camera.frameStart();
 		draw(map, camera.vp(), GL_TRIANGLES);
 //		draw(points, camera.vp(), GL_POINTS);
-		draw(water, camera.vp(), GL_POINTS);
+//		draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
 		SDL_GL_SwapWindow(core.win);
