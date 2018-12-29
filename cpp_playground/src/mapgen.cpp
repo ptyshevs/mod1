@@ -102,7 +102,15 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 	clReleaseContext(cl.context);
 }
 
-GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4> &hmap) {
+static int		to1D(int x, int z)
+{
+	x = x + hf_sl;
+	z = z + hf_sl;
+	return (x * sl + z);
+}
+
+HeightMap generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4> &hmap)
+{
 	for (size_t i = 0; i < sl; i++) {
 		for (size_t j = 0; j < sl; j++) {
 			auto &point = hmap[i * sl + j];
@@ -116,16 +124,27 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4
 
 	// Interpolate stuff
 	interpolate_using_controll_points(control_points, hmap);
-
-	// Remap interpolated map on height map
-
+//	hmap[to1D(0, 0)][3] += 1.0f;
+//	hmap[to1D(0, 1)][3] += 1.0f;
+//	hmap[to1D(0, 2)][3] += 1.0f;
+//	hmap[to1D(0, 3)][3] += 1.0f;
+	hmap[to1D(0, hf_sl - 1)][3] += 1000.0f;
+	hmap[to1D(1, hf_sl - 1)][3] += 10000.0f;
+	hmap[to1D(2, hf_sl - 1)][3] += 1000.0f;
 	// Create object suitable for rendering
-	GLItem map_item;
+	HeightMap map_item;
+
+	auto cl = CLCore();
+	cl_host_part(cl, true);
+	cl_compile_kernel(cl, "src/kernels/wsim.cl", "wsim_kernel");
 
 	map_item.model = glm::mat4(1.0f);
 	map_item.idx_num = map_render_indices.size() * 3;
 	map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
-												 "src/shaders/ground_fragment.glsl");
+											"src/shaders/ground_fragment.glsl");
+	map_item.water_shader = compile_shaders("src/shaders/water_vertex.glsl",
+												 "src/shaders/water_fragment.glsl");
+
 	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
 		auto mvp = vp * map_item.model;
@@ -141,21 +160,56 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<glm::vec4
 		glUniform1i(ao, 2);
 		glUniform1i(rough, 3);
 	};
+	map_item.water_uniforms = [&](const glm::mat4 &vp) {
+		auto mvp_id = glGetUniformLocation(map_item.water_shader, "MVP");
+		auto mvp = vp * map_item.model;
+		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+	};
+
 	map_item.tex = load_texture("src/textures/layered-rock-albedo.png");
 	map_item.tex_n = load_texture("src/textures/layered-rock-normal.png");
 	map_item.tex_ao = load_texture("src/textures/layered-rock-ao.png");
 	map_item.tex_r = load_texture("src/textures/layered-rock-rough.png");
 
 	glGenBuffers(1, &map_item.vbo);
+	glGenBuffers(1, &map_item.vbo2);
 	glGenBuffers(1, &map_item.ibo);
 	glGenVertexArrays(1, &map_item.vao);
 	glBindVertexArray(map_item.vao);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
 	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo);
 	glBufferData(GL_ARRAY_BUFFER, hmap.size() * sizeof(glm::vec4), hmap.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec4), (GLvoid*)0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_TRUE, sizeof(glm::vec4), (GLvoid *)(sizeof(float) * 3));
+
+	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo2);
+	glBufferData(GL_ARRAY_BUFFER, hmap.size() * sizeof(glm::vec4), hmap.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec4), (GLvoid*)0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_TRUE, sizeof(glm::vec4), (GLvoid *)(sizeof(float) * 3));
 	glBindVertexArray(0);
+
+
+	int err = 0;
+
+	map_item.cl_vbo = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, map_item.vbo, &err);
+	map_item.cl_vbo2 = clCreateFromGLBuffer(cl.context, CL_MEM_READ_WRITE, map_item.vbo2, &err);
+	if (err != CL_SUCCESS) {
+        std::cout << "Error: " << __LINE__ << " code: " << err << ".\n";
+        exit(1);
+    }
+	map_item.cl = cl;
+
+	auto emiter = Emiter();
+	emiter.prepare_emit(cl);
+
+	map_item.emiter = emiter;
+
 	return map_item;
 }

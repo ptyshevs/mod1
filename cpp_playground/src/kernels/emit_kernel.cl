@@ -21,7 +21,6 @@ typedef struct {
     float x;
     float y;
     float z;
-    int is_solid;
     float in_volume;
 } t_cell;
 
@@ -119,7 +118,7 @@ size_t place_in_corner_with_offset(__global t_cell *cell, size_t offset, size_t 
 
 size_t to_address(float x, float y, float z)
 {
-    return ((x + hf_sl) * sl * (sl / 4) + y * sl + (z + hf_sl));
+    return ((x + hf_sl) * sl + (z + hf_sl));
 }
 
 size_t rand(size_t seed)

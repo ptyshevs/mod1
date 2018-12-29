@@ -27,8 +27,6 @@ Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode)
 
 	w.hmap = hmap;
 	w.idx_num = sl * sl * sl / 4;
-	w.snow = snow;
-	w.explode = explode;
 	w.model = glm::mat4(1.0f);
 	if (snow)
 		w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
@@ -87,45 +85,7 @@ Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode)
 	return (w);
 }
 
-void	Water::show_hmap()
-{
-	for (int i = 0; i < sl; i++)
-	{
-		for (int j = 0; j < sl; j++)
-		{
-			for (int k = 0; k < sl; k++)
-			{
-				Cell c= this->address(i, j, k);
-
-				std::cout << " 3D coords: [" << glm::to_string(c.pos);
-				std::cout << "]: " << c.volume;
-			}
-		}
-
-	}
-}
-
-glm::vec3	Water::to_coords(int x, int y, int z)
-{
-	return (glm::vec3(x, y, z) - (float)hf_sl);
-}
-
-Cell	&Water::address(int x, int y, int z)
-{
-	return (this->hmap[x * sl * sl + y * sl + z]);
-}
-
-void	Water::add_volume(int x, int y, int z, float volume)
-{
-	Cell &c = this->address(x, z, y);
-//	if (c.is_solid)
-//	{
-//		return ;
-//	}
-	c.volume += volume;
-}
-
-void 	Water::emit(void) {
+void 	HeightMap::emit(void) {
 	static uint last_emit_time = SDL_GetTicks();
 
 	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emiter.pps)) {
@@ -134,9 +94,9 @@ void 	Water::emit(void) {
 	}
 }
 
-static const size_t  global_work_size = (sl * hf_sl/2 * sl);
+static const size_t  global_work_size = (sl * sl);
 
-void	Water::update_particles()
+void	HeightMap::simulation_step()
 {
 	// To be 1000% sure that GL is finished it's work
 	glFinish();

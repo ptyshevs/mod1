@@ -14,10 +14,10 @@
 #include <camera.hpp>
 #include "limits.h"
 
-void draw(GLItem &item, const glm::mat4 &vp, GLenum type);
+void draw(HeightMap &map, const glm::mat4 &vp);
 
 
-void	process_input(GLCamera &camera, GLItem &map, bool *quit)
+void	process_input(GLCamera &camera, HeightMap &map, bool *quit)
 {
 	auto keystate = SDL_GetKeyboardState(NULL);
 
@@ -63,39 +63,38 @@ void	process_input(GLCamera &camera, GLItem &map, bool *quit)
 //		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 //		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-//	if (keystate[SDL_SCANCODE_1])
-//	{
-//		water.emiter.type = EMITER_RAIN;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_2] && !water.snow)
-//	{
-//		water.emiter.type = EMITER_WAVE;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_3] && !water.snow)
-//	{
-//		water.emiter.type = EMITER_UNDERGROUND;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_4] && !water.snow)
-//	{
-//		water.emiter.type = EMITER_BOUNDARIES;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_KP_MINUS])
-//		water.emiter.pps = abs(water.emiter.pps + 100);
-//	if (keystate[SDL_SCANCODE_KP_PLUS])
-//		water.emiter.pps = abs(water.emiter.pps - 100);
+	if (keystate[SDL_SCANCODE_1])
+	{
+		map.emiter.type = EMITER_RAIN;
+		map.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_2])
+	{
+		map.emiter.type = EMITER_WAVE;
+		map.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_3])
+	{
+		map.emiter.type = EMITER_UNDERGROUND;
+		map.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_4])
+	{
+		map.emiter.type = EMITER_BOUNDARIES;
+		map.emiter.pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_KP_MINUS])
+		map.emiter.pps = abs(map.emiter.pps + 100);
+	if (keystate[SDL_SCANCODE_KP_PLUS])
+		map.emiter.pps = abs(map.emiter.pps - 100);
 
 }
 
-int		to1D(int x, int y, int z)
+static int		to1D(int x, int z)
 {
 	x = x + hf_sl;
 	z = z + hf_sl;
-	int v = (sl * (sl / 4) * x) + sl * y + z;
-	return (v);
+	return (x * sl + z);
 }
 
 glm::vec3		to3D(int n)
@@ -159,7 +158,6 @@ int main(int ac, char *av[]) {
 
 	std::vector<glm::vec4> hmap(sl * sl, glm::vec4(0.0f));
 	auto map = generate_map(controlPointsArray, hmap);
-
 //	hmap.shrink_to_fit();
 //
 //	auto water = instance_water(hmap, snow, explode);
@@ -167,7 +165,7 @@ int main(int ac, char *av[]) {
 //	auto points = generate_control_points(controlPointsArray);
 //
 	auto camera = GLCamera();
-//
+	glPointSize(3);
 	while(!quit)
 	{
 		// Event handle
@@ -177,14 +175,14 @@ int main(int ac, char *av[]) {
 			quit = true;
 
 //		// Simulation step
-//		water.update_particles();
+		map.simulation_step();
 
 		// Actual render
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.frameStart();
-		draw(map, camera.vp(), GL_TRIANGLES);
+		draw(map, camera.vp());
 //		draw(points, camera.vp(), GL_POINTS);
 //		draw(water, camera.vp(), GL_POINTS);
 		camera.frameEnd();
@@ -196,43 +194,67 @@ int main(int ac, char *av[]) {
 
 }
 
-void draw(GLItem &item, const glm::mat4 &vp, GLenum type)
+void draw(HeightMap &map, const glm::mat4 &vp)
 {
-	glUseProgram(item.shader_program);
-	item.fill_uniforms(vp);
-	glBindVertexArray(item.vao);
+	glUseProgram(map.shader_program);
+	map.fill_uniforms(vp);
+	glBindVertexArray(map.vao);
 
-	if (item.tex) {
+	if (map.tex) {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, item.tex);
+		glBindTexture(GL_TEXTURE_2D, map.tex);
 	}
 
-	if (item.tex_n) {
+	if (map.tex_n) {
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, item.tex_n);
+		glBindTexture(GL_TEXTURE_2D, map.tex_n);
 	}
 
-	if (item.tex_ao) {
+	if (map.tex_ao) {
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, item.tex_ao);
+		glBindTexture(GL_TEXTURE_2D, map.tex_ao);
 	}
 
-	if (item.tex_r) {
+	if (map.tex) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, map.tex);
+	}
+
+	if (map.tex_n) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, map.tex_n);
+	}
+
+	if (map.tex_ao) {
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, map.tex_ao);
+	}
+
+	if (map.tex_r) {
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, item.tex_r);
+		glBindTexture(GL_TEXTURE_2D, map.tex_r);
 	}
+	glBindBuffer(GL_ARRAY_BUFFER, map.state ? map.vbo : map.vbo2);
+	glDrawElements(GL_TRIANGLES, map.idx_num, GL_UNSIGNED_INT, NULL);
 
-	if (type == GL_POINTS)
-	{
-		try {
-			auto dbitem = dynamic_cast<CLGLDoubleBufferedItem &>(item);
-			glBindBuffer(GL_ARRAY_BUFFER, dbitem.state ? dbitem.vbo : dbitem.vbo2);
-		} catch (const std::bad_cast& e) { }
-		glDrawArrays(GL_POINTS, 0, item.idx_num);
-	} else
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
-		glDrawElements(type, item.idx_num, GL_UNSIGNED_INT, NULL);
-	}
+	glUseProgram(map.water_shader);
+	map.water_uniforms(vp);
+	glBindVertexArray(map.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, map.state ? map.vbo : map.vbo2);
+	glDrawElements(GL_TRIANGLES, map.idx_num, GL_UNSIGNED_INT, NULL);
+
+
+//	if (type == GL_POINTS)
+//	{
+//		try {
+//			auto dbitem = dynamic_cast<CLGLDoubleBufferedItem &>(item);
+//			glBindBuffer(GL_ARRAY_BUFFER, dbitem.state ? dbitem.vbo : dbitem.vbo2);
+//		} catch (const std::bad_cast& e) { }
+//		glDrawArrays(GL_POINTS, 0, item.idx_num);
+//	} else
+//	{
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, item.ibo);
+//		glDrawElements(type, item.idx_num, GL_UNSIGNED_INT, NULL);
+//	}
 	glBindVertexArray(0);
 }

@@ -1,7 +1,7 @@
 #version 410 core
 
 in vec4 pos;
-
+in float volume;
 in vec4 world_normal;
 
 in vec2 uv;
