@@ -68,7 +68,7 @@ void scale_back(std::vector<glm::vec3> &cpoints)
 	{
 		glm::vec3 &cp = cpoints[0];
 		cp -= 1; // all coordinates are always 1, since they are divided by themselves in rescale
-		cp.y = (float)hf_sl / 8;
+		cp.y = (float)hf_sl / 3;
 		return ;
 	}
 	for (glm::vec3 &cp: cpoints)
@@ -76,7 +76,7 @@ void scale_back(std::vector<glm::vec3> &cpoints)
 		cp *= (float)hf_sl; // scaling
 		cp -= (float)hf_sl * 0.5; // centering
 		cp.y += (float)hf_sl; // scale down height
-		cp.y *= 0.2; // scale height more
+		cp.y *= 0.3; // scale height more
 	}
 }
 
