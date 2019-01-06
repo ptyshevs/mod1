@@ -67,6 +67,7 @@ struct GLItem {
     glm::mat4 model;
     std::function<void (const glm::mat4 &vp)> fill_uniforms;
 	virtual ~GLItem() = default;
+	void	draw(const glm::mat4 &vp, GLenum type);
 };
 
 SDLCore	sdl_gl_init(void);
@@ -75,6 +76,7 @@ void	deinit(SDLCore &core);
 // compileshaders.cpp
 char	*reader(const char *path);
 GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
+void	panic(const std::string &message);
 
 // mapgen.cpp
 

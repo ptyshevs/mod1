@@ -60,4 +60,3 @@ void	deinit(SDLCore &core) {
 	SDL_DestroyWindow(core.win);
 	SDL_Quit();
 }
-

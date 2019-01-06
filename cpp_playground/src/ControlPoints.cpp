@@ -10,8 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "core.hpp"
+#include <ControlPoints.hpp>
 
+#include "ControlPoints.hpp"
+
+ControlPoints::ControlPoints() = default;
 
 /*
 ** @brief Scale control points to [0, 1] range.
@@ -23,7 +26,7 @@
 ** @param cpoints Vector of control points
 */
 
-void rescale(std::vector<glm::vec3> &cpoints)
+void ControlPoints::_rescale()
 {
 	float x_max, y_max, z_max;
 
@@ -31,7 +34,7 @@ void rescale(std::vector<glm::vec3> &cpoints)
 	y_max = INT_MIN;
 	z_max = INT_MIN;
 
-	for (glm::vec3 cpoint: cpoints)
+	for (glm::vec3 cpoint: this->_arr)
 	{
 		if (cpoint.x > x_max)
 			x_max = cpoint.x;
@@ -40,7 +43,7 @@ void rescale(std::vector<glm::vec3> &cpoints)
 		if (cpoint.z > z_max)
 			z_max = cpoint.z;
 	}
-	for (auto &point : cpoints)
+	for (auto &point : this->_arr)
 	{
 		point.x /= x_max;
 		point.y /= y_max;
@@ -62,16 +65,16 @@ void rescale(std::vector<glm::vec3> &cpoints)
 ** @param cpoints Control points vector
 */
 
-void scale_back(std::vector<glm::vec3> &cpoints)
+void ControlPoints::_scale_back()
 {
-	if (cpoints.size() == 1)
+	if (this->_arr.size() == 1)
 	{
-		glm::vec3 &cp = cpoints[0];
+		glm::vec3 &cp = this->_arr[0];
 		cp -= 1; // all coordinates are always 1, since they are divided by themselves in rescale
 		cp.y = (float)hf_sl / 3;
 		return ;
 	}
-	for (glm::vec3 &cp: cpoints)
+	for (glm::vec3 &cp: this->_arr)
 	{
 		cp *= (float)hf_sl; // scaling
 		cp -= (float)hf_sl * 0.5; // centering
@@ -81,9 +84,9 @@ void scale_back(std::vector<glm::vec3> &cpoints)
 }
 
 
-void	show_points(std::vector<glm::vec3> &cpoints)
+void	ControlPoints::show()
 {
-	for (glm::vec3 cp: cpoints)
+	for (glm::vec3 cp: this->_arr)
 	{
 		std::cout << glm::to_string(cp) << std::endl;
 	}
@@ -93,29 +96,36 @@ void	show_points(std::vector<glm::vec3> &cpoints)
 ** @brief Add borders to control points (needed for proper interpolation)
 **
 ** You can control border points density by varying the step
-** @param cpoints 
+** @param cpoints
 */
 
-void 	add_borders(std::vector<glm::vec3> &cpoints)
+void 	ControlPoints::_add_borders()
 {
 	for (int i = 0; i < sl; i ++)
 	{
-		cpoints.emplace_back(i - hf_sl, 0, -hf_sl);
-		cpoints.emplace_back(-hf_sl, 0, i - hf_sl);
-		cpoints.emplace_back(hf_sl, 0, i - hf_sl);
-		cpoints.emplace_back(i - hf_sl, 0, hf_sl);
+		this->_arr.emplace_back(i - hf_sl, 0, -hf_sl);
+		this->_arr.emplace_back(-hf_sl, 0, i - hf_sl);
+		this->_arr.emplace_back(hf_sl, 0, i - hf_sl);
+		this->_arr.emplace_back(i - hf_sl, 0, hf_sl);
 	}
 }
 
 /*
-** @brief Rescale control points and add border
-** 
-** @param cpoints 
+** @brief Rescale control points and add border optionally
+**
 */
 
-void	prepare_control_points(std::vector<glm::vec3> &cpoints)
+void	ControlPoints::prepare(bool add_borders)
 {
-	rescale(cpoints);
-	scale_back(cpoints);
-	add_borders(cpoints);
+	this->_rescale();
+	this->_scale_back();
+	if (add_borders)
+		this->_add_borders();
 }
+
+ControlPoints &ControlPoints::operator=(const std::vector<glm::vec3> &m)
+{
+	this->_arr = m;
+	return (*this);
+}
+

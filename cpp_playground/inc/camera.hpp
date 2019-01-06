@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef CAMERA_HPP
+# define CAMERA_HPP
 #include <core.hpp>
 
 struct GLCamera {
@@ -65,3 +67,5 @@ struct GLCamera {
         speed = 0.5f * delta_time;
     }
 };
+
+#endif
