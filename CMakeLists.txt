@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(cpp_playground/inc cpp_playground/libs/libglm cpp_playground/libs/libglew/src/include cpp_playground/libs/liblodepng)
 aux_source_directory(cpp_playground/src MOD_SRC)
-add_executable(mod1 ${MOD_SRC})
+add_executable(mod1 ${MOD_SRC} cpp_playground/src/key_bindings.cpp cpp_playground/src/GLItem.cpp)
 
 add_subdirectory(cpp_playground/libs/libglm)
 
@@ -17,3 +17,5 @@ target_link_libraries(mod1 glew glm "-framework OpenGL" "-framework SDL2" "-fram
 
 add_compile_options(-std=c++1z)
 
+add_executable(sph sph/main.cpp)
+target_link_libraries(sph glm)

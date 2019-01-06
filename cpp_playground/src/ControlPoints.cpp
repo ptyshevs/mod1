@@ -12,8 +12,6 @@
 
 #include <ControlPoints.hpp>
 
-#include "ControlPoints.hpp"
-
 ControlPoints::ControlPoints() = default;
 
 /*
