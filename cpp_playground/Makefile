@@ -53,15 +53,20 @@ LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC)
 
 EXEC = mod1
 
+
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp sdl_gl_init.cpp \
 				compileshaders.cpp cl_init.cpp control_points.cpp Water.cpp \
 				Emiter.cpp textures.cpp
 
-SRC = $(addprefix src/, $(SRCFILENAME))
+SRC_DIR = src
+SRC = $(addprefix $(SRC_DIR)/, $(SRCFILENAME))
 
-OBJ := $(SRC:.cpp=.o)
+OBJ_DIR = obj
 
-%.o:%.cpp
+OBJ := $(addprefix $(OBJ_DIR)/, $(SRCFILENAME:.cpp=.o))
+
+$(OBJ_DIR)/%.o:$(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CCFLAGS) $(MOD1INC) $(LIBSINC) $(FRAMEWORKSPATH) -o $@ -c $<
 
 CC = clang++
@@ -77,7 +82,7 @@ $(EXEC): $(LIBGLEWBIN) $(LIBLODEPNGBIN) $(OBJ)
 	$(CC) $(CCFLAGS) $(FRMPATH) $(FRAMEWORKS) $(LIBSDIR) $(LIBS) $(OBJ) -o $(EXEC)
 
 clean:
-	@rm -rf $(OBJ)
+	@rm -rf $(OBJ_DIR)
 
 fclean: clean
 	@rm -rf $(EXEC)
