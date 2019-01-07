@@ -66,10 +66,27 @@ void	ParticleSystemSolver::resolveCollision() {
 		Particle &p = _data[i];
 		auto new_position = _new_positions[i];
 		auto new_velocity = _new_velocities[i];
-		if (new_position.y < 0.0) // floor
+		// Bounding box
+		if (_data.hmap != nullptr) {
+			_data.hmap->bound(new_position);
+
+			Cell &c = _data.hmap->address(new_position);
+			if (c.is_solid)
+			{
+				// assume that this cell is right at the surface. If anything strange happens,
+				// especially on high velicities, this will probably fail.
+				glm::vec3 normal = _data.hmap->normal(new_position);
+
+				double scaling = glm::dot(normal, new_velocity);
+				glm::vec3 v_normal = scaling * normal;
+				_new_velocities[i] = v_normal;
+//				_new_velocities[i] *= -DAMPING;
+			}
+		}
+		else if (new_position.y < 0.0)
 		{
 			_new_positions[i].y = 0;
-			_new_velocities[i] *= -DAMPING;
+			_new_velocities[i] *= -DAMPING; // this can introduce oscillations on small scale
 		}
 	}
 }

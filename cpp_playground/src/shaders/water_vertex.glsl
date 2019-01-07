@@ -10,7 +10,7 @@ out vec3 velocity;
 uniform mat4 MVP;
 
 void main() {
-    gl_Position = MVP * vec4(in_position, 1.0f);
+    gl_Position = MVP * vec4(in_position.x, in_position.y + 0.75f, in_position.z, 1.0f);
     position = vec4(in_position, 1.0f);
     velocity = in_velocity;
 }

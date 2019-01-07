@@ -13,6 +13,7 @@
 #ifndef PARTICLE_SYSTEM_DATA_HPP
 #define PARTICLE_SYSTEM_DATA_HPP
 
+#include <HeightMap.hpp>
 #include <iostream>
 #include <vector>
 
@@ -40,7 +41,8 @@ private:
 	const float 			_mass;
 	const glm::vec3			_gravity;
 public:
-	std::vector<Particle> _particles;
+	std::vector<Particle>	_particles;
+	HeightMap				*hmap;
 
 	explicit ParticleSystemData(size_t numOfParticles = 0);
 

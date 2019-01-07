@@ -14,11 +14,13 @@
 #define PARTICLESYSTEMSOLVER_H
 
 #include <ParticleSystemData.hpp>
+#include <HeightMap.hpp>
 
 // like 60 FPS = 1/60 SPF
 #define TIME_STEP 0.0166f
 // increase to see how it would decrease relative velocity
 #define DRAG_COEF 0.001f
+#define RESTITUTION 0.7f
 #define DAMPING 0.4f
 
 class ParticleSystemSolver {
