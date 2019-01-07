@@ -1,16 +1,16 @@
 #version 410 core
 #define hf_sl 100
-layout (location = 0) in vec3 position;
-layout (location = 1) in int  is_solid;
-layout (location = 2) in float in_volume;
+layout (location = 0) in vec3 in_position;
+layout (location = 1) in vec3 in_velocity;
+layout (location = 2) in vec3 in_force;
 
-out vec4 pos;
-out float volume;
+out vec4 position;
+out vec3 velocity;
 
 uniform mat4 MVP;
 
 void main() {
-    gl_Position = MVP * vec4(position, 1.0f);
-    pos = vec4(position, 1.0f);
-    volume = in_volume;
+    gl_Position = MVP * vec4(in_position, 1.0f);
+    position = vec4(in_position, 1.0f);
+    velocity = in_velocity;
 }

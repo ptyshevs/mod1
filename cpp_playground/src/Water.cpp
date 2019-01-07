@@ -64,4 +64,5 @@ void Water::_updateBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, data->numOfParticles() * sizeof(Particle), data->_particles.data(), GL_DYNAMIC_DRAW);
 	glBindVertexArray(0);
+	idx_num = data->numOfParticles();
 }

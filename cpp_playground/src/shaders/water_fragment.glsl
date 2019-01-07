@@ -1,29 +1,28 @@
 #version 410 core
-#define sl 200
-#define hf_sl 100
-#define eps 0.0001f
+in vec4 position;
+in vec3 velocity;
 
-in vec4 pos;
+float Ns = 250;
+vec4 mat_specular=vec4(1);
+vec4 light_specular=vec4(1);
 
-in float volume;
 
 out vec4 color;
 
-vec3 checker(in float u, in float v)
-{
-  float checkSize = 50;
-  float fmodResult = mod(floor(checkSize * u) + floor(checkSize * v), 2.0);
-  float fin = max(sign(fmodResult), 0.0);
-  return vec3(fin, fin, fin);
-}
-
 void main() {
-	if (volume < eps)
-		discard ;
-  // if (volume < 0)
-  //   color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-  // else if (volume > 1)
-  //   color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-  // else
-	color = vec4(0.0f, 0.0f, 0.6f + volume, 0.01f);
+    vec3 N;
+    N.xy = gl_PointCoord* 2.0 - vec2(1.0);
+    float mag = dot(N.xy, N.xy);
+    if (mag > 1.0) discard;   // kill pixels outside circle
+    N.z = sqrt(1.0-mag);
+
+    // calculate lighting
+    float diffuse = max(0.0, dot(vec3(0,0,1), N));
+
+    vec3 eye = vec3 (0.0, 0.0, 1.0);
+    vec3 halfVector = normalize( eye + vec3(0,0,1));
+    float spec = max( pow(dot(N,halfVector), Ns), 0.);
+    vec4 S = light_specular*mat_specular* spec;
+    float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
+    color = vec4(0.3f + vel_mag, 0.3f + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
 }

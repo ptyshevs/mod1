@@ -1,6 +1,14 @@
-//
-// Created by Pavlo TYSHEVSKYI on 1/6/19.
-//
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ControlPoints.hpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/01/07 16:00:20 by ptyshevs          #+#    #+#             */
+/*   Updated: 2019/01/07 16:00:26 by ptyshevs         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef CONTROL_POINTS_HPP
 #define CONTROL_POINTS_HPP
@@ -21,4 +29,4 @@ public:
 	void 	show();
 };
 
-#endif //CONTROL_POINTS_HPP
+#endif
