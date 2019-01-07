@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include <core.hpp>
+#include <HeightMap.hpp>
+#include <ControlPoints.hpp>
 
 /*
 ** Generate map here
@@ -39,7 +41,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 ** Modify map
 */
 
-void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map)
+void interpolate_using_controll_points(const std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map)
 {
 	auto cl = CLCore();
 
@@ -102,7 +104,10 @@ void interpolate_using_controll_points(std::vector<glm::vec3> &cp, std::vector<g
 	clReleaseContext(cl.context);
 }
 
-GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap) {
+HeightMap generate_map(const ControlPoints &control_points) {
+	HeightMap heightMap;
+	heightMap.hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
+
 	std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
 	for (size_t i = 0; i < sl; i++) {
 		for (size_t j = 0; j < sl; j++) {
@@ -116,7 +121,7 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
 	std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
 	// Interpolate stuff
-	interpolate_using_controll_points(control_points, map);
+	interpolate_using_controll_points(control_points._arr, map);
 
 	// Remap interpolated map on height map
 	for (size_t i = 0; i < sl; i++)
@@ -126,51 +131,52 @@ GLItem generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hm
 			for (size_t k = 0; k < sl; k++)
 			{
 				auto &point = map[i * sl + k];
-				hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
+				heightMap.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
 								  (float)j <= point.y,
 								  0.0f);
 			}
 		}
 	}
 	// Create object suitable for rendering
-	GLItem map_item;
 
-	map_item.model = glm::mat4(1.0f);
-	map_item.idx_num = map_render_indices.size() * 3;
-	map_item.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
+	heightMap.model = glm::mat4(1.0f);
+	heightMap.idx_num = map_render_indices.size() * 3;
+	heightMap.shader_program = compile_shaders("src/shaders/ground_vertex.glsl",
 												 "src/shaders/ground_fragment.glsl");
-	map_item.fill_uniforms = [&](const glm::mat4 &vp) {
-		auto mvp_id = glGetUniformLocation(map_item.shader_program, "MVP");
-		auto mvp = vp * map_item.model;
+	heightMap.fill_uniforms = [&](const glm::mat4 &vp) {
+		auto mvp_id = glGetUniformLocation(heightMap.shader_program, "MVP");
+		auto mvp = vp * heightMap.model;
 		glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
 
-		auto albedo = glGetUniformLocation(map_item.shader_program, "albedo");
-		auto normal  = glGetUniformLocation(map_item.shader_program, "normal");
-		auto ao = glGetUniformLocation(map_item.shader_program, "ao");
-		auto rough  = glGetUniformLocation(map_item.shader_program, "rough");
+		auto albedo = glGetUniformLocation(heightMap.shader_program, "albedo");
+		auto normal  = glGetUniformLocation(heightMap.shader_program, "normal");
+		auto ao = glGetUniformLocation(heightMap.shader_program, "ao");
+		auto rough  = glGetUniformLocation(heightMap.shader_program, "rough");
 
 		glUniform1i(albedo, 0);
 		glUniform1i(normal, 1);
 		glUniform1i(ao, 2);
 		glUniform1i(rough, 3);
 	};
-	map_item.tex = load_texture("src/textures/layered-rock-albedo.png");
-	map_item.tex_n = load_texture("src/textures/layered-rock-normal.png");
-	map_item.tex_ao = load_texture("src/textures/layered-rock-ao.png");
-	map_item.tex_r = load_texture("src/textures/layered-rock-rough.png");
+	heightMap.tex = load_texture("src/textures/layered-rock-albedo.png");
+	heightMap.tex_n = load_texture("src/textures/layered-rock-normal.png");
+	heightMap.tex_ao = load_texture("src/textures/layered-rock-ao.png");
+	heightMap.tex_r = load_texture("src/textures/layered-rock-rough.png");
 
-	glGenBuffers(1, &map_item.vbo);
-	glGenBuffers(1, &map_item.ibo);
-	glGenVertexArrays(1, &map_item.vao);
-	glBindVertexArray(map_item.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, map_item.vbo);
+	glGenBuffers(1, &heightMap.vbo);
+	glGenBuffers(1, &heightMap.ibo);
+	glGenVertexArrays(1, &heightMap.vao);
+	glBindVertexArray(heightMap.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, heightMap.vbo);
 	glBufferData(GL_ARRAY_BUFFER, map.size() * sizeof(glm::vec3), map.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, map_item.ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, heightMap.ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, map_render_indices.size() * sizeof(glm::ivec3), map_render_indices.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(glm::vec3), (GLvoid*)0);
 	glBindVertexArray(0);
-	return map_item;
+
+	heightMap.hmap.shrink_to_fit();
+	return heightMap;
 }
 
 GLItem generate_control_points(std::vector<glm::vec3> control_points)

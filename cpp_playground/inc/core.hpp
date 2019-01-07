@@ -145,7 +145,7 @@ public:
 	void	emit(void);
 };
 
-GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
+//GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
 GLItem	generate_control_points(std::vector<glm::vec3> control_points);
 void	prepare_control_points(std::vector<glm::vec3> &cpoints);
 Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode);

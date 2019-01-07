@@ -14,6 +14,7 @@
 #include <camera.hpp>
 #include <key_bindings.hpp>
 #include <ControlPoints.hpp>
+#include <HeightMap.hpp>
 
 int main(int ac, char *av[]) {
 	ControlPoints controlPoints;
@@ -28,13 +29,10 @@ int main(int ac, char *av[]) {
 	controlPoints.prepare(true);
 	auto core = sdl_gl_init();
 
-	std::vector<Cell> hmap;
-	hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
-	auto map = generate_map(controlPoints._arr, hmap);
+	auto map = generate_map(controlPoints);
 
-	hmap.shrink_to_fit();
 
-	auto water = instance_water(hmap, false, false);
+	auto water = instance_water(map.hmap, false, false);
 
 	auto camera = GLCamera();
 
@@ -44,7 +42,7 @@ int main(int ac, char *av[]) {
 	{
 		// Event handle
 		SDL_PollEvent(&(core.event));
-		process_input(camera, map, water, &quit);
+		process_input(camera, static_cast<GLItem &>(map), water, &quit);
 		// Simulation step
 		water.update_particles();
 

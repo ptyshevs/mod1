@@ -148,7 +148,7 @@ void	Water::update_particles()
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
 	// Emit some water
-//	emit();
+	emit();
 
 	int err = 0;
 	err = clSetKernelArg(cl.kernel, state ? 0 : 1, sizeof(cl_vbo), &cl_vbo);

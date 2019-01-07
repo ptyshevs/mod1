@@ -37,9 +37,6 @@ struct Particle {
 struct ParticleSystemData {
 private:
 	std::vector<Particle> _particles;
-	std::vector<glm::vec3>	_positions;
-	std::vector<glm::vec3>	_velocities;
-	std::vector<glm::vec3>	_forces;
 
 	const float 			_mass;
 	const glm::vec3			_gravity;
