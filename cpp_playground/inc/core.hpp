@@ -132,9 +132,6 @@ struct Water: CLGLDoubleBufferedItem
 public:
 	std::vector<Cell>		hmap;
 	std::vector<glm::vec3>	indices;
-
-	bool					snow;
-	bool					explode;
 	Emiter emiter;
 
 	void	update_particles();
@@ -146,8 +143,7 @@ public:
 };
 
 //GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
-GLItem	generate_control_points(std::vector<glm::vec3> control_points);
-void	prepare_control_points(std::vector<glm::vec3> &cpoints);
+
 Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode);
 
 typedef struct  s_constants {

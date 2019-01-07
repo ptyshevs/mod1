@@ -23,14 +23,13 @@ int main(int ac, char *av[]) {
 		panic("File is not readable");
 	try {
 		controlPoints = readFile(av[1]);
+		controlPoints.prepare(true);
 		} catch (std::exception &e) {
 		panic(e.what());
 		}
-	controlPoints.prepare(true);
 	auto core = sdl_gl_init();
 
 	auto map = generate_map(controlPoints);
-
 
 	auto water = instance_water(map.hmap, false, false);
 
