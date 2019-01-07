@@ -20,7 +20,7 @@ void	HeightMap::show() const
 		{
 			for (int k = 0; k < sl; k++)
 			{
-				Cell c= this->hash(i, j, k);
+				Cell c= hmap[hash(i, j, k)];
 
 				std::cout << " 3D coords: [" << glm::to_string(c.pos);
 				std::cout << "]: " << c.volume;

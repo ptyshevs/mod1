@@ -36,11 +36,12 @@ struct Particle {
 
 struct ParticleSystemData {
 private:
-	std::vector<Particle> _particles;
 
 	const float 			_mass;
 	const glm::vec3			_gravity;
 public:
+	std::vector<Particle> _particles;
+
 	explicit ParticleSystemData(size_t numOfParticles = 0);
 
 	void addParticle(const glm::vec3 &position,

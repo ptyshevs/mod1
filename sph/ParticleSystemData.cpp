@@ -23,10 +23,6 @@ void	Particle::show() const {
 	printf("vel [%0.2f, %0.2f, %0.2f] ", this->velocity.x, this->velocity.y,
 			this->velocity.z);
 	printf("F [%0.2f, %0.2f, %0.2f]\n", this->force.x, this->force.y, this->force.z);
-//	std::cout << "p: " << glm::to_string(this->position);
-//	std::cout << " v: " << glm::to_string(this->velocity);
-//	std::cout << " f: " << glm::to_string(this->force);
-//	std::cout << std::endl;
 }
 
 ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0))

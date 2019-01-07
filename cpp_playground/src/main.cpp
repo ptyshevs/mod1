@@ -27,16 +27,15 @@ int main(int ac, char *av[]) {
 		controlPoints.prepare(true);
 		} catch (std::exception &e) {
 		panic(e.what());
-		}
-	auto core = sdl_gl_init();
+	}
 
+	auto core = sdl_gl_init();
 	auto map = generate_map(controlPoints);
 
-	auto water = instance_water(map);
-
+	ParticleSystemData data;
+	auto water = instance_water(&map, &data);
+	water.solver = new ParticleSystemSolver(data);
 	auto camera = GLCamera();
-
-	glPointSize(4);
 	bool quit = false;
 	do
 	{

@@ -27,13 +27,8 @@ void GLItem::draw(const glm::mat4 &vp, GLenum type)
 	}
 
 	if (type == GL_POINTS)
-	{
-		try {
-			auto dbitem = dynamic_cast<CLGLDoubleBufferedItem &>(*this);
-			glBindBuffer(GL_ARRAY_BUFFER, dbitem.state ? dbitem.vbo : dbitem.vbo2);
-		} catch (const std::bad_cast& e) { }
-		glDrawArrays(GL_POINTS, 0, this->idx_num);
-	} else
+		glDrawArrays(GL_POINTS, 0, this->idx_num); // those are only particles
+	else
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
 		glDrawElements(type, this->idx_num, GL_UNSIGNED_INT, NULL);

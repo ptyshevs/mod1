@@ -15,6 +15,8 @@
 
 #include <core.hpp>
 #include <HeightMap.hpp>
+#include <ParticleSystemData.hpp>
+#include <ParticleSystemSolver.hpp>
 
 /*
  * This is the main structure for water simulation, that contains:
@@ -23,20 +25,22 @@
  */
 struct Water: public GLItem
 {
+private:
+	void					_updateBuffer();
 public:
-	explicit Water(HeightMap &map) : hmap(map) {};
-	HeightMap	&hmap;
+	explicit Water();
+
+	HeightMap				*hmap;
+	ParticleSystemData		*data;
+	ParticleSystemSolver	*solver;
 	std::vector<glm::vec3>	indices;
-	Emiter emiter;
+//	Emiter emiter;
 
 	void	update_particles();
-	glm::vec3 to_coords(int x, int y, int z);
-	void	add_volume(int x, int y, int z, float volume);
-	void	emit();
+//	void	emit();
 };
 
 
-Water	instance_water(HeightMap &hmap);
-
+Water	instance_water(HeightMap *hmap, ParticleSystemData *data);
 
 #endif
