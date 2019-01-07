@@ -18,8 +18,14 @@
 int main(int ac, char **av)
 {
 	ParticleSystemData data;
-	data.addParticle(glm::vec3(0));
 	data.addParticle(glm::vec3(1));
+//	data.addParticle(glm::vec3(1));
 	std::cout << data.numOfParticles() << std::endl;
-
+	ParticleSystemSolver solver(data);
+	for (int i = 0; i < 100; ++i)
+	{
+		std::cout << "Time step: " << i << std::endl;
+		solver.simulation_step();
+		data.show();
+	}
 }

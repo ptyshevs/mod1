@@ -58,6 +58,8 @@ public:
 	const glm::vec3	&gravity() const;
 
 	Particle	&operator[](size_t i);
+
+	void	show(ssize_t i = -1);
 };
 
 #endif

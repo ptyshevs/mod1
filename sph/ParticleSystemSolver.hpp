@@ -15,20 +15,30 @@
 
 #include <ParticleSystemData.hpp>
 
+// like 60 FPS = 1/60 SPF
+#define TIME_STEP 0.0166f
+// increase to see how it would decrease relative velocity
+#define DRAG_COEF 0.001f
+#define DAMPING 0.7f
+
 class ParticleSystemSolver {
 private:
-	ParticleSystemData	*_data;
+	ParticleSystemData	&_data;
+	std::vector<glm::vec3>	_new_velocities;
+	std::vector<glm::vec3>	_new_positions;
+
 	void	beginAdvanceTimeStep();
 	void	endAdvanceTimeStep();
 
-	void	accumulateForces(double dt);
+	void	accumulateForces(float dt);
 	void	accumulateExternalForces();
-	void	timeIntegration(double dt);
+	void	timeIntegration(float dt);
 	void	resolveCollision();
 public:
-	ParticleSystemSolver();
+//	ParticleSystemSolver();
+	ParticleSystemSolver(ParticleSystemData &data);
 
-	void simulation_step(double dt);
+	void simulation_step(float dt = TIME_STEP);
 };
 
 #endif
