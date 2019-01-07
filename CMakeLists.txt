@@ -17,5 +17,7 @@ target_link_libraries(mod1 glew glm "-framework OpenGL" "-framework SDL2" "-fram
 
 add_compile_options(-std=c++1z)
 
-add_executable(sph sph/main.cpp)
+aux_source_directory(sph SPH_SRC)
+add_executable(sph ${SPH_SRC})
+include_directories(sph)
 target_link_libraries(sph glm)
