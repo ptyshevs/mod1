@@ -15,6 +15,7 @@
 #include <key_bindings.hpp>
 #include <ControlPoints.hpp>
 #include <HeightMap.hpp>
+#include <Water.hpp>
 
 int main(int ac, char *av[]) {
 	ControlPoints controlPoints;
@@ -31,7 +32,7 @@ int main(int ac, char *av[]) {
 
 	auto map = generate_map(controlPoints);
 
-	auto water = instance_water(map.hmap, false, false);
+	auto water = instance_water(map);
 
 	auto camera = GLCamera();
 

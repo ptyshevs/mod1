@@ -127,24 +127,6 @@ struct Emiter: CLCore {
 	cl_mem  cl_emiter;
 };
 
-struct Water: CLGLDoubleBufferedItem
-{
-public:
-	std::vector<Cell>		hmap;
-	std::vector<glm::vec3>	indices;
-	Emiter emiter;
-
-	void	update_particles();
-	Cell	&address(int x, int y, int z);
-	glm::vec3 to_coords(int x, int y, int z);
-	void	show_hmap(void);
-	void	add_volume(int x, int y, int z, float volume);
-	void	emit(void);
-};
-
-//GLItem  generate_map(std::vector<glm::vec3> control_points, std::vector<Cell> &hmap);
-
-Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode);
 
 typedef struct  s_constants {
     cl_int      map_size;

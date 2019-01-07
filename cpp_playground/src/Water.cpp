@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include "core.hpp"
+#include <Water.hpp>
 
-Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode)
+Water	instance_water(HeightMap &hmap)
 {
-	Water w;
+	Water w(hmap);
 
     auto cl = CLCore();
     cl_host_part(cl, true);
@@ -74,34 +75,13 @@ Water	instance_water(std::vector<Cell> &hmap, bool snow, bool explode)
 	return (w);
 }
 
-void	Water::show_hmap()
-{
-	for (int i = 0; i < sl; i++)
-	{
-		for (int j = 0; j < sl; j++)
-		{
-			for (int k = 0; k < sl; k++)
-			{
-				Cell c= this->address(i, j, k);
 
-				std::cout << " 3D coords: [" << glm::to_string(c.pos);
-				std::cout << "]: " << c.volume;
-				std::cout << " is_solid: " << c.is_solid << std::endl;
-			}
-		}
-
-	}
-}
 
 glm::vec3	Water::to_coords(int x, int y, int z)
 {
 	return (glm::vec3(x, y, z) - (float)hf_sl);
 }
 
-Cell	&Water::address(int x, int y, int z)
-{
-	return (this->hmap[x * sl * sl + y * sl + z]);
-}
 
 void	Water::add_volume(int x, int y, int z, float volume)
 {
