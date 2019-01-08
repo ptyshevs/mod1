@@ -30,6 +30,7 @@ public:
 	Cell		&address(int i, int j, int k);
 	Cell		&address(glm::vec3 pos);
 	void		bound(glm::vec3 &position);
+	bool		out_of_bound(const glm::vec3 &position) const;
 	glm::vec3	normal(const glm::vec3 &position);
 //	Cell		&find_surface(glm::vec3 &position const);
 };

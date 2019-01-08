@@ -35,9 +35,13 @@ int main(int ac, char *av[]) {
 	ParticleSystemData data;
 	data.hmap = &map;
 	data.addParticle(glm::vec3(0, hf_sl / 2 - 1, 0));
-//	data.addParticle(glm::vec3(0, 20, hf_sl - 45));
-//	data.addParticle(glm::vec3(-20, 40, hf_sl - 45));
-//	data.addParticle(glm::vec3(-15, 40, hf_sl - 45));
+	data.addParticle(glm::vec3(0, 20, hf_sl - 45));
+	data.addParticle(glm::vec3(-20, 40, hf_sl - 45));
+	data.addParticle(glm::vec3(-15, 40, hf_sl - 45));
+	data.addParticle(glm::vec3(14, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(15, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(16, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(17, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(hf_sl - 1, 1, hf_sl - 1));
 //	data.addParticle(glm::vec3(0, 1, hf_sl - 1));
 	auto water = instance_water(&map, &data);

@@ -21,7 +21,7 @@
 // increase to see how it would decrease relative velocity
 #define DRAG_COEF 0.001f
 #define RESTITUTION 0.6f
-#define DAMPING 0.4f
+#define DAMPING 0.65f
 
 class ParticleSystemSolver {
 private:
