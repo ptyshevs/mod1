@@ -65,7 +65,7 @@ void	ParticleSystemSolver::resolveCollision() {
 	for (size_t i = 0; i < n; ++i){
 		Particle &p = _data[i];
 		auto new_position = _new_positions[i];
-		auto new_velocity = _new_velocities[i];
+		auto velocity = _new_velocities[i];
 		// Bounding box
 		if (_data.hmap != nullptr) {
 			_data.hmap->bound(new_position);
@@ -76,10 +76,15 @@ void	ParticleSystemSolver::resolveCollision() {
 				// assume that this cell is right at the surface. If anything strange happens,
 				// especially on high velicities, this will probably fail.
 				glm::vec3 normal = _data.hmap->normal(new_position);
-
-				double scaling = glm::dot(normal, new_velocity);
-				glm::vec3 v_normal = scaling * normal;
-				_new_velocities[i] = v_normal;
+				float vel_mag = glm::length(velocity);
+//				_new_velocities[i] = normal * vel_mag * RESTITUTION;
+				glm::vec3 vel_normalized = velocity / vel_mag;
+				glm::vec3 reflected = vel_normalized - (2 * glm::dot(vel_normalized, normal) * normal);
+				glm::vec3 renormalized = reflected * vel_mag * RESTITUTION;
+				_new_velocities[i] = renormalized;
+//				double scaling = glm::dot(normal, velocity);
+//				glm::vec3 v_normal = scaling * normal;
+//				_new_velocities[i] = v_normal;
 //				_new_velocities[i] *= -DAMPING;
 			}
 		}

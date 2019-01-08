@@ -95,39 +95,55 @@ glm::vec3 HeightMap::normal(const glm::vec3 &position)
 	glm::vec3 normed_normal = normal / glm::length(normal);
 	return (normed_normal);
 }
+#define DERIV_DUMPING 1.0f
+
 
 float HeightMap::_dx(glm::vec3 &grid_position)
 {
-	if (grid_position.x < hf_sl - 2)
+	float left_y = 0;
+	float right_y = 0;
+	bool  left_found, right_found;
+
+	left_found = false;
+	right_found = false;
+	for (int i = hf_sl / 2 - 1; i >= 0; --i)
 	{
-		for (int i = hf_sl / 2 - 1; i >= 0; --i)
-		{
-			if (address(grid_position.x + 1, i, grid_position.z).is_solid)
-				return (i - grid_position.y) * 0.001f;
+		if (!left_found && address(grid_position.x - 1, i, grid_position.z).is_solid) {
+			left_y = i;
+			left_found = true;
 		}
-	} else
-		std::cerr << "Backward difference is not implemented" << std::endl;
-	return (0);
+		if (!right_found && address(grid_position.x + 1, i, grid_position.z).is_solid) {
+			right_y = i;
+			right_found = true;
+		}
+		if (left_found && right_found)
+			break ;
+	}
+	return (right_y - left_y) / 2 * DERIV_DUMPING;
 }
 
 float HeightMap::_dz(glm::vec3 &grid_position)
 {
-	if (grid_position.z < hf_sl - 2)
-	{
-		for (int i = hf_sl / 2 - 1; i >= 0; --i)
-		{
-			if (address(grid_position.x, i, grid_position.z + 1).is_solid)
-				return (i - grid_position.y) * 0.001f;
-		}
-	} else {
-		std::cerr << "Backward difference is not implemented" << std::endl;
+	float left_y = 0;
+	float right_y = 0;
+	bool  left_found, right_found;
 
-		for (int i = hf_sl / 2 - 1; i >= 0; --i) {
-			if (address(grid_position.x, i, grid_position.z - 1).is_solid)
-				return (grid_position.y - i) * 0.001f;
+	left_found = false;
+	right_found = false;
+	for (int i = hf_sl / 2 - 1; i >= 0; --i)
+	{
+		if (!left_found && address(grid_position.x, i, grid_position.z - 1).is_solid) {
+			left_y = i;
+			left_found = true;
 		}
+		if (!right_found && address(grid_position.x, i, grid_position.z + 1).is_solid) {
+			right_y = i;
+			right_found = true;
+		}
+		if (left_found && right_found)
+			break ;
 	}
-	return (0);
+	return (right_y - left_y) / 2 * DERIV_DUMPING;
 }
 
 ///*

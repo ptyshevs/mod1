@@ -20,7 +20,7 @@
 #define TIME_STEP 0.0166f
 // increase to see how it would decrease relative velocity
 #define DRAG_COEF 0.001f
-#define RESTITUTION 0.7f
+#define RESTITUTION 0.98f
 #define DAMPING 0.4f
 
 class ParticleSystemSolver {
