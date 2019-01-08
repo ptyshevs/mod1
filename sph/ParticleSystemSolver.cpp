@@ -68,7 +68,7 @@ void	ParticleSystemSolver::resolveCollision() {
 		auto velocity = _new_velocities[i];
 		// Bounding box
 		if (_data.hmap != nullptr) {
-			_data.hmap->bound(new_position);
+			_data.hmap->bound(_new_positions[i]);
 
 			Cell &c = _data.hmap->address(new_position);
 			if (c.is_solid)
@@ -77,15 +77,11 @@ void	ParticleSystemSolver::resolveCollision() {
 				// especially on high velicities, this will probably fail.
 				glm::vec3 normal = _data.hmap->normal(new_position);
 				float vel_mag = glm::length(velocity);
-//				_new_velocities[i] = normal * vel_mag * RESTITUTION;
 				glm::vec3 vel_normalized = velocity / vel_mag;
 				glm::vec3 reflected = vel_normalized - (2 * glm::dot(vel_normalized, normal) * normal);
-				glm::vec3 renormalized = reflected * vel_mag * RESTITUTION;
-				_new_velocities[i] = renormalized;
-//				double scaling = glm::dot(normal, velocity);
-//				glm::vec3 v_normal = scaling * normal;
-//				_new_velocities[i] = v_normal;
-//				_new_velocities[i] *= -DAMPING;
+				glm::vec3 renormalized = reflected * (vel_mag);
+				glm::vec3 frictioned = renormalized - renormalized * 0.3 * fabs(glm::dot(vel_normalized, normal));
+				_new_velocities[i] = frictioned;
 			}
 		}
 		else if (new_position.y < 0.0)

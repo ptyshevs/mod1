@@ -95,9 +95,8 @@ glm::vec3 HeightMap::normal(const glm::vec3 &position)
 	glm::vec3 normed_normal = normal / glm::length(normal);
 	return (normed_normal);
 }
-#define DERIV_DUMPING 1.0f
 
-
+// This will fail on the boundaries, but is more straight-forward
 float HeightMap::_dx(glm::vec3 &grid_position)
 {
 	float left_y = 0;
@@ -119,7 +118,7 @@ float HeightMap::_dx(glm::vec3 &grid_position)
 		if (left_found && right_found)
 			break ;
 	}
-	return (right_y - left_y) / 2 * DERIV_DUMPING;
+	return (right_y - left_y) / 2.0f;
 }
 
 float HeightMap::_dz(glm::vec3 &grid_position)
@@ -143,7 +142,7 @@ float HeightMap::_dz(glm::vec3 &grid_position)
 		if (left_found && right_found)
 			break ;
 	}
-	return (right_y - left_y) / 2 * DERIV_DUMPING;
+	return (right_y - left_y) / 2.0f;
 }
 
 ///*
