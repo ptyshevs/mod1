@@ -33,6 +33,7 @@ struct Particle {
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
 	void	show() const;
+	std::ostream &operator<<(std::ostream &);
 };
 
 struct ParticleSystemData {
@@ -42,6 +43,7 @@ private:
 	const glm::vec3			_gravity;
 public:
 	std::vector<Particle>	_particles;
+	std::vector<std::vector<Particle *>> neighbors;
 	HeightMap				*hmap;
 
 	explicit ParticleSystemData(size_t numOfParticles = 0);
@@ -60,6 +62,8 @@ public:
 	Particle	&operator[](size_t i);
 
 	void	show(ssize_t i = -1);
+
+	void	cacheNeighbors();
 };
 
 #endif

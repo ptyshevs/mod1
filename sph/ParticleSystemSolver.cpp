@@ -60,7 +60,6 @@ void	ParticleSystemSolver::timeIntegration(float dt) {
 }
 
 void	ParticleSystemSolver::resolveCollision() {
-	// todo: Add heightmap into consideration and bounding box
 	size_t 			n = _data.numOfParticles();
 	for (size_t i = 0; i < n; ++i){
 		Particle &p = _data[i];
@@ -97,6 +96,9 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
 	// here we should clear forces, but they're rewritten in accumulateExternalForces
 	_new_positions.reserve(_data.numOfParticles());
 	_new_velocities.reserve(_data.numOfParticles());
+	_data.cacheNeighbors();
+	_data.show();
+	exit (1);
 }
 
 /*
@@ -104,6 +106,7 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
  */
 void ParticleSystemSolver::endAdvanceTimeStep()
 {
+	// TODO: replace with range-based loop for efficiency
 	size_t n = _data.numOfParticles();
 	for (size_t i = 0; i < n; ++i)
 	{

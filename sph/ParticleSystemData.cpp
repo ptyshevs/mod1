@@ -25,6 +25,12 @@ void	Particle::show() const {
 	printf("F [%0.2f, %0.2f, %0.2f]\n", this->force.x, this->force.y, this->force.z);
 }
 
+std::ostream& Particle::operator<<(std::ostream &o)
+{
+	o << "pos [" << glm::to_string(position) << "]";
+	return (o);
+}
+
 ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0))
 {
 	if (numOfParticles > 0)
@@ -74,5 +80,32 @@ void ParticleSystemData::show(ssize_t i)
 		Particle &p = (*this)[j];
 		std::cout << j << ": ";
 		p.show();
+	}
+}
+
+
+// Naive implementation of neighbors list building
+// Spacial hashing should be here instead, probably with different grid
+void ParticleSystemData::cacheNeighbors()
+{
+	size_t n = numOfParticles();
+	if (neighbors.size() == 0) {
+		for (size_t i = 0; i < n; ++i)
+			neighbors.push_back(std::vector<Particle *>());
+	}
+	if (neighbors.size() < n)
+	{
+		for (size_t i = neighbors.size(); i < n; ++i)
+			neighbors.push_back(std::vector<Particle *>());
+	}
+	for (size_t i = 0; i < n; ++i)
+	{
+		neighbors[i].clear();
+		for (size_t j = 0; j < n; ++j)
+		{
+			if (i != j) {
+				neighbors[i].push_back(&_particles[j]);
+			}
+		}
 	}
 }
