@@ -25,9 +25,9 @@ void	Particle::show() const {
 	printf("F [%0.2f, %0.2f, %0.2f]\n", this->force.x, this->force.y, this->force.z);
 }
 
-std::ostream& Particle::operator<<(std::ostream &o)
+std::ostream& operator<<(std::ostream &o, const Particle &particle)
 {
-	o << "pos [" << glm::to_string(position) << "]";
+	o << "pos [" << glm::to_string(particle.position) << "]";
 	return (o);
 }
 
@@ -104,8 +104,18 @@ void ParticleSystemData::cacheNeighbors()
 		for (size_t j = 0; j < n; ++j)
 		{
 			if (i != j) {
-				neighbors[i].push_back(&_particles[j]);
+				// calculate distance, and if close enough, add to neighbor list
+				if (distance(_particles[i].position, _particles[j].position) < NEIGHBOR_RADIUS) {
+					neighbors[i].push_back(&_particles[j]);
+					std::cout << _particles[i] << "-> " << _particles[j] << std::endl;
+				}
 			}
 		}
 	}
 }
+
+float ParticleSystemData::distance(const glm::vec3 &a, const glm::vec3 &b) const
+{
+	return glm::distance(a, b);
+}
+

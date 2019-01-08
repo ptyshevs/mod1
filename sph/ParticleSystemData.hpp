@@ -23,6 +23,7 @@
 #include "glm/gtx/string_cast.hpp"
 
 #define PARTICLE_MASS 1
+#define NEIGHBOR_RADIUS 1.5f
 
 
 struct Particle {
@@ -33,8 +34,10 @@ struct Particle {
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
 	void	show() const;
-	std::ostream &operator<<(std::ostream &);
 };
+
+std::ostream &operator<<(std::ostream &o, const Particle &particle);
+
 
 struct ParticleSystemData {
 private:
@@ -63,6 +66,7 @@ public:
 
 	void	show(ssize_t i = -1);
 
+	float	distance(const glm::vec3 &a, const glm::vec3 &b) const;
 	void	cacheNeighbors();
 };
 
