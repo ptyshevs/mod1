@@ -15,6 +15,8 @@
 
 #include <glm/glm.hpp>
 
+#define KERNEL_RADIUS 1.5f
+
 class PolyMixedKernel {
 private:
 	float _r;
@@ -22,11 +24,11 @@ private:
 	float _const;
 	float _dconst;
 public:
-	PolyMixedKernel(float r);
-	inline float	weight(const float &d) const;
-	inline float	weight2(const float &d2) const;
-	inline float	first_derivative(const float &d) const;
-	inline float	second_derivative(const float &d) const;
+	explicit PolyMixedKernel(float r = KERNEL_RADIUS);
+	float	weight(const float &d) const;
+	float	weight2(const float &d2) const;
+	float	first_derivative(const float &d) const;
+	float	second_derivative(const float &d) const;
 
 	glm::vec3		gradient(const float &d, const glm::vec3 &dir) const;
 };

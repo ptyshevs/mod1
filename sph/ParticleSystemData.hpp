@@ -14,6 +14,7 @@
 #define PARTICLE_SYSTEM_DATA_HPP
 
 #include <HeightMap.hpp>
+#include <PolyMixedKernel.hpp>
 #include <iostream>
 #include <vector>
 
@@ -47,7 +48,9 @@ private:
 public:
 	std::vector<Particle>	_particles;
 	std::vector<std::vector<Particle *>> neighbors;
+	std::vector<float>		densities;
 	HeightMap				*hmap;
+	PolyMixedKernel			kernel;
 
 	explicit ParticleSystemData(size_t numOfParticles = 0);
 
@@ -68,6 +71,7 @@ public:
 
 	float	distance(const glm::vec3 &a, const glm::vec3 &b) const;
 	void	cacheNeighbors();
+	void	update_densities();
 };
 
 #endif

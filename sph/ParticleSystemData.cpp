@@ -77,9 +77,8 @@ void ParticleSystemData::show(ssize_t i)
 		return (*this)[i].show();
 	for (size_t j = 0; j < this->numOfParticles(); ++j)
 	{
-		Particle &p = (*this)[j];
-		std::cout << j << ": ";
-		p.show();
+		Particle &particle = (*this)[j];
+		std::cout << j << ": " << particle << " D: " << densities[j] << std::endl;
 	}
 }
 
@@ -111,6 +110,23 @@ void ParticleSystemData::cacheNeighbors()
 				}
 			}
 		}
+	}
+}
+
+void	ParticleSystemData::update_densities() {
+	if (densities.size() != _particles.size()) {
+		for (size_t i = densities.size(); i < _particles.size(); ++i)
+			densities.push_back(0);
+	}
+	size_t	n = numOfParticles();
+	for (size_t i = 0; i < n; ++i)
+	{
+		float sum = 0;
+		for (Particle *neighbor: neighbors[i]) {
+			float dist = distance(_particles[i].position, neighbor->position);
+			sum += kernel.weight(dist);
+		}
+		densities[i] = _mass * sum;
 	}
 }
 

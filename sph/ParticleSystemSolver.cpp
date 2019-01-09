@@ -98,7 +98,7 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
 	_new_positions.reserve(_data.numOfParticles());
 	_new_velocities.reserve(_data.numOfParticles());
 	_data.cacheNeighbors();
-	// Update densities here
+	_data.update_densities();
 	_data.show();
 	exit (1);
 }

@@ -14,6 +14,7 @@
 #define PARTICLESYSTEMSOLVER_H
 
 #include <ParticleSystemData.hpp>
+#include <PolyMixedKernel.hpp>
 #include <HeightMap.hpp>
 
 // like 60 FPS = 1/60 SPF
@@ -27,7 +28,7 @@ class ParticleSystemSolver {
 private:
 	ParticleSystemData	&_data;
 
-	PolyKernel			kernel;
+	PolyMixedKernel			kernel;
 	// Temporary arrays for storing new velocity and positions, s.t. collision resolution
 	std::vector<glm::vec3>	_new_velocities;
 	std::vector<glm::vec3>	_new_positions;
