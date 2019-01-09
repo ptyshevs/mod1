@@ -23,11 +23,12 @@
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
 
-#define PARTICLE_MASS 1
+#define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
 
 #define PRESSURE_CONST 250.0f
 #define TARGET_DENSITY 1.0f
+#define NEGATIVE_PRESSURE_SCALE 0.5f
 
 struct Particle {
 	glm::vec3 position;
@@ -75,7 +76,8 @@ public:
 	float	distance(const glm::vec3 &a, const glm::vec3 &b) const;
 	void	cacheNeighbors();
 	void	update_densities();
-	void	compute_pressure();
+	void	compute_pressure(bool clamp_negative = false);
+	void	add_pressure();
 };
 
 #endif

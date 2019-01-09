@@ -78,7 +78,7 @@ void ParticleSystemData::show(ssize_t i)
 	for (size_t j = 0; j < this->numOfParticles(); ++j)
 	{
 		Particle &particle = (*this)[j];
-		std::cout << j << ": " << particle << " D: " << densities[j] << std::endl;
+		std::cout << j << ": " << particle << " D: " << densities[j] << " P: " << pressures[j] << std::endl;
 	}
 }
 
@@ -88,10 +88,6 @@ void ParticleSystemData::show(ssize_t i)
 void ParticleSystemData::cacheNeighbors()
 {
 	size_t n = numOfParticles();
-	if (neighbors.size() == 0) {
-		for (size_t i = 0; i < n; ++i)
-			neighbors.push_back(std::vector<Particle *>());
-	}
 	if (neighbors.size() < n)
 	{
 		for (size_t i = neighbors.size(); i < n; ++i)
@@ -126,11 +122,39 @@ void	ParticleSystemData::update_densities() {
 			sum += kernel.weight(dist);
 		}
 		densities[i] = _mass * sum;
+		// this will add mass of the particle itself to calculations
+//		densities[i] = _mass * (sum + kernel.weight(0));
+		if (densities[i] < 0) {
+			std::cerr << "Density is negative! : " << _particles[i] << std::endl;
+		}
 	}
 }
 
-void 	ParticleSystemData::compute_pressure() {
-	// todo: Compute pressures
+void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
+	size_t n = numOfParticles();
+	if (pressures.size() != n)
+		for (size_t i = pressures.size(); i < n; ++i)
+			pressures.push_back(0);
+	for (size_t i = 0; i < n; ++i) {
+		pressures[i] = PRESSURE_CONST * (densities[i] - TARGET_DENSITY);
+		if (clamp_negative && pressures[i] < 0)
+			pressures[i] *= -NEGATIVE_PRESSURE_SCALE;
+	}
+}
+
+// Add negative pressure gradient to the force
+void	ParticleSystemData::add_pressure() {
+	size_t n = numOfParticles();
+	for (size_t i = 0; i < n; ++i) {
+		float sum = 0;
+		for (size_t *neighbor: neighbors[i]) {
+			float dist = distance(_particles[i].position, neighbor->position);
+			if (dist > 0) {
+				glm::vec3 dir = (_particles[i].position - neighbor->position) / dist; // normed vector
+				_particles[i].force -=
+			}
+		}
+	}
 }
 
 float ParticleSystemData::distance(const glm::vec3 &a, const glm::vec3 &b) const

@@ -53,7 +53,8 @@ void ParticleSystemSolver::accumulateExternalForces()
 
 void ParticleSystemSolver::accumulatePressureForce() {
 	_data.compute_pressure();
-	// todo
+
+	//	exit(1);
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {
