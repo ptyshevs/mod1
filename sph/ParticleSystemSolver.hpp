@@ -26,6 +26,9 @@
 class ParticleSystemSolver {
 private:
 	ParticleSystemData	&_data;
+
+	PolyKernel			kernel;
+	// Temporary arrays for storing new velocity and positions, s.t. collision resolution
 	std::vector<glm::vec3>	_new_velocities;
 	std::vector<glm::vec3>	_new_positions;
 

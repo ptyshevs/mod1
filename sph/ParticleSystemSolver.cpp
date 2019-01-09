@@ -32,6 +32,7 @@ void ParticleSystemSolver::accumulateForces(float dt)
 {
 	// This resets forces by rewriting them with gravity constant
 	accumulateExternalForces(); // gravity and drag
+	// Here should be force from pressure gradient
 }
 
 void ParticleSystemSolver::accumulateExternalForces()
@@ -97,6 +98,7 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
 	_new_positions.reserve(_data.numOfParticles());
 	_new_velocities.reserve(_data.numOfParticles());
 	_data.cacheNeighbors();
+	// Update densities here
 	_data.show();
 	exit (1);
 }
