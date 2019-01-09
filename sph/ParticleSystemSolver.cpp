@@ -33,7 +33,9 @@ void ParticleSystemSolver::accumulateForces(float dt)
 	// This resets forces by rewriting them with gravity constant
 	accumulateExternalForces(); // gravity and drag
 	// Here should be force from pressure gradient
+	accumulatePressureForce();
 }
+
 
 void ParticleSystemSolver::accumulateExternalForces()
 {
@@ -47,6 +49,11 @@ void ParticleSystemSolver::accumulateExternalForces()
 		p.force = mass * gravity;
 		p.force += - DRAG_COEF * p.velocity;
 	}
+}
+
+void ParticleSystemSolver::accumulatePressureForce() {
+	_data.compute_pressure();
+	// todo
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {
@@ -99,8 +106,6 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
 	_new_velocities.reserve(_data.numOfParticles());
 	_data.cacheNeighbors();
 	_data.update_densities();
-	_data.show();
-	exit (1);
 }
 
 /*
@@ -117,4 +122,6 @@ void ParticleSystemSolver::endAdvanceTimeStep()
 		p.velocity = _new_velocities[i];
 	}
 }
+
+
 

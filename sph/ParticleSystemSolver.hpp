@@ -20,7 +20,7 @@
 // like 60 FPS = 1/60 SPF
 #define TIME_STEP 0.0166f
 // increase to see how it would decrease relative velocity
-#define DRAG_COEF 0.001f
+#define DRAG_COEF 0.004f
 #define RESTITUTION 0.6f
 #define DAMPING 0.65f
 
@@ -38,6 +38,9 @@ private:
 
 	void	accumulateForces(float dt);
 	void	accumulateExternalForces();
+
+	void	accumulatePressureForce();
+
 	void	timeIntegration(float dt);
 	void	resolveCollision();
 public:

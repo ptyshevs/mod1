@@ -26,6 +26,8 @@
 #define PARTICLE_MASS 1
 #define NEIGHBOR_RADIUS 1.5f
 
+#define PRESSURE_CONST 250.0f
+#define TARGET_DENSITY 1.0f
 
 struct Particle {
 	glm::vec3 position;
@@ -49,6 +51,7 @@ public:
 	std::vector<Particle>	_particles;
 	std::vector<std::vector<Particle *>> neighbors;
 	std::vector<float>		densities;
+	std::vector<float>		pressures;
 	HeightMap				*hmap;
 	PolyMixedKernel			kernel;
 
@@ -72,6 +75,7 @@ public:
 	float	distance(const glm::vec3 &a, const glm::vec3 &b) const;
 	void	cacheNeighbors();
 	void	update_densities();
+	void	compute_pressure();
 };
 
 #endif

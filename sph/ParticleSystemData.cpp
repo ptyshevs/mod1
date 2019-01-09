@@ -106,7 +106,6 @@ void ParticleSystemData::cacheNeighbors()
 				// calculate distance, and if close enough, add to neighbor list
 				if (distance(_particles[i].position, _particles[j].position) < NEIGHBOR_RADIUS) {
 					neighbors[i].push_back(&_particles[j]);
-					std::cout << _particles[i] << "-> " << _particles[j] << std::endl;
 				}
 			}
 		}
@@ -128,6 +127,10 @@ void	ParticleSystemData::update_densities() {
 		}
 		densities[i] = _mass * sum;
 	}
+}
+
+void 	ParticleSystemData::compute_pressure() {
+	// todo: Compute pressures
 }
 
 float ParticleSystemData::distance(const glm::vec3 &a, const glm::vec3 &b) const
