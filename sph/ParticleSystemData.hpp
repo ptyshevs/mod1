@@ -26,14 +26,16 @@
 #define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
 
-#define PRESSURE_CONST 250.0f
-#define TARGET_DENSITY 1.0f
+#define PRESSURE_CONST 7.5f
+#define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
 
 struct Particle {
-	glm::vec3 position;
-	glm::vec3 velocity;
-	glm::vec3 force;
+	glm::vec3	position;
+	glm::vec3	velocity;
+	glm::vec3	force;
+	float		density;
+	float		pressure;
 
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);

@@ -55,6 +55,6 @@ float PolyMixedKernel::second_derivative(const float &d) const
 
 glm::vec3 PolyMixedKernel::gradient(const float &d, const glm::vec3 &dir) const
 {
-	return (-first_derivative(d) * dir);
+	return (first_derivative(d) * dir);
 }
 

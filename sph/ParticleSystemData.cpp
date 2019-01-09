@@ -12,10 +12,10 @@
 
 #include <ParticleSystemData.hpp>
 
-Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)) {};
+Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
-		position(position), velocity(velocity), force(force) {};
+		position(position), velocity(velocity), force(force), density(0.0f), pressure(0.0f) {};
 
 void	Particle::show() const {
 	printf("pos [%0.2f, %0.2f, %0.2f] ", this->position.x, this->position.y,
@@ -28,6 +28,9 @@ void	Particle::show() const {
 std::ostream& operator<<(std::ostream &o, const Particle &particle)
 {
 	o << "pos [" << glm::to_string(particle.position) << "]";
+	o << " vel [" << glm::to_string(particle.velocity) << "]";
+	o << " F [" << glm::to_string(particle.force) << "]";
+	o << " D: " << particle.density << " P: " << particle.pressure;
 	return (o);
 }
 
@@ -78,7 +81,7 @@ void ParticleSystemData::show(ssize_t i)
 	for (size_t j = 0; j < this->numOfParticles(); ++j)
 	{
 		Particle &particle = (*this)[j];
-		std::cout << j << ": " << particle << " D: " << densities[j] << " P: " << pressures[j] << std::endl;
+		std::cout << j << ": " << particle << std::endl;
 	}
 }
 
@@ -109,10 +112,6 @@ void ParticleSystemData::cacheNeighbors()
 }
 
 void	ParticleSystemData::update_densities() {
-	if (densities.size() != _particles.size()) {
-		for (size_t i = densities.size(); i < _particles.size(); ++i)
-			densities.push_back(0);
-	}
 	size_t	n = numOfParticles();
 	for (size_t i = 0; i < n; ++i)
 	{
@@ -121,10 +120,10 @@ void	ParticleSystemData::update_densities() {
 			float dist = distance(_particles[i].position, neighbor->position);
 			sum += kernel.weight(dist);
 		}
-		densities[i] = _mass * sum;
+//		_particles[i].density = _mass * sum;
 		// this will add mass of the particle itself to calculations
-//		densities[i] = _mass * (sum + kernel.weight(0));
-		if (densities[i] < 0) {
+		_particles[i].density = _mass * (sum + kernel.weight(0));
+		if (_particles[i].density < 0) {
 			std::cerr << "Density is negative! : " << _particles[i] << std::endl;
 		}
 	}
@@ -132,13 +131,11 @@ void	ParticleSystemData::update_densities() {
 
 void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
 	size_t n = numOfParticles();
-	if (pressures.size() != n)
-		for (size_t i = pressures.size(); i < n; ++i)
-			pressures.push_back(0);
 	for (size_t i = 0; i < n; ++i) {
-		pressures[i] = PRESSURE_CONST * (densities[i] - TARGET_DENSITY);
-		if (clamp_negative && pressures[i] < 0)
-			pressures[i] *= -NEGATIVE_PRESSURE_SCALE;
+		Particle &p = _particles[i];
+		p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
+		if (clamp_negative && p.pressure < 0)
+			p.pressure *= -NEGATIVE_PRESSURE_SCALE;
 	}
 }
 
@@ -146,12 +143,15 @@ void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
 void	ParticleSystemData::add_pressure() {
 	size_t n = numOfParticles();
 	for (size_t i = 0; i < n; ++i) {
-		float sum = 0;
-		for (size_t *neighbor: neighbors[i]) {
-			float dist = distance(_particles[i].position, neighbor->position);
+		Particle &p = _particles[i];
+		for (Particle *neighbor: neighbors[i]) {
+			float dist = distance(p.position, neighbor->position);
 			if (dist > 0) {
-				glm::vec3 dir = (_particles[i].position - neighbor->position) / dist; // normed vector
-				_particles[i].force -=
+				glm::vec3 dir = (p.position - neighbor->position) / dist; // normed vector
+				glm::vec3 val = _mass * (p.pressure + neighbor->pressure) /
+						(2 * p.density * neighbor->density) * kernel.first_derivative(dist) * dir;
+//				std::cerr << glm::to_string(val) << std::endl;
+				p.force -= val;
 			}
 		}
 	}

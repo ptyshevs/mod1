@@ -53,7 +53,9 @@ void ParticleSystemSolver::accumulateExternalForces()
 
 void ParticleSystemSolver::accumulatePressureForce() {
 	_data.compute_pressure();
-
+	_data.add_pressure();
+//	_data.show();
+//	exit(1);
 	//	exit(1);
 }
 
