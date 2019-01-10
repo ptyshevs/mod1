@@ -55,9 +55,6 @@ void ParticleSystemSolver::accumulateExternalForces()
 void ParticleSystemSolver::accumulatePressureForce() {
 	_data.compute_pressure();
 	_data.add_pressure();
-//	_data.show();
-//	exit(1);
-	//	exit(1);
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {
@@ -75,40 +72,35 @@ void	ParticleSystemSolver::resolveCollision() {
 	size_t 			n = _data.numOfParticles();
 	for (size_t i = 0; i < n; ++i){
 		Particle &p = _data[i];
-//		auto &new_position = _new_positions[i];
-//		auto velocity = _new_velocities[i];
-			if (_data.hmap->out_of_bound(p.position))
-			{
-				// handle collision with boundary
-				_data.hmap->bound(p.position);
-				p.velocity *= -DAMPING;
-				// ...
-				continue ;
-			}
-			// No boundary crossing, maybe there's a surface?
-//			if (_data.hmap->address(p.position).is_solid)
-			if (_data.hmap->surface_height(p.position) > p.position.y)
-			{
-				// assume that this cell is right at the surface. If anything strange happens,
-				// especially on high velicities, this will probably fail.
-				glm::vec3 normal = _data.hmap->normal(p.position);
-				float vel_mag = glm::length(p.velocity);
-				glm::vec3 vel_normalized = p.velocity / vel_mag;
-				glm::vec3 reflected = vel_normalized - (2 * glm::dot(vel_normalized, normal) * normal);
-				glm::vec3 renormalized = reflected * (vel_mag);
-				// Easy way
-//				glm::vec3 frictioned = renormalized * RESTITUTION;
-				// we prefer tangenial speed over
-				glm::vec3 frictioned = renormalized - renormalized * 0.65 * fabs(glm::dot(vel_normalized, normal));
-				p.velocity = frictioned;
-				p.position = _data.hmap->closest_surface_point(p.position);
-//				p.position.y += 0.1;
-			}
+		if (_data.hmap->out_of_bound(p.position))
+		{
+			// handle collision with boundary
+			_data.hmap->bound(p.position);
+			p.velocity *= -DAMPING;
+			// ...
+			continue ;
+		}
+		// No boundary crossing, maybe there's a surface?
+		float h = _data.hmap->surface_height(p.position);
+		if (h > p.position.y)
+		{
+			surfaceCollision(p);
+			p.position.y = h;
+		}
 	}
 }
 
 void 	ParticleSystemSolver::surfaceCollision(Particle &p) {
-
+	glm::vec3 normal = _data.hmap->normal(p.position);
+	float vel_mag = glm::length(p.velocity);
+	glm::vec3 vel_normalized = p.velocity / vel_mag;
+	glm::vec3 reflected = vel_normalized - (2 * glm::dot(vel_normalized, normal) * normal);
+	glm::vec3 renormalized = reflected * (vel_mag);
+	// Easy way
+//	glm::vec3 frictioned = renormalized * RESTITUTION;
+	// we prefer tangenial speed over
+	glm::vec3 frictioned = renormalized - renormalized * 0.55 * fabs(glm::dot(vel_normalized, normal));
+	p.velocity = frictioned;
 }
 
 

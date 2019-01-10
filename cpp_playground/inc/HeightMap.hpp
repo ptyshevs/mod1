@@ -21,7 +21,6 @@ private:
 	const ControlPoints &_cpoints;
 	float	_dx(const glm::vec3 &grid_position);
 	float	_dz(const glm::vec3 &grid_position);
-	float	_idw(float x, float z, glm::vec3 const &cp) const;
 public:
 	HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
 	std::vector<Cell>	hmap;

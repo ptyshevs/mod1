@@ -53,8 +53,6 @@ private:
 public:
 	std::vector<Particle>	_particles;
 	std::vector<std::vector<Particle *>> neighbors;
-	std::vector<float>		densities;
-	std::vector<float>		pressures;
 	HeightMap				*hmap;
 	PolyMixedKernel			kernel;
 
