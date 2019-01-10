@@ -23,16 +23,19 @@ private:
 	glm::vec3			_force;
 	float				_density;
 	float				_pressure;
+
+	float				_step;
 public:
 	Emitter(ParticleSystemData &data);
-	void	setVelocity(glm::vec3 &velocity);
-	void	setForce(glm::vec3 &force);
+	void	setVelocity(const glm::vec3 &velocity);
+	void	setForce(const glm::vec3 &force);
 	void	setDensity(float density);
 	void	setPressure(float pressure);
-	void	cube(float step = 0.5f,
+	void	cuboid(float step = 0.5f,
 			float x_start = 0, float x_end = 1,
 			float y_start = 0, float y_end = 1,
 			float z_start = 0, float z_end = 1);
-};
+	void	cube(const glm::vec3 &origin, float side);
+	};
 
 #endif

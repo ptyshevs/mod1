@@ -11,11 +11,24 @@
 /* ************************************************************************** */
 
 #include <ParticleSystemData.hpp>
+#include "ParticleSystemData.hpp"
+
 
 Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
-		position(position), velocity(velocity), force(force), density(0.0f), pressure(0.0f) {};
+		position(position), velocity(velocity), force(force)
+{
+	density = 0.0f;
+	pressure = 0.0f;
+};
+
+Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force, float density,
+				   float pressure) : Particle(position, velocity, force)
+{
+	this->density = density;
+	this->pressure = pressure;
+}
 
 void	Particle::show() const {
 	printf("pos [%0.2f, %0.2f, %0.2f] ", this->position.x, this->position.y,
@@ -50,6 +63,13 @@ size_t ParticleSystemData::numOfParticles() const {
 void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) {
 	this->_particles.emplace_back(position, velocity, force);
 }
+
+void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
+									  float density, float pressure)
+{
+	this->_particles.emplace_back(position, velocity, force, density, pressure);
+}
+
 
 void ParticleSystemData::addParticles(std::vector<glm::vec3> positions, std::vector<glm::vec3> velocities,
 									  std::vector<glm::vec3> forces) {

@@ -39,6 +39,8 @@ struct Particle {
 
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
+	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
+			float density, float pressure);
 	void	show() const;
 };
 
@@ -59,8 +61,15 @@ public:
 	explicit ParticleSystemData(size_t numOfParticles = 0);
 
 	void addParticle(const glm::vec3 &position,
+					  const glm::vec3 &velocity,
+					  const glm::vec3 &force,
+					  float density,
+					  float pressure);
+
+	void addParticle(const glm::vec3 &position,
 					 const glm::vec3 &velocity = glm::vec3(0.0f, 0.0f, 0.0f),
 					 const glm::vec3 &force = glm::vec3(0.0f, 0.0f, 0.0f));
+
 	void addParticles(std::vector<glm::vec3> positions,
 					  std::vector<glm::vec3> velocities,
 					  std::vector<glm::vec3> forces);

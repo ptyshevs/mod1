@@ -99,7 +99,7 @@ void	ControlPoints::show()
 
 void 	ControlPoints::_add_borders()
 {
-	for (float i = 0; i < sl; i += 1.5f)
+	for (float i = 0; i < sl; i += 3.5f)
 	{
 		this->_arr.emplace_back(i - hf_sl, 0, -hf_sl);
 		this->_arr.emplace_back(-hf_sl, 0, i - hf_sl);

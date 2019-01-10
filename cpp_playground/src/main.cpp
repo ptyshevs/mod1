@@ -36,7 +36,9 @@ int main(int ac, char *av[]) {
 	ParticleSystemData data;
 	data.hmap = &map;
 	Emitter emitter(data);
-	emitter.cube(0.5,0, 3, 38, 48, 0, 3);
+//	emitter.cube(glm::vec3(0, 45, 0), 3);
+//	emitter.cube(glm::vec3(0, 1, hf_sl - 5), 3);
+	emitter.cuboid(0.5, -5, 5, 0, 3, hf_sl - 7, hf_sl - 6);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
 
 	// right near the camera
