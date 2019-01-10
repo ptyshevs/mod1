@@ -86,7 +86,8 @@ void	ParticleSystemSolver::resolveCollision() {
 				continue ;
 			}
 			// No boundary crossing, maybe there's a surface?
-			if (_data.hmap->address(p.position).is_solid)
+//			if (_data.hmap->address(p.position).is_solid)
+			if (_data.hmap->surface_height(p.position) > p.position.y)
 			{
 				// assume that this cell is right at the surface. If anything strange happens,
 				// especially on high velicities, this will probably fail.
@@ -97,10 +98,11 @@ void	ParticleSystemSolver::resolveCollision() {
 				glm::vec3 renormalized = reflected * (vel_mag);
 				// Easy way
 //				glm::vec3 frictioned = renormalized * RESTITUTION;
-				glm::vec3 frictioned = renormalized - renormalized * 0.05 * fabs(glm::dot(vel_normalized, normal));
+				// we prefer tangenial speed over
+				glm::vec3 frictioned = renormalized - renormalized * 0.65 * fabs(glm::dot(vel_normalized, normal));
 				p.velocity = frictioned;
 				p.position = _data.hmap->closest_surface_point(p.position);
-				p.position.y += 0.1;
+//				p.position.y += 0.1;
 			}
 	}
 }

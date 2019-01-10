@@ -27,6 +27,8 @@ public:
 	ControlPoints &operator=(const std::vector<glm::vec3> &m);
 	void	prepare(bool borders);
 	void 	show();
+	float	idw(const glm::vec3 &point) const;
+	float	idw(float x, float z) const;
 };
 
 #endif

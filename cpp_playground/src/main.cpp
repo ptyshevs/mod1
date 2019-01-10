@@ -34,7 +34,12 @@ int main(int ac, char *av[]) {
 
 	ParticleSystemData data;
 	data.hmap = &map;
-//	data.addParticle(glm::vec3(0, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0.01, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0.02, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0.03, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0.04, hf_sl / 2 - 1, 0));
+	data.addParticle(glm::vec3(0.05, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(0, 20, hf_sl - 45));
 //	data.addParticle(glm::vec3(-20, 40, hf_sl - 45));
 //	data.addParticle(glm::vec3(-15, 40, hf_sl - 45));
@@ -43,21 +48,21 @@ int main(int ac, char *av[]) {
 //	data.addParticle(glm::vec3(16, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(17, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(hf_sl - 1, 1, hf_sl - 1));
-	data.addParticle(glm::vec3(3,25, hf_sl - 50));
-	data.addParticle(glm::vec3(2.5,25, hf_sl - 50));
+//	data.addParticle(glm::vec3(3,25, hf_sl - 50));
+//	data.addParticle(glm::vec3(2.5,25, hf_sl - 50));
 //	data.addParticle(glm::vec3(1,25, hf_sl - 50));
 //	data.addParticle(glm::vec3(0, 26, hf_sl - 50));
 //	data.addParticle(glm::vec3(0.5, 26, hf_sl - 50));
 //	data.addParticle(glm::vec3(1, 26, hf_sl - 50));
 
 	// right near the camera
-//	data.addParticle(glm::vec3(0,25, hf_sl - 2));
-//	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
-//	data.addParticle(glm::vec3(1,25, hf_sl - 2));
+	data.addParticle(glm::vec3(0,25, hf_sl - 2));
+	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
+	data.addParticle(glm::vec3(1,25, hf_sl - 2));
 
 	auto water = instance_water(&map, &data);
 
-	water.solver = new ParticleSystemSolver(data, false);
+	water.solver = new ParticleSystemSolver(data);
 	auto camera = GLCamera();
 	bool quit = false;
 	glPointSize(10);

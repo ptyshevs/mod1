@@ -99,7 +99,7 @@ void	ControlPoints::show()
 
 void 	ControlPoints::_add_borders()
 {
-	for (int i = 0; i < sl; i ++)
+	for (float i = 0; i < sl; i += 1.5f)
 	{
 		this->_arr.emplace_back(i - hf_sl, 0, -hf_sl);
 		this->_arr.emplace_back(-hf_sl, 0, i - hf_sl);
@@ -127,3 +127,23 @@ ControlPoints &ControlPoints::operator=(const std::vector<glm::vec3> &m)
 	return (*this);
 }
 
+float ControlPoints::idw(float x, float z) const
+{
+	float num = 0;
+	float denum = 0;
+	for (const glm::vec3 &cp: _arr) {
+		float w = 0;
+		glm::vec3 diff(x - cp.x, -cp.y, z - cp.z);
+		diff *= diff;
+		float sqsum = diff.x + diff.z;
+		w = 1.0f / (pow(sqsum, 1.3f) + 0.0001f);
+		num += w * cp.y;
+		denum += w;
+	}
+	return (num / denum);
+}
+
+float ControlPoints::idw(const glm::vec3 &point) const
+{
+	return idw(point.x, point.z);
+}

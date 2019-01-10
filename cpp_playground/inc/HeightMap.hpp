@@ -19,8 +19,9 @@
 class HeightMap: public GLItem {
 private:
 	const ControlPoints &_cpoints;
-	float	_dx(glm::vec3 &grid_position);
-	float	_dz(glm::vec3 &grid_position);
+	float	_dx(const glm::vec3 &grid_position);
+	float	_dz(const glm::vec3 &grid_position);
+	float	_idw(float x, float z, glm::vec3 const &cp) const;
 public:
 	HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
 	std::vector<Cell>	hmap;
@@ -37,6 +38,7 @@ public:
 	float		interpolate(const glm::vec3 &point) const;
 	float		interpolate(float x, float z) const;
 	glm::vec3	closest_surface_point(glm::vec3 &point) const;
+	float		surface_height(const glm::vec3 &point) const;
 //	Cell		&find_surface(glm::vec3 &position const);
 };
 

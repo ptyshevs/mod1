@@ -105,66 +105,41 @@ bool HeightMap::out_of_bound(const glm::vec3 &position) const
 glm::vec3 HeightMap::normal(const glm::vec3 &position)
 {
 	Cell &c = address(position);
-	glm::vec3 normal(-_dx(c.pos), 1.0f, -_dz(c.pos));
+	glm::vec3 normal(-_dx(position), 1.0f, -_dz(position));
 	glm::vec3 normed_normal = normal / glm::length(normal);
 	return (normed_normal);
 }
 
-// This will fail on the boundaries, but is more straight-forward
-float HeightMap::_dx(glm::vec3 &grid_position)
+float HeightMap::_dx(const glm::vec3 &pos)
 {
-	float left_y = 0;
-	float right_y = 0;
-	bool  left_found, right_found;
-
-	left_found = false;
-	right_found = false;
-	for (int i = hf_sl / 2 - 1; i >= 0; --i)
-	{
-		if (!left_found && address(grid_position.x - 1, i, grid_position.z).is_solid) {
-			left_y = i;
-			left_found = true;
-		}
-		if (!right_found && address(grid_position.x + 1, i, grid_position.z).is_solid) {
-			right_y = i;
-			right_found = true;
-		}
-		if (left_found && right_found)
-			break ;
-	}
-	return (right_y - left_y) / 2.0f;
+	return (interpolate(pos.x + 0.5f, pos.z) - interpolate(pos.x - 0.5f, pos.z));
 }
 
-float HeightMap::_dz(glm::vec3 &grid_position)
+float HeightMap::_dz(const glm::vec3 &pos)
 {
-	float left_y = 0;
-	float right_y = 0;
-	bool  left_found, right_found;
-
-	left_found = false;
-	right_found = false;
-	for (int i = hf_sl / 2 - 1; i >= 0; --i)
-	{
-		if (!left_found && address(grid_position.x, i, grid_position.z - 1).is_solid) {
-			left_y = i;
-			left_found = true;
-		}
-		if (!right_found && address(grid_position.x, i, grid_position.z + 1).is_solid) {
-			right_y = i;
-			right_found = true;
-		}
-		if (left_found && right_found)
-			break ;
-	}
-	return (right_y - left_y) / 2.0f;
+	return (interpolate(pos.x, pos.z + 0.5f) - interpolate(pos.x, pos.z - 0.5f));
 }
 
-///*
-// * Find survace for the given y location
-// */
-//Cell& HeightMap::find_surface(glm::vec3 &position const)
-//{
-//	for (int i = 0; i < hf_sl / 2 - 2; ++i) {
-//		if (address(position.x, i))
-//	}
-//}
+/*
+ * Find survace for the given y location
+ */
+glm::vec3 HeightMap::closest_surface_point(glm::vec3 &point) const
+{
+	float y = interpolate(point.x, point.z);
+	return (glm::vec3(point.x, y, point.z));
+}
+
+float HeightMap::surface_height(const glm::vec3 &point) const {
+	return (interpolate(point));
+}
+
+
+float HeightMap::interpolate(float x, float z) const
+{
+
+	return (_cpoints.idw(x, z));
+}
+
+float HeightMap::interpolate(const glm::vec3 &point) const {
+	return _cpoints.idw(point);
+}
