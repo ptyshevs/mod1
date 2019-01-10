@@ -38,6 +38,7 @@ private:
 	void	accumulateExternalForces();
 
 	void	accumulatePressureForce();
+	void	accumulateViscosityForce();
 
 	void	timeIntegration(float dt);
 	void	resolveCollision();

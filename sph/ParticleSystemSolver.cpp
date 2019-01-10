@@ -34,7 +34,10 @@ void ParticleSystemSolver::accumulateForces(float dt)
 	accumulateExternalForces(); // gravity and drag
 	// Here should be force from pressure gradient
 	if (_interact)
+	{
 		accumulatePressureForce();
+		accumulateViscosityForce();
+	}
 }
 
 
@@ -55,6 +58,10 @@ void ParticleSystemSolver::accumulateExternalForces()
 void ParticleSystemSolver::accumulatePressureForce() {
 	_data.compute_pressure();
 	_data.add_pressure();
+}
+
+void	ParticleSystemSolver::accumulateViscosityForce() {
+	// TODO
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {
@@ -117,14 +124,6 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
  */
 void ParticleSystemSolver::endAdvanceTimeStep()
 {
-	// TODO: replace with range-based loop for efficiency
-//	size_t n = _data.numOfParticles();
-//	for (size_t i = 0; i < n; ++i)
-//	{
-//		Particle &p = _data[i];
-//		p.position = _new_positions[i];
-//		p.velocity = _new_velocities[i];
-//	}
 }
 
 
