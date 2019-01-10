@@ -15,7 +15,7 @@
 
 //ParticleSystemSolver::ParticleSystemSolver() : _data(ParticleSystemData()), _drag_coef(DRAG_COEF) {}
 
-ParticleSystemSolver::ParticleSystemSolver(ParticleSystemData &data) : _data(data) {}
+ParticleSystemSolver::ParticleSystemSolver(ParticleSystemData &data, bool interact) :_data(data), _interact(interact) {}
 
 void ParticleSystemSolver::simulation_step(float dt)
 {
@@ -33,7 +33,8 @@ void ParticleSystemSolver::accumulateForces(float dt)
 	// This resets forces by rewriting them with gravity constant
 	accumulateExternalForces(); // gravity and drag
 	// Here should be force from pressure gradient
-	accumulatePressureForce();
+	if (_interact)
+		accumulatePressureForce();
 }
 
 
@@ -65,8 +66,8 @@ void	ParticleSystemSolver::timeIntegration(float dt) {
 	for (size_t i = 0; i < n; ++i)
 	{
 		Particle &p = _data[i];
-		_new_velocities[i] = p.velocity + dt * p.force / mass; // F = ma -> a = F/m
-		_new_positions[i] = p.position +  dt * p.velocity; // Use updated velocity to move particle position
+		p.velocity += dt * p.force / mass; // F = ma -> a = F/m
+		p.position +=  dt * p.velocity; // Use updated velocity to move particle position
 	}
 }
 
@@ -75,38 +76,44 @@ void	ParticleSystemSolver::resolveCollision() {
 	for (size_t i = 0; i < n; ++i){
 		Particle &p = _data[i];
 //		auto &new_position = _new_positions[i];
-		auto velocity = _new_velocities[i];
-			if (_data.hmap->out_of_bound(_new_positions[i]))
+//		auto velocity = _new_velocities[i];
+			if (_data.hmap->out_of_bound(p.position))
 			{
 				// handle collision with boundary
-				_data.hmap->bound(_new_positions[i]);
-				_new_velocities[i] *= -DAMPING;
+				_data.hmap->bound(p.position);
+				p.velocity *= -DAMPING;
 				// ...
 				continue ;
 			}
 			// No boundary crossing, maybe there's a surface?
-			if (_data.hmap->address(_new_positions[i]).is_solid)
+			if (_data.hmap->address(p.position).is_solid)
 			{
 				// assume that this cell is right at the surface. If anything strange happens,
 				// especially on high velicities, this will probably fail.
-				glm::vec3 normal = _data.hmap->normal(_new_positions[i]);
-				float vel_mag = glm::length(velocity);
-				glm::vec3 vel_normalized = velocity / vel_mag;
+				glm::vec3 normal = _data.hmap->normal(p.position);
+				float vel_mag = glm::length(p.velocity);
+				glm::vec3 vel_normalized = p.velocity / vel_mag;
 				glm::vec3 reflected = vel_normalized - (2 * glm::dot(vel_normalized, normal) * normal);
 				glm::vec3 renormalized = reflected * (vel_mag);
 				// Easy way
 //				glm::vec3 frictioned = renormalized * RESTITUTION;
 				glm::vec3 frictioned = renormalized - renormalized * 0.05 * fabs(glm::dot(vel_normalized, normal));
-				_new_velocities[i] = frictioned;
+				p.velocity = frictioned;
+				p.position = _data.hmap->closest_surface_point(p.position);
+				p.position.y += 0.1;
 			}
 	}
 }
 
+void 	ParticleSystemSolver::surfaceCollision(Particle &p) {
+
+}
+
+
+
 void ParticleSystemSolver::beginAdvanceTimeStep()
 {
 	// here we should clear forces, but they're rewritten in accumulateExternalForces
-	_new_positions.reserve(_data.numOfParticles());
-	_new_velocities.reserve(_data.numOfParticles());
 	_data.cacheNeighbors();
 	_data.update_densities();
 }
@@ -117,13 +124,13 @@ void ParticleSystemSolver::beginAdvanceTimeStep()
 void ParticleSystemSolver::endAdvanceTimeStep()
 {
 	// TODO: replace with range-based loop for efficiency
-	size_t n = _data.numOfParticles();
-	for (size_t i = 0; i < n; ++i)
-	{
-		Particle &p = _data[i];
-		p.position = _new_positions[i];
-		p.velocity = _new_velocities[i];
-	}
+//	size_t n = _data.numOfParticles();
+//	for (size_t i = 0; i < n; ++i)
+//	{
+//		Particle &p = _data[i];
+//		p.position = _new_positions[i];
+//		p.velocity = _new_velocities[i];
+//	}
 }
 
 

@@ -26,12 +26,10 @@
 
 class ParticleSystemSolver {
 private:
+	bool	_interact;
 	ParticleSystemData	&_data;
 
-	PolyMixedKernel			kernel;
 	// Temporary arrays for storing new velocity and positions, s.t. collision resolution
-	std::vector<glm::vec3>	_new_velocities;
-	std::vector<glm::vec3>	_new_positions;
 
 	void	beginAdvanceTimeStep();
 	void	endAdvanceTimeStep();
@@ -43,9 +41,10 @@ private:
 
 	void	timeIntegration(float dt);
 	void	resolveCollision();
+	void	surfaceCollision(Particle &p);
 public:
 //	ParticleSystemSolver();
-	ParticleSystemSolver(ParticleSystemData &data);
+	explicit ParticleSystemSolver(ParticleSystemData &data, bool interact = true);
 
 	void simulation_step(float dt = TIME_STEP);
 };

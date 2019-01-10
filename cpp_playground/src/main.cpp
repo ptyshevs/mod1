@@ -43,39 +43,21 @@ int main(int ac, char *av[]) {
 //	data.addParticle(glm::vec3(16, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(17, hf_sl / 2 - 1, 0));
 //	data.addParticle(glm::vec3(hf_sl - 1, 1, hf_sl - 1));
-	data.addParticle(glm::vec3(0,25, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5,25, hf_sl - 50));
-	data.addParticle(glm::vec3(1,25, hf_sl - 50));
-	data.addParticle(glm::vec3(0,25, hf_sl - 2));
-	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
-	data.addParticle(glm::vec3(1,25, hf_sl - 2));
-	data.addParticle(glm::vec3(0, 26, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5, 26, hf_sl - 50));
-	data.addParticle(glm::vec3(1, 26, hf_sl - 50));
-	data.addParticle(glm::vec3(0, 26, hf_sl - 2));
-	data.addParticle(glm::vec3(0.5, 26, hf_sl - 2));
-	data.addParticle(glm::vec3(1, 26, hf_sl - 2));
-	data.addParticle(glm::vec3(0, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(1, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(0, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(1, 24, hf_sl - 50));
-	data.addParticle(glm::vec3(0, 3.5, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5, 3.5, hf_sl - 50));
-	data.addParticle(glm::vec3(1, 3.5, hf_sl - 50));
-	data.addParticle(glm::vec3(0, 3.5, hf_sl - 2));
-	data.addParticle(glm::vec3(0.5, 3.5, hf_sl - 2));
-	data.addParticle(glm::vec3(1, 3.5, hf_sl - 2));
-	data.addParticle(glm::vec3(0, 4.5, hf_sl - 50));
-	data.addParticle(glm::vec3(0.5, 4.5, hf_sl - 50));
-	data.addParticle(glm::vec3(1, 4.5, hf_sl - 50));
-	data.addParticle(glm::vec3(0, 4.5, hf_sl - 2));
-	data.addParticle(glm::vec3(0.5, 4.5, hf_sl - 2));
-	data.addParticle(glm::vec3(1, 4.5, hf_sl - 2));
+	data.addParticle(glm::vec3(3,25, hf_sl - 50));
+	data.addParticle(glm::vec3(2.5,25, hf_sl - 50));
+//	data.addParticle(glm::vec3(1,25, hf_sl - 50));
+//	data.addParticle(glm::vec3(0, 26, hf_sl - 50));
+//	data.addParticle(glm::vec3(0.5, 26, hf_sl - 50));
+//	data.addParticle(glm::vec3(1, 26, hf_sl - 50));
+
+	// right near the camera
+//	data.addParticle(glm::vec3(0,25, hf_sl - 2));
+//	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
+//	data.addParticle(glm::vec3(1,25, hf_sl - 2));
+
 	auto water = instance_water(&map, &data);
 
-	water.solver = new ParticleSystemSolver(data);
+	water.solver = new ParticleSystemSolver(data, false);
 	auto camera = GLCamera();
 	bool quit = false;
 	glPointSize(10);

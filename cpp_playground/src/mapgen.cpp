@@ -105,7 +105,7 @@ void interpolate_using_controll_points(const std::vector<glm::vec3> &cp, std::ve
 }
 
 HeightMap generate_map(const ControlPoints &control_points) {
-	HeightMap heightMap;
+	HeightMap heightMap(control_points);
 	heightMap.hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
 
 	std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
