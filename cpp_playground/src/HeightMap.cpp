@@ -88,6 +88,23 @@ void HeightMap::bound(glm::vec3 &position)
 		position.x = hf_sl - 1;
 }
 
+//void	HeightMap::bound(glm::vec3 &position) {
+//	if (position.y < -10)
+//		position.y = -10;
+//	else if (position.y > 10)
+//		position.y = 10;
+//
+//	if (position.z < -10)
+//		position.z = -10;
+//	else if (position.z > 10)
+//		position.z = 10;
+//
+//	if (position.x < -10)
+//		position.x = -10;
+//	else if (position.x > 10)
+//		position.x = 10;
+//}
+
 bool HeightMap::out_of_bound(const glm::vec3 &position) const
 {
 	// we handle below surface collision separatedly
@@ -101,6 +118,16 @@ bool HeightMap::out_of_bound(const glm::vec3 &position) const
 		return true;
 	return (false);
 }
+
+//bool HeightMap::out_of_bound(const glm::vec3 &position) const {
+//	if (position.y < -10 || position.y > 10)
+//		return (true);
+//	if (position.z < -10 || position.z > 10)
+//		return (true);
+//	if (position.x < -10 || position.x > 10)
+//		return (true);
+//	return (false);
+//}
 
 glm::vec3 HeightMap::normal(const glm::vec3 &position)
 {

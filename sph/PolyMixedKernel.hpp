@@ -15,7 +15,7 @@
 
 #include <glm/glm.hpp>
 
-#define KERNEL_RADIUS 1.5f
+#define KERNEL_RADIUS 3.95f
 
 class PolyMixedKernel {
 private:

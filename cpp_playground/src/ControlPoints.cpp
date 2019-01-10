@@ -129,13 +129,14 @@ ControlPoints &ControlPoints::operator=(const std::vector<glm::vec3> &m)
 
 float ControlPoints::idw(float x, float z) const
 {
-	float num = 0;
-	float denum = 0;
+	float num, denum, w, sqsum;
+
+	num = 0;
+	denum = 0;
 	for (const glm::vec3 &cp: _arr) {
-		float w = 0;
 		glm::vec3 diff(x - cp.x, -cp.y, z - cp.z);
 		diff *= diff;
-		float sqsum = diff.x + diff.z;
+		sqsum = diff.x + diff.z;
 		w = 1.0f / (pow(sqsum, 1.3f) + 0.0001f);
 		num += w * cp.y;
 		denum += w;

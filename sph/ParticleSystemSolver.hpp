@@ -18,7 +18,7 @@
 #include <HeightMap.hpp>
 
 // like 60 FPS = 1/60 SPF
-#define TIME_STEP 0.0166f
+#define TIME_STEP 0.0066f
 // increase to see how it would decrease relative velocity
 #define DRAG_COEF 0.004f
 #define RESTITUTION 0.6f

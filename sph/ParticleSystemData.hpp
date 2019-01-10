@@ -24,10 +24,10 @@
 #include "glm/gtx/string_cast.hpp"
 
 #define PARTICLE_MASS 1.0f
-#define NEIGHBOR_RADIUS 1.5f
+#define NEIGHBOR_RADIUS 3.95f
 
-#define PRESSURE_CONST 7.5f
-#define TARGET_DENSITY 0.01f
+#define PRESSURE_CONST 800.5f
+#define TARGET_DENSITY 0.01f // decrease doesn't result in increased spacing
 #define NEGATIVE_PRESSURE_SCALE 0.5f
 #define VISCOSITY 0.18f
 
