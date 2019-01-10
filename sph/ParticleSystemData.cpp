@@ -177,6 +177,17 @@ void	ParticleSystemData::add_pressure() {
 	}
 }
 
+void	ParticleSystemData::add_viscosity() {
+	for (size_t i = 0; i < numOfParticles(); ++i) {
+		Particle &p = _particles[i];
+		for (Particle *neighbor: neighbors[i]) {
+			float dist = glm::distance(p.position, neighbor->position);
+			// maybe need to multiply on the unit vector of direction from one particle to it's neighbor
+			p.force += VISCOSITY * (neighbor->velocity - p.velocity) / neighbor->density * kernel.second_derivative(dist);
+		}
+	}
+}
+
 float ParticleSystemData::distance(const glm::vec3 &a, const glm::vec3 &b) const
 {
 	return glm::distance(a, b);

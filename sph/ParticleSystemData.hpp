@@ -29,6 +29,8 @@
 #define PRESSURE_CONST 7.5f
 #define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
+#define VISCOSITY 0.18f
+
 
 struct Particle {
 	glm::vec3	position;
@@ -87,6 +89,7 @@ public:
 	void	update_densities();
 	void	compute_pressure(bool clamp_negative = false);
 	void	add_pressure();
+	void	add_viscosity();
 };
 
 #endif

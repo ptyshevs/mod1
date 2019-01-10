@@ -31,10 +31,10 @@ public:
 	void	setForce(const glm::vec3 &force);
 	void	setDensity(float density);
 	void	setPressure(float pressure);
-	void	cuboid(float step = 0.5f,
-			float x_start = 0, float x_end = 1,
-			float y_start = 0, float y_end = 1,
-			float z_start = 0, float z_end = 1);
+	void	setStep(float step);
+	void	cuboid(float x_start = 0, float x_end = 1,
+				float y_start = 0, float y_end = 1,
+				float z_start = 0, float z_end = 1);
 	void	cube(const glm::vec3 &origin, float side);
 	};
 

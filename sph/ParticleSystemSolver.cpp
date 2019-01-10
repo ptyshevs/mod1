@@ -61,7 +61,7 @@ void ParticleSystemSolver::accumulatePressureForce() {
 }
 
 void	ParticleSystemSolver::accumulateViscosityForce() {
-	// TODO
+	_data.add_viscosity();
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {

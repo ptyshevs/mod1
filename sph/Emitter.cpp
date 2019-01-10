@@ -37,12 +37,16 @@ void Emitter::setPressure(float pressure)
 	_pressure = pressure;
 }
 
-void	Emitter::cuboid(float step, float x_start, float x_end,
+void	Emitter::setStep(float step) {
+	_step = step;
+}
+
+void	Emitter::cuboid(float x_start, float x_end,
 		float y_start, float y_end, float z_start, float z_end)
 {
-	for (float i = x_start; i <= x_end; i += step) {
-		for (float j = y_start; j <= y_end; j += step) {
-			for (float k = z_start; k <= z_end; k += step) {
+	for (float i = x_start; i <= x_end; i += _step) {
+		for (float j = y_start; j <= y_end; j += _step) {
+			for (float k = z_start; k <= z_end; k += _step) {
 				glm::vec3 pos(i, j, k);
 				_data.addParticle(pos, _velocity, _force, _density, _pressure);
 			}
