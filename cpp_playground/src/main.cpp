@@ -55,8 +55,6 @@ int main(int ac, char *av[]) {
 	auto camera = GLCamera();
 	bool quit = false;
 	glPointSize(10);
-	glEnable (GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
 
 	do
 	{
@@ -69,9 +67,9 @@ int main(int ac, char *av[]) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.frameStart();
+		water.draw(camera.vp(), GL_POINTS);
 		map.draw(camera.vp(), GL_TRIANGLES);
 //		draw(points, camera.vp(), GL_POINTS);
-		water.draw(camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
 		SDL_GL_SwapWindow(core.win);

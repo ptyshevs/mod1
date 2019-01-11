@@ -4,3 +4,6 @@
 [submodule "fluid-sim"]
 	path = fluid-sim
 	url = https://github.com/ptyshevs/fluid-sim.git
+[submodule "pbf_render"]
+	path = pbf_render
+	url = https://github.com/JAGJ10/PositionBasedFluids.git
