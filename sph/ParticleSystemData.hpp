@@ -14,6 +14,7 @@
 #define PARTICLE_SYSTEM_DATA_HPP
 
 #include <HeightMap.hpp>
+#include "Particle.hpp"
 #include <PolyMixedKernel.hpp>
 #include <iostream>
 #include <vector>
@@ -30,24 +31,6 @@
 #define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
 #define VISCOSITY 0.18f
-
-
-struct Particle {
-	glm::vec3	position;
-	glm::vec3	velocity;
-	glm::vec3	force;
-	float		density;
-	float		pressure;
-
-	Particle();
-	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
-	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
-			float density, float pressure);
-	void	show() const;
-};
-
-std::ostream &operator<<(std::ostream &o, const Particle &particle);
-
 
 struct ParticleSystemData {
 private:
@@ -86,6 +69,7 @@ public:
 
 	float	distance(const glm::vec3 &a, const glm::vec3 &b) const;
 	void	cacheNeighbors();
+	void	fill_hmap();
 	void	update_densities();
 	void	compute_pressure(bool clamp_negative = false);
 	void	add_pressure();

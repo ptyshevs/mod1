@@ -20,7 +20,7 @@
 # define sl 200
 // half the number (used for centering in NDC
 # define hf_sl 100
-
+# define MAX_PER_CELL 28
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
 #include <glm/glm.hpp>
@@ -84,6 +84,7 @@ void	panic(const std::string &message);
 #include <OpenCL/cl.h>
 #include <OpenCL/cl_gl.h>
 #include <OpenCL/cl_gl_ext.h>
+#include <Particle.hpp>
 
 struct CLCore {
     cl_device_id        device;
@@ -109,9 +110,10 @@ struct Cell
 {
 	glm::vec3	pos;
 	int			is_solid;
-	float		volume;
+	size_t      n_inside;
+	Particle    *particles[MAX_PER_CELL];
 public:
-	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), volume(volume) {};
+	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), n_inside(0) {};
 };
 
 #define EMITER_RAIN 1

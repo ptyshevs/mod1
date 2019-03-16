@@ -10,42 +10,35 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <ParticleSystemData.hpp>
 #include "ParticleSystemData.hpp"
 
-
-Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f) {};
-
-Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
-		position(position), velocity(velocity), force(force)
-{
-	density = 0.0f;
-	pressure = 0.0f;
-};
-
-Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force, float density,
-				   float pressure) : Particle(position, velocity, force)
-{
-	this->density = density;
-	this->pressure = pressure;
-}
-
-void	Particle::show() const {
-	printf("pos [%0.2f, %0.2f, %0.2f] ", this->position.x, this->position.y,
-			this->position.z);
-	printf("vel [%0.2f, %0.2f, %0.2f] ", this->velocity.x, this->velocity.y,
-			this->velocity.z);
-	printf("F [%0.2f, %0.2f, %0.2f]\n", this->force.x, this->force.y, this->force.z);
-}
-
-std::ostream& operator<<(std::ostream &o, const Particle &particle)
-{
-	o << "pos [" << glm::to_string(particle.position) << "]";
-	o << " vel [" << glm::to_string(particle.velocity) << "]";
-	o << " F [" << glm::to_string(particle.force) << "]";
-	o << " D: " << particle.density << " P: " << particle.pressure;
-	return (o);
-}
+static int offsets[27][3] = {	{-1, -1, -1},
+							{-1, -1, 0},
+							{-1, -1, 1},
+							{-1, 0, -1},
+							{-1, 0, 0},
+							{-1, 0, 1},
+							{-1, 1, -1},
+							{-1, 1, 0},
+							{-1, 1, 1},
+							{0, -1, -1},
+							{0, -1, 0},
+							{0, -1, 1},
+							{0, 0, -1},
+							{0, 0, 0},
+							{0, 0, 1},
+							{0, 1, -1},
+							{0, 1, 0},
+							{0, 1, 1},
+							{1, -1, -1},
+							{1, -1, 0},
+							{1, -1, 1},
+							{1, 0, -1},
+							{1, 0, 0},
+							{1, 0, 1},
+							{1, 1, -1},
+							{1, 1, 0},
+							{1, 1, 1}};
 
 ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0))
 {
@@ -110,26 +103,65 @@ void ParticleSystemData::show(ssize_t i)
 // Spacial hashing should be here instead, probably with different grid
 void ParticleSystemData::cacheNeighbors()
 {
+	fill_hmap();
 	size_t n = numOfParticles();
 	if (neighbors.size() < n)
 	{
 		for (size_t i = neighbors.size(); i < n; ++i)
-			neighbors.push_back(std::vector<Particle *>());
+			neighbors.emplace_back();
 	}
+
 	for (size_t i = 0; i < n; ++i)
 	{
+		auto const &p = _particles[i];
 		neighbors[i].clear();
-		for (size_t j = 0; j < n; ++j)
+
+//		std::cout << _particles[i] << std::endl;
+//		std::cout << "hmap pos:" << glm::to_string(hmap->address(_particles[i].position).pos) << std::endl;
+//		std::cout << "3d idx: " << glm::to_string(hmap->pos_to_3D_idx(_particles[i].position)) << std::endl;
+//		auto const &cell = hmap->address(_particles[i].position);
+		glm::vec3 cell_pos = hmap->pos_to_3D_idx(_particles[i].position);
+		for (auto const &offset: offsets)
 		{
-			if (i != j) {
+			glm::vec3 offset_pos(cell_pos[0] + offset[0], cell_pos[1] + offset[1], cell_pos[2] + offset[2]);
+			if (hmap->out_of_bound(offset_pos))
+				continue ;
+			auto const &neigh_cell = hmap->address(offset_pos);
+			for (size_t j = 0; j < neigh_cell.n_inside; ++j) {
+				auto const &np = neigh_cell.particles[j];
+				if (&p != np) {
 				// calculate distance, and if close enough, add to neighbor list
-				if (distance(_particles[i].position, _particles[j].position) < NEIGHBOR_RADIUS) {
-					neighbors[i].push_back(&_particles[j]);
+				if (distance(p.position, np->position) < NEIGHBOR_RADIUS) {
+					neighbors[i].push_back(np);
+					}
 				}
 			}
 		}
 	}
 }
+
+void	ParticleSystemData::fill_hmap()
+{
+	// step 1: clear non-empty cells
+	for (auto const &idx: hmap->nempty_cells) {
+		std::fill(hmap->hmap[idx].particles, hmap->hmap[idx].particles + MAX_PER_CELL, nullptr);
+		hmap->hmap[idx].n_inside = 0;
+	}
+	hmap->nempty_cells.clear();
+	// step 2: add particles to cells they occupy
+	for (size_t i = 0, n = numOfParticles(); i < n; ++i)
+	{
+		auto idx = hmap->hash(_particles[i].position);
+		auto &cell = hmap->hmap[idx];
+		if (cell.n_inside < MAX_PER_CELL)
+		{
+			cell.particles[cell.n_inside] = &_particles[i];
+			cell.n_inside += 1;
+			hmap->nempty_cells.insert(idx);
+		}
+	}
+}
+
 
 void	ParticleSystemData::update_densities() {
 	size_t	n = numOfParticles();

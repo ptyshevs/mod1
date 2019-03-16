@@ -41,7 +41,7 @@ std::vector<glm::ivec3> generate_triangulated_mesh_indices() {
 ** Modify map
 */
 
-void interpolate_using_controll_points(const std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map)
+void interpolate_using_control_points(const std::vector<glm::vec3> &cp, std::vector<glm::vec3> &map)
 {
 	auto cl = CLCore();
 
@@ -121,7 +121,7 @@ HeightMap generate_map(const ControlPoints &control_points) {
 	std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
 	// Interpolate stuff
-	interpolate_using_controll_points(control_points._arr, map);
+	interpolate_using_control_points(control_points._arr, map);
 
 	// Remap interpolated map on height map
 	for (size_t i = 0; i < sl; i++)

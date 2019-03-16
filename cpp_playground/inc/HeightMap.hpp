@@ -15,6 +15,7 @@
 
 #include <core.hpp>
 #include <ControlPoints.hpp>
+#include <unordered_set>
 
 class HeightMap: public GLItem {
 private:
@@ -24,12 +25,15 @@ private:
 public:
 	HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
 	std::vector<Cell>	hmap;
+	std::unordered_set<size_t> nempty_cells;
 
 	void show() const;
 	ssize_t		hash(int i, int j, int k) const;
 	ssize_t		hash(glm::vec3 xyz) const;
 	Cell		&address(int i, int j, int k);
 	Cell		&address(glm::vec3 pos);
+	glm::vec3	pos_to_3D_idx(glm::vec3 const &pos) const;
+
 	void		bound(glm::vec3 &position);
 	bool		out_of_bound(const glm::vec3 &position) const;
 	glm::vec3	normal(const glm::vec3 &position);

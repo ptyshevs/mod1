@@ -22,8 +22,8 @@ void	HeightMap::show() const
 			{
 				Cell c= hmap[hash(i, j, k)];
 
-				std::cout << " 3D coords: [" << glm::to_string(c.pos);
-				std::cout << "]: " << c.volume;
+				std::cout << "C [" << glm::to_string(c.pos);
+				std::cout << "] contains " << c.n_inside << "elements";
 				std::cout << " is_solid: " << c.is_solid << std::endl;
 			}
 		}
@@ -55,6 +55,10 @@ ssize_t HeightMap::hash(int i, int j, int k) const
 ssize_t HeightMap::hash(glm::vec3 pos) const
 {
 	return static_cast<ssize_t>((ceil(pos.x) + hf_sl) * (sl * (sl / 4.0)) + sl * ceil(pos.y) + (ceil(pos.z) + hf_sl));
+}
+
+glm::vec3 HeightMap::pos_to_3D_idx(glm::vec3 const &pos) const {
+	return (glm::vec3(ceil(pos.x), ceil(pos.y), ceil(pos.z)));
 }
 
 Cell& HeightMap::address(glm::vec3 pos)
