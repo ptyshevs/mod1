@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
-# define MAX_NEIGHBORS 100
+# define MAX_NEIGHBORS 10
 
 struct Particle {
 	glm::vec3	position;

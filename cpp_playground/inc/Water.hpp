@@ -30,12 +30,18 @@ private:
 public:
 	explicit Water();
 
+	CLCore					cl;
+	cl_mem					cl_cp;
+	cl_mem					cl_hmap;
+	cl_mem					cl_vbo; // particles
+
+
 	HeightMap				*hmap;
 	ParticleSystemData		*data;
 	ParticleSystemSolver	*solver;
 	std::vector<glm::vec3>	indices;
 //	Emiter emiter;
-
+	virtual ~Water() override;
 	void	update_particles();
 //	void	emit();
 };

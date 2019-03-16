@@ -19,11 +19,11 @@
 
 class HeightMap: public GLItem {
 private:
-	const ControlPoints &_cpoints;
 	float	_dx(const glm::vec3 &grid_position);
 	float	_dz(const glm::vec3 &grid_position);
 public:
 	explicit HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
+	const ControlPoints &_cpoints;
 	std::vector<Cell>	hmap;
 	std::unordered_set<size_t> nempty_cells;
 
