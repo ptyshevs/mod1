@@ -23,7 +23,7 @@ private:
 	float	_dx(const glm::vec3 &grid_position);
 	float	_dz(const glm::vec3 &grid_position);
 public:
-	HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
+	explicit HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints) {};
 	std::vector<Cell>	hmap;
 	std::unordered_set<size_t> nempty_cells;
 

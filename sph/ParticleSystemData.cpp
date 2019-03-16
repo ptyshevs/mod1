@@ -12,33 +12,34 @@
 
 #include "ParticleSystemData.hpp"
 
-static int offsets[27][3] = {	{-1, -1, -1},
+static int offsets[27][3] = {
+							{0, 0, 0},
+							{-1, 0, 0},
+							{0, -1, 0},
+							{0, 0, -1},
+							{0, 0, 1},
+							{0, 1, 0},
+							{1, 0, 0},
 							{-1, -1, 0},
 							{-1, -1, 1},
 							{-1, 0, -1},
-							{-1, 0, 0},
 							{-1, 0, 1},
 							{-1, 1, -1},
 							{-1, 1, 0},
 							{-1, 1, 1},
 							{0, -1, -1},
-							{0, -1, 0},
 							{0, -1, 1},
-							{0, 0, -1},
-							{0, 0, 0},
-							{0, 0, 1},
 							{0, 1, -1},
-							{0, 1, 0},
 							{0, 1, 1},
 							{1, -1, -1},
 							{1, -1, 0},
 							{1, -1, 1},
 							{1, 0, -1},
-							{1, 0, 0},
 							{1, 0, 1},
 							{1, 1, -1},
 							{1, 1, 0},
-							{1, 1, 1}};
+							{1, 1, 1},
+							{-1, -1, -1}};
 
 ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0))
 {
@@ -104,35 +105,34 @@ void ParticleSystemData::show(ssize_t i)
 void ParticleSystemData::cacheNeighbors()
 {
 	fill_hmap();
-	size_t n = numOfParticles();
-	if (neighbors.size() < n)
+	for (auto &p: _particles)
 	{
-		for (size_t i = neighbors.size(); i < n; ++i)
-			neighbors.emplace_back();
-	}
-
-	for (size_t i = 0; i < n; ++i)
-	{
-		auto const &p = _particles[i];
-		neighbors[i].clear();
-
+		p.n_neighbors = 0;
 //		std::cout << _particles[i] << std::endl;
 //		std::cout << "hmap pos:" << glm::to_string(hmap->address(_particles[i].position).pos) << std::endl;
 //		std::cout << "3d idx: " << glm::to_string(hmap->pos_to_3D_idx(_particles[i].position)) << std::endl;
 //		auto const &cell = hmap->address(_particles[i].position);
-		glm::vec3 cell_pos = hmap->pos_to_3D_idx(_particles[i].position);
+		glm::vec3 cell_pos = hmap->pos_to_3D_idx(p.position);
 		for (auto const &offset: offsets)
 		{
+			if (p.n_neighbors == MAX_NEIGHBORS)
+				break ;
 			glm::vec3 offset_pos(cell_pos[0] + offset[0], cell_pos[1] + offset[1], cell_pos[2] + offset[2]);
 			if (hmap->out_of_bound(offset_pos))
 				continue ;
 			auto const &neigh_cell = hmap->address(offset_pos);
 			for (size_t j = 0; j < neigh_cell.n_inside; ++j) {
-				auto const &np = neigh_cell.particles[j];
+				auto &np = neigh_cell.particles[j];
 				if (&p != np) {
 				// calculate distance, and if close enough, add to neighbor list
-				if (distance(p.position, np->position) < NEIGHBOR_RADIUS) {
-					neighbors[i].push_back(np);
+					if (distance(p.position, np->position) < NEIGHBOR_RADIUS && p.n_neighbors < MAX_NEIGHBORS) {
+						p.neighbors[p.n_neighbors] = np;
+						p.n_neighbors += 1;
+						if (p.n_neighbors == MAX_NEIGHBORS) {
+//							std::cout << "Max # of neighbors reached" << std::endl;
+//							p.show();
+							break ;
+						}
 					}
 				}
 			}
@@ -149,42 +149,37 @@ void	ParticleSystemData::fill_hmap()
 	}
 	hmap->nempty_cells.clear();
 	// step 2: add particles to cells they occupy
-	for (size_t i = 0, n = numOfParticles(); i < n; ++i)
+	for (auto &p: _particles)
 	{
-		auto idx = hmap->hash(_particles[i].position);
+		auto idx = hmap->hash(p.position);
 		auto &cell = hmap->hmap[idx];
 		if (cell.n_inside < MAX_PER_CELL)
 		{
-			cell.particles[cell.n_inside] = &_particles[i];
+			cell.particles[cell.n_inside] = &p;
 			cell.n_inside += 1;
 			hmap->nempty_cells.insert(idx);
+//			if (cell.n_inside > cnt_max)
+//				cnt_max = cell.n_inside;
 		}
 	}
+//	std::cout << "Max p in cell=" << cnt_max << std::endl;
 }
 
 
 void	ParticleSystemData::update_densities() {
-	size_t	n = numOfParticles();
-	for (size_t i = 0; i < n; ++i)
+	for (auto &p: _particles)
 	{
 		float sum = 0;
-		for (Particle *neighbor: neighbors[i]) {
-			float dist = distance(_particles[i].position, neighbor->position);
+		for (size_t j=0, m=p.n_neighbors; j < m; ++j) {
+			float dist = distance(p.position, p.neighbors[j]->position);
 			sum += kernel.weight(dist);
 		}
-//		_particles[i].density = _mass * sum;
-		// this will add mass of the particle itself to calculations
-		_particles[i].density = _mass * (sum + kernel.weight(0));
-		if (_particles[i].density < 0) {
-			std::cerr << "Density is negative! : " << _particles[i] << std::endl;
-		}
+		p.density = _mass * (sum + kernel.weight(0));
 	}
 }
 
 void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
-	size_t n = numOfParticles();
-	for (size_t i = 0; i < n; ++i) {
-		Particle &p = _particles[i];
+	for (auto &p: _particles) {
 		p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
 		if (clamp_negative && p.pressure < 0)
 			p.pressure *= -NEGATIVE_PRESSURE_SCALE;
@@ -193,15 +188,13 @@ void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
 
 // Add negative pressure gradient to the force
 void	ParticleSystemData::add_pressure() {
-	size_t n = numOfParticles();
-	for (size_t i = 0; i < n; ++i) {
-		Particle &p = _particles[i];
-		for (Particle *neighbor: neighbors[i]) {
-			float dist = distance(p.position, neighbor->position);
+	for (auto &p: _particles) {
+		for (size_t j=0, m=p.n_neighbors; j < m; ++j) {
+			float dist = distance(p.position, p.neighbors[j]->position);
 			if (dist > 0) {
-				glm::vec3 dir = (p.position - neighbor->position) / dist; // normed vector
-				glm::vec3 val = _mass * (p.pressure + neighbor->pressure) /
-						(2 * p.density * neighbor->density) * kernel.first_derivative(dist) * dir;
+				glm::vec3 dir = (p.position - p.neighbors[j]->position) / dist; // normed vector
+				glm::vec3 val = _mass * (p.pressure + p.neighbors[j]->pressure) /
+						(2 * p.density * p.neighbors[j]->density) * kernel.first_derivative(dist) * dir;
 //				std::cerr << glm::to_string(val) << std::endl;
 				p.force -= val;
 			}
@@ -210,12 +203,12 @@ void	ParticleSystemData::add_pressure() {
 }
 
 void	ParticleSystemData::add_viscosity() {
-	for (size_t i = 0; i < numOfParticles(); ++i) {
-		Particle &p = _particles[i];
-		for (Particle *neighbor: neighbors[i]) {
-			float dist = glm::distance(p.position, neighbor->position);
+	for (auto &p: _particles) {
+		for (size_t j=0, m=p.n_neighbors; j < m; ++j) {
+			float dist = glm::distance(p.position, p.neighbors[j]->position);
 			// maybe need to multiply on the unit vector of direction from one particle to it's neighbor
-			p.force += VISCOSITY * (neighbor->velocity - p.velocity) / neighbor->density * kernel.second_derivative(dist);
+			p.force += VISCOSITY * (p.neighbors[j]->velocity - p.velocity) /
+					p.neighbors[j]->density * kernel.second_derivative(dist);
 		}
 	}
 }

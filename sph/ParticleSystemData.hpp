@@ -39,7 +39,6 @@ private:
 	const glm::vec3			_gravity;
 public:
 	std::vector<Particle>	_particles;
-	std::vector<std::vector<Particle *>> neighbors;
 	HeightMap				*hmap;
 	PolyMixedKernel			kernel;
 

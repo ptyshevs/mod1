@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
+# define MAX_NEIGHBORS 100
 
 struct Particle {
 	glm::vec3	position;
@@ -18,6 +19,8 @@ struct Particle {
 	glm::vec3	force;
 	float		density;
 	float		pressure;
+	size_t		n_neighbors;
+	Particle	*neighbors[MAX_NEIGHBORS];
 
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);

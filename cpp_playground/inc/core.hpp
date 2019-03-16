@@ -20,7 +20,7 @@
 # define sl 200
 // half the number (used for centering in NDC
 # define hf_sl 100
-# define MAX_PER_CELL 28
+# define MAX_PER_CELL 100  // max amount of particles pointers stored in a single cell
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
 #include <glm/glm.hpp>

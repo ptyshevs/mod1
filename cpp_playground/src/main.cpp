@@ -36,8 +36,8 @@ int main(int ac, char *av[]) {
 	ParticleSystemData data;
 	data.hmap = &map;
 	Emitter emitter(data);
-	emitter.setStep(1.0);
-	emitter.cube(glm::vec3(0, 40, 0), 20);
+	emitter.setStep(.7);
+	emitter.cube(glm::vec3(0, 40, 0), 10);
 //	emitter.cube(glm::vec3(0, 1, hf_sl - 5), 3);
 //	emitter.cuboid(-5, 5, 0, 20, hf_sl - 7, hf_sl - 5);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);

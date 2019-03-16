@@ -47,9 +47,8 @@ void ParticleSystemSolver::accumulateExternalForces()
 	float			mass = _data.mass();
 	glm::vec3		gravity = _data.gravity();
 
-	for (size_t i = 0; i < n; ++i)
+	for (auto &p: _data._particles)
 	{
-		Particle &p = _data[i];
 		p.force = mass * gravity;
 		p.force += - DRAG_COEF * p.velocity;
 	}
@@ -65,20 +64,18 @@ void	ParticleSystemSolver::accumulateViscosityForce() {
 }
 
 void	ParticleSystemSolver::timeIntegration(float dt) {
-	size_t			n = _data.numOfParticles();
 	const float 	mass = _data.mass();
-	for (size_t i = 0; i < n; ++i)
+	for (auto &p: _data._particles)
 	{
-		Particle &p = _data[i];
 		p.velocity += dt * p.force / mass; // F = ma -> a = F/m
 		p.position +=  dt * p.velocity; // Use updated velocity to move particle position
 	}
 }
 
 void	ParticleSystemSolver::resolveCollision() {
-	size_t 			n = _data.numOfParticles();
-	for (size_t i = 0; i < n; ++i){
-		Particle &p = _data[i];
+	float			h;
+
+	for (auto &p: _data._particles){
 		if (_data.hmap->out_of_bound(p.position))
 		{
 			// handle collision with boundary
@@ -88,7 +85,7 @@ void	ParticleSystemSolver::resolveCollision() {
 			continue ;
 		}
 		// No boundary crossing, maybe there's a surface?
-		float h = _data.hmap->surface_height(p.position);
+		h = _data.hmap->surface_height(p.position);
 		if (h > p.position.y)
 		{
 			surfaceCollision(p);
