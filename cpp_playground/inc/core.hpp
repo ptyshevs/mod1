@@ -68,6 +68,7 @@ struct GLItem {
     std::function<void (const glm::mat4 &vp)> fill_uniforms;
 	virtual ~GLItem() = default;
 	void	draw(const glm::mat4 &vp, GLenum type);
+	void	no_err(int err, int line) noexcept(false);
 };
 
 SDLCore	sdl_gl_init(void);
@@ -92,6 +93,14 @@ struct CLCore {
     cl_command_queue    queue;
     cl_program          program;
     cl_kernel           kernel;
+};
+
+struct CLWaterCore: CLCore {
+	// kernel is used for neighbors search and density/pressure update
+	cl_kernel           accumForces;
+	cl_program          accumForcesProgram;
+	cl_kernel           integrateResolve;
+	cl_program          integrateResolveProgram;
 };
 
 struct CLGLDoubleBufferedItem: GLItem {
@@ -156,6 +165,7 @@ typedef struct {
 
 void     cl_host_part(CLCore &cl_core, bool wGLInterop = false);
 void    cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);
+void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kernel &kernel_field, const char *filepath, const char *program_name);
 
 // textures.cpp
 

@@ -4,6 +4,13 @@
 #define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
 
+// like 60 FPS = 1/60 SPF
+#define TIME_STEP 0.0166f
+// increase to see how it would decrease relative velocity
+#define DRAG_COEF 0.004f
+#define RESTITUTION 0.6f
+#define DAMPING 0.65f
+
 //#define M_PI 3.1416 // M_PI is pre-defined
 #define K_RADIUS 1.5f
 #define K_DCONST = 45.0f / (M_PI * pow(r, 6))
@@ -67,7 +74,7 @@ float kernel_weight(float d) {
 }
 
 // step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void wsim_kernel(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
+__kernel void sim_update(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
     size_t offset = get_global_id(0);
 //	particles[offset].vel[0] = 300;
@@ -95,5 +102,8 @@ __kernel void wsim_kernel(__global t_cp *control_points, __global t_cell *hmap, 
 	p->force[0] = 0;
 	p->force[1] = PARTICLE_MASS * gravity[1];
 	p->force[2] = 0;
+	p->force[0] -= DRAG_COEF * p->vel[0];
+	p->force[1] -= DRAG_COEF * p->vel[1];
+	p->force[2] -= DRAG_COEF * p->vel[2];
 //	std::cout << "Max p in cell=" << cnt_max << std::endl;
 }

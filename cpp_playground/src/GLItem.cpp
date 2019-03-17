@@ -35,3 +35,11 @@ void GLItem::draw(const glm::mat4 &vp, GLenum type)
 	}
 	glBindVertexArray(0);
 }
+
+void GLItem::no_err(int err, int line) noexcept(false)
+{
+	if (err != CL_SUCCESS) {
+        std::cout << "Error on line " << line << " | code: " << err << ".\n";
+        exit(1);
+    }
+}

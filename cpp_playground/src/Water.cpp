@@ -19,9 +19,11 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 
 	w.hmap = hmap;
 	w.data = data;
-	w.cl = CLCore();
+	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
-	cl_compile_kernel(w.cl, "src/kernels/wsim_kernel.cl", "wsim_kernel");
+	cl_compile_kernel(w.cl, "src/kernels/sim_update.cl", "sim_update");
+	cl_compile_water_kernel(w.cl, w.cl.accumForcesProgram, w.cl.accumForces, "src/kernels/accum_forces.cl", "accum_forces");
+	cl_compile_water_kernel(w.cl, w.cl.integrateResolveProgram, w.cl.integrateResolve, "src/kernels/integrate_resolve.cl", "integrate_resolve");
 
 	w.model = glm::mat4(1.0f);
 	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
@@ -40,9 +42,9 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-//	glEnableVertexAttribArray(3);
-//	glEnableVertexAttribArray(4);
-//	glEnableVertexAttribArray(5);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
+	glEnableVertexAttribArray(5);
 //	glEnableVertexAttribArray(6);
 
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
@@ -50,7 +52,9 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 6));
-//	glVertexAttribPointer(3, 1, GL_FLOAT)
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 9));
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 10));
+	glVertexAttribPointer(5, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 11));
 	glBindVertexArray(0);
 	w.idx_num = w.data->numOfParticles();
 	int err = 0;
@@ -101,17 +105,21 @@ void Water::update_particles()
 	err = clSetKernelArg(cl.kernel, 0, sizeof(cl_cp), &cl_cp);
 	err |= clSetKernelArg(cl.kernel, 1, sizeof(cl_hmap), &cl_hmap);
 	err |= clSetKernelArg(cl.kernel, 2, sizeof(cl_vbo), &cl_vbo);
-	if (err != CL_SUCCESS) {
-		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-		exit(1);
-	}
+	no_err(err, __LINE__);
 	size_t global_work_size = data->numOfParticles() ;
     err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-    if (err != CL_SUCCESS) {
-        std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-        exit(1);
-    }
-
+    no_err(err, __LINE__);
+    clFinish(cl.queue);
+	err = clSetKernelArg(cl.accumForces, 0, sizeof(cl_cp), &cl_cp);
+	err |= clSetKernelArg(cl.accumForces, 1, sizeof(cl_hmap), &cl_hmap);
+	err |= clSetKernelArg(cl.accumForces, 2, sizeof(cl_vbo), &cl_vbo);
+	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	no_err(err, __LINE__);
+	err = clSetKernelArg(cl.integrateResolve, 0, sizeof(cl_cp), &cl_cp);
+	err |= clSetKernelArg(cl.integrateResolve, 1, sizeof(cl_hmap), &cl_hmap);
+	err |= clSetKernelArg(cl.integrateResolve, 2, sizeof(cl_vbo), &cl_vbo);
+	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	no_err(err, __LINE__);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 
     clFinish(cl.queue);

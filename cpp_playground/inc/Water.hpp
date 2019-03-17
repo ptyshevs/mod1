@@ -30,7 +30,7 @@ private:
 public:
 	explicit Water();
 
-	CLCore					cl;
+	CLWaterCore				cl;
 	cl_mem					cl_cp;
 	cl_mem					cl_hmap;
 	cl_mem					cl_vbo; // particles

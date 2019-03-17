@@ -91,3 +91,39 @@ void	cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_nam
 		exit(1);
 	}
 }
+
+void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kernel &kernel_field, const char *filepath, const char *program_name)
+{
+	int err;
+	char	*kernel = reader(filepath);
+
+	// Create obj
+	program_field = clCreateProgramWithSource(cl.context, 1, (const char **) & kernel, NULL, &err);
+	if (!program_field || err != CL_SUCCESS)
+	{
+		printf("Error: Failed to create compute program!\n");
+		return ;
+	}
+	free(kernel);
+	// Compile
+	err = clBuildProgram(program_field, 1, &(cl.device), NULL, NULL, NULL);
+	if (err != CL_SUCCESS)
+	{
+		size_t len;
+		char buffer[2048];
+		// first get length of the log
+		clGetProgramBuildInfo(program_field, cl.device, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
+		printf("Error: Failed to build program executable! %d \n", err);
+		// get the log itself
+		clGetProgramBuildInfo(program_field, cl.device, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
+		printf("%s\n", buffer);
+		exit(1);
+	}
+	// Link
+	kernel_field = clCreateKernel(program_field, program_name, &err);
+	if (!kernel_field || err != CL_SUCCESS)
+	{
+		printf("Error: Failed to create compute kernel!\n");
+		exit(1);
+	}
+}
