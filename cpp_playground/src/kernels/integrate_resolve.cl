@@ -77,7 +77,17 @@ float kernel_weight(float d) {
 __kernel void integrate_resolve(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
     size_t offset = get_global_id(0);
-	particles[offset].vel[0] = 300;
-	particles[offset].vel[1] = 300;
+	// particles[offset].vel[0] = 300;
+//	particles[offset].vel[1] = 300;
+	__global t_particle *p = &particles[offset];
+	float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
+	val = TIME_STEP * val / PARTICLE_MASS;
 
+	p->vel[0] += val[0];
+	p->vel[1] += val[1];
+	p->vel[2] += val[2];
+
+	p->pos[0] += TIME_STEP * p->vel[0];
+	p->pos[1] += TIME_STEP * p->vel[1];
+	p->pos[2] += TIME_STEP * p->vel[2];
 }

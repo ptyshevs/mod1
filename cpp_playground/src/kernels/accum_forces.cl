@@ -55,8 +55,9 @@ typedef struct {
 
 ///////////////////////// PROTOTYPES
 float k_distance(float3 a, float3 b);
-float kernel_weight(float d);
-
+float k_weight(float d);
+float k_first_derivative(float d);
+float k_second_derivative(float d);
 
 
 
@@ -66,18 +67,60 @@ float k_distance(float3 a, float3 b) {
 
 
 
-float kernel_weight(float d) {
+float k_weight(float d) {
 	if (d >= K_RADIUS)
 		return (0.0f);
 	float x = K_RADIUS - d * d;
 	return (k_const * x * x * x);
 }
 
+
+
+float k_first_derivative(float d) {
+	if (d >= K_RADIUS)
+		return (0.0f);
+	float x = K_RADIUS - d;
+	return (-k_dconst * x * x);
+}
+
+float k_second_derivative(float d)
+{
+	if (d >= K_RADIUS)
+		return (0.0f);
+	return (k_dconst * (K_RADIUS - d));
+}
+
+
+
 // step 2: accumulate forces from pressure and viscosity
 __kernel void accum_forces(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
-    size_t offset = get_global_id(0);
-	particles[offset].vel[0] = 300;
-	particles[offset].vel[1] = 300;
+	size_t offset = get_global_id(0);
+	__global t_particle *p = &particles[offset];
+	for (unsigned int i=0; i < p->n_neighbors; ++i) {
+		__global t_particle *np = &particles[p->neighbors[i]];
 
+		float3 ppos = (float3)(p->pos[0], p->pos[1], p->pos[2]);
+		float3 nppos = (float3)(np->pos[0], np->pos[1], np->pos[2]);
+		float dist = k_distance(ppos, nppos);
+		if (dist > 0) {
+			float3 dir = (ppos - nppos) / dist; // normed vector
+			float3 val = PARTICLE_MASS * (p->pressure + np->pressure) /
+						(2 * p->density * np->density) * k_first_derivative(dist) * dir;
+
+
+			p->force[0] -= val[0];
+			p->force[1] -= val[1];
+			p->force[2] -= val[2];
+
+			float3 pvel = (float3)(p->vel[0], p->vel[1], p->vel[2]);
+			float3 npvel = (float3)(np->vel[0], np->vel[1], np->vel[2]);
+			val = VISCOSITY * (npvel - pvel) / np->density * k_second_derivative(dist);
+
+			p->force[0] += val[0];
+			p->force[1] += val[1];
+			p->force[2] += val[2];
+		}
+
+	}
 }

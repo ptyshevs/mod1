@@ -64,8 +64,6 @@ float k_distance(float3 a, float3 b) {
 	return length(a - b);
 }
 
-
-
 float kernel_weight(float d) {
 	if (d >= K_RADIUS)
 		return (0.0f);
@@ -77,14 +75,12 @@ float kernel_weight(float d) {
 __kernel void sim_update(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
     size_t offset = get_global_id(0);
-//	particles[offset].vel[0] = 300;
-//	particles[offset].vel[1] = 300;
 	__global t_particle *p = &particles[offset];
-//	p->vel[0] = 300;
-//	p->vel[1] = 300;
 	p->n_neighbors = 0;
 	float density_accum = 0;
 	for (size_t i = 0; i < NUM_PARTICLES; ++i) {
+		if (i == offset)
+			continue ;
 		__global t_particle *np = &particles[i];
 		if (p->n_neighbors == MAX_NEIGHBORS)
 			break ;
@@ -105,5 +101,4 @@ __kernel void sim_update(__global t_cp *control_points, __global t_cell *hmap, _
 	p->force[0] -= DRAG_COEF * p->vel[0];
 	p->force[1] -= DRAG_COEF * p->vel[1];
 	p->force[2] -= DRAG_COEF * p->vel[2];
-//	std::cout << "Max p in cell=" << cnt_max << std::endl;
 }
