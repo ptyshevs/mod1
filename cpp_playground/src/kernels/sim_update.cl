@@ -27,6 +27,13 @@ __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 
 
 typedef struct {
+	unsigned int     n_cp;
+	unsigned int     hmap_size;
+	unsigned int     n_particles;
+} t_constants;
+
+
+typedef struct {
 	float x;
 	float y;
 	float z;
@@ -72,13 +79,13 @@ float kernel_weight(float d) {
 }
 
 // step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void sim_update(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
+__kernel void sim_update(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
     size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];
 	p->n_neighbors = 0;
 	float density_accum = 0;
-	for (size_t i = 0; i < NUM_PARTICLES; ++i) {
+	for (size_t i = 0, c = constants->n_particles; i < c; ++i) {
 		if (i == offset)
 			continue ;
 		__global t_particle *np = &particles[i];

@@ -27,6 +27,13 @@ __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 
 
 typedef struct {
+	unsigned int     n_cp;
+	unsigned int     hmap_size;
+	unsigned int     n_particles;
+} t_constants;
+
+
+typedef struct {
 	float x;
 	float y;
 	float z;
@@ -93,7 +100,7 @@ float k_second_derivative(float d)
 
 
 // step 2: accumulate forces from pressure and viscosity
-__kernel void accum_forces(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
+__kernel void accum_forces(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];

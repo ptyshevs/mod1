@@ -1,3 +1,5 @@
+#define sl 200
+#define hf_sl 100
 #define MAX_NEIGHBORS 26
 #define MAX_PER_CELL 100
 #define NUM_PARTICLES 1000
@@ -24,6 +26,13 @@ __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
 // pow(K_RADIUS, 9)
 __constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
 __constant float k_dconst = 45.0f / (M_PI * 11.390625);
+
+
+typedef struct {
+	unsigned int     n_cp;
+	unsigned int     hmap_size;
+	unsigned int     n_particles;
+} t_constants;
 
 
 typedef struct {
@@ -56,6 +65,7 @@ typedef struct {
 ///////////////////////// PROTOTYPES
 float k_distance(float3 a, float3 b);
 float kernel_weight(float d);
+bool  bound(__global float *pos[3]);
 
 
 
@@ -73,12 +83,42 @@ float kernel_weight(float d) {
 	return (k_const * x * x * x);
 }
 
+bool bound(__global float **pos) {
+	float3 p = (float3)((*pos)[0], (*pos)[1], (*pos)[2]);
+	bool out_of_bound = false;
+	if (p.y < 0) {
+		(*pos)[1] = 0;
+		out_of_bound = true;
+	}
+	else if (p.y > hf_sl / 2.0f - 1) {
+		(*pos)[1] = hf_sl / 2.0f - 1;
+		out_of_bound = true;
+	}
+
+	if (p.z < -hf_sl) {
+		(*pos)[2] = -hf_sl;
+		out_of_bound = true;
+	}
+	else if (p.z > hf_sl - 1) {
+		(*pos)[2] = hf_sl - 1;
+		out_of_bound = true;
+	}
+
+	if (p.x < -hf_sl) {
+		(*pos)[0] =  -hf_sl;
+		out_of_bound = true;
+	}
+	else if (p.x > hf_sl - 1) {
+		(*pos)[0] = hf_sl - 1;
+		out_of_bound = true;
+	}
+	return (out_of_bound);
+}
+
 // step 2: accumulate forces from pressure and viscosity
-__kernel void integrate_resolve(__global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
+__kernel void integrate_resolve(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
-    size_t offset = get_global_id(0);
-	// particles[offset].vel[0] = 300;
-//	particles[offset].vel[1] = 300;
+	size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];
 	float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
 	val = TIME_STEP * val / PARTICLE_MASS;
@@ -90,4 +130,17 @@ __kernel void integrate_resolve(__global t_cp *control_points, __global t_cell *
 	p->pos[0] += TIME_STEP * p->vel[0];
 	p->pos[1] += TIME_STEP * p->vel[1];
 	p->pos[2] += TIME_STEP * p->vel[2];
+	// Collision resolution
+	if (bound(&p->pos)) {
+		p->vel[0] *= -DAMPING;
+		p->vel[1] *= -DAMPING;
+		p->vel[2] *= -DAMPING;
+	}
+	// No boundary crossing, maybe there's a surface?
+	// float h = surface_height(control_points, p->pos);
+	// if (h > p->pos[1])
+	// {
+	// 	surfaceCollision(p);
+	// 	p->position[1] = h;
+	// }
 }

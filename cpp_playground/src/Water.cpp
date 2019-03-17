@@ -19,6 +19,10 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 
 	w.hmap = hmap;
 	w.data = data;
+
+	w.constants.hmap_size = hmap->hmap.size();
+	w.constants.n_control_points = hmap->_cpoints._arr.size();
+	w.constants.n_particles = w.data->numOfParticles();
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
 	cl_compile_kernel(w.cl, "src/kernels/sim_update.cl", "sim_update");
@@ -59,32 +63,35 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.idx_num = w.data->numOfParticles();
 	int err = 0;
 
+	w.cl_constants = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, sizeof(WaterConstants), NULL, &err);
 	w.cl_cp = clCreateBuffer(w.cl.context, CL_MEM_READ_ONLY, hmap->_cpoints._arr.size() * sizeof(glm::vec3), NULL, &err);
 	w.cl_hmap = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, hmap->hmap.size() * sizeof(Cell), NULL, &err);
 	w.cl_vbo = clCreateFromGLBuffer(w.cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
 
+
 	err = 0;
 	err = clEnqueueWriteBuffer(w.cl.queue, w.cl_cp, CL_TRUE, 0, hmap->_cpoints._arr.size() * sizeof(glm::vec3), hmap->_cpoints._arr.data(), 0, NULL, NULL);
 	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_hmap, CL_TRUE, 0, hmap->hmap.size() * sizeof(Cell), hmap->hmap.data(), 0, NULL, NULL);
-	if (err != CL_SUCCESS) {
-		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-		exit(1);
-	}
+	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_constants, CL_TRUE, 0, sizeof(WaterConstants), &w.constants, 0, NULL, NULL);
+	w.no_err(err, __LINE__);
 
 	err = 0;
-	err = clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.kernel, 1, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.kernel, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_constants), &w.cl_constants);
+	err |= clSetKernelArg(w.cl.kernel, 1, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.kernel, 2, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.kernel, 3, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
-	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.accumForces, 1, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.accumForces, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_constants), &w.cl_constants);
+	err |= clSetKernelArg(w.cl.accumForces, 1, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.accumForces, 2, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.accumForces, 3, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
-	err = clSetKernelArg(w.cl.integrateResolve, 0, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.integrateResolve, 1, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.integrateResolve, 0, sizeof(w.cl_constants), &w.cl_constants);
+	err = clSetKernelArg(w.cl.integrateResolve, 1, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.integrateResolve, 3, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
 	return (w);

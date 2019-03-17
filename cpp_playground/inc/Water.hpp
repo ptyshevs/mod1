@@ -18,6 +18,12 @@
 #include <ParticleSystemData.hpp>
 #include <ParticleSystemSolver.hpp>
 
+struct WaterConstants {
+	unsigned int	n_control_points;
+	unsigned int 	hmap_size;
+	unsigned int	n_particles;
+};
+
 /*
  * This is the main structure for water simulation, that contains:
  * 1) Particle System Solver
@@ -34,7 +40,8 @@ public:
 	cl_mem					cl_cp;
 	cl_mem					cl_hmap;
 	cl_mem					cl_vbo; // particles
-
+	cl_mem					cl_constants;
+	WaterConstants			constants;
 
 	HeightMap				*hmap;
 	ParticleSystemData		*data;
