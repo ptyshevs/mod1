@@ -1,10 +1,11 @@
 
 #include "Particle.hpp"
 
-Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f) {};
+Particle::Particle()  : position(cl_float3()), velocity(cl_float3()), force(cl_float3()), density(0.0f), pressure(0.0f) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
-		position(position), velocity(velocity), force(force)
+		position({position.x, position.y, position.z}), velocity({velocity.x, velocity.y, velocity.z}),
+		force({force.x, force.y, force.z})
 {
 	density = 0.0f;
 	pressure = 0.0f;
@@ -27,9 +28,9 @@ void	Particle::show() const {
 
 std::ostream& operator<<(std::ostream &o, const Particle &particle)
 {
-	o << "pos [" << glm::to_string(particle.position) << "]";
-	o << " vel [" << glm::to_string(particle.velocity) << "]";
-	o << " F [" << glm::to_string(particle.force) << "]";
-	o << " D: " << particle.density << " P: " << particle.pressure;
+//	o << "pos [" << glm::to_string(particle.position) << "]";
+//	o << " vel [" << glm::to_string(particle.velocity) << "]";
+//	o << " F [" << glm::to_string(particle.force) << "]";
+//	o << " D: " << particle.density << " P: " << particle.pressure;
 	return (o);
 }

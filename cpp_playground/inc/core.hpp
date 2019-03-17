@@ -49,6 +49,7 @@ std::vector<glm::vec3> readFile(char *filePath);
 # define WINNAME	"mod1"
 
 struct SDLCore {
+
 	SDL_Window		*win;
 	SDL_GLContext	ctx;
 	SDL_Event		event;

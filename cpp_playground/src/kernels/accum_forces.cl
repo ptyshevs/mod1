@@ -18,7 +18,7 @@
 #define PRESSURE_CONST 7.5f
 #define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
-#define VISCOSITY 0.18f
+#define VISCOSITY 0.1f
 
 __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
 // pow(K_RADIUS, 9)
@@ -40,9 +40,9 @@ typedef struct {
 } t_cp;
 
 typedef struct s_particle {
-	float pos[3];
-	float vel[3];
-	float force[3];
+	float3 pos;
+	float3 vel;
+	float3 force;
 	float density;
 	float pressure;
 	unsigned int n_neighbors;
@@ -107,14 +107,11 @@ __kernel void accum_forces(__global t_constants *constants, __global t_cp *contr
 	for (unsigned int i=0; i < p->n_neighbors; ++i) {
 		__global t_particle *np = &particles[p->neighbors[i]];
 
-		float3 ppos = (float3)(p->pos[0], p->pos[1], p->pos[2]);
-		float3 nppos = (float3)(np->pos[0], np->pos[1], np->pos[2]);
-		float dist = k_distance(ppos, nppos);
+		float dist = k_distance(p->pos, np->pos);
 		if (dist > 0) {
-			float3 dir = (ppos - nppos) / dist; // normed vector
+			float3 dir = (p->pos - np->pos) / dist; // normed vector
 			float3 val = PARTICLE_MASS * (p->pressure + np->pressure) /
 						(2 * p->density * np->density) * k_first_derivative(dist) * dir;
-
 
 			p->force[0] -= val[0];
 			p->force[1] -= val[1];
@@ -128,6 +125,5 @@ __kernel void accum_forces(__global t_constants *constants, __global t_cp *contr
 			p->force[1] += val[1];
 			p->force[2] += val[2];
 		}
-
 	}
 }

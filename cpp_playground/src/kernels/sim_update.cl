@@ -40,9 +40,9 @@ typedef struct {
 } t_cp;
 
 typedef struct s_particle {
-	float pos[3];
-	float vel[3];
-	float force[3];
+	float3 pos;
+	float3 vel;
+	float3 force;
 	float density;
 	float pressure;
 	unsigned int n_neighbors;
@@ -81,7 +81,7 @@ float kernel_weight(float d) {
 // step 1: find neighbors, compute density and pressure, and apply external forces
 __kernel void sim_update(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
-    size_t offset = get_global_id(0);
+	size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];
 	p->n_neighbors = 0;
 	float density_accum = 0;
@@ -91,9 +91,7 @@ __kernel void sim_update(__global t_constants *constants, __global t_cp *control
 		__global t_particle *np = &particles[i];
 		if (p->n_neighbors == MAX_NEIGHBORS)
 			break ;
-		float3 ppos = (float3)(p->pos[0], p->pos[1], p->pos[2]);
-		float3 nppos = (float3)(np->pos[0], np->pos[1], np->pos[2]);
-		float dist = k_distance(ppos, nppos);
+		float dist = k_distance(p->pos, np->pos);
 		if (dist < NEIGHBOR_RADIUS) {
 			p->neighbors[p->n_neighbors] = i;
 			p->n_neighbors += 1;

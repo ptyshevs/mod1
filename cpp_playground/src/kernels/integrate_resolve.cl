@@ -2,7 +2,7 @@
 #define hf_sl 100
 #define MAX_NEIGHBORS 26
 #define MAX_PER_CELL 100
-#define NUM_PARTICLES 1000
+
 #define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
 
@@ -42,9 +42,9 @@ typedef struct {
 } t_cp;
 
 typedef struct s_particle {
-	float pos[3];
-	float vel[3];
-	float force[3];
+	float3 pos;
+	float3 vel;
+	float3 force;
 	float density;
 	float pressure;
 	unsigned int n_neighbors;
@@ -65,7 +65,7 @@ typedef struct {
 ///////////////////////// PROTOTYPES
 float k_distance(float3 a, float3 b);
 float kernel_weight(float d);
-bool  bound(__global float *pos[3]);
+bool  bound(__global float3 *pos);
 float surface_height(__global t_constants *constants, __global t_cp *control_points, float3 pos);
 float3 surface_normal(__global t_constants *c, __global t_cp *cp, float3 pos);
 float3 surface_collision(__global t_constants *constants, __global t_cp *control_points, float3 pos, float3 vel);
@@ -86,33 +86,32 @@ float kernel_weight(float d) {
 	return (k_const * x * x * x);
 }
 
-bool bound(__global float **pos) {
-	float3 p = (float3)((*pos)[0], (*pos)[1], (*pos)[2]);
+bool bound(__global float3 *pos) {
 	bool out_of_bound = false;
-	if (p.y < 0) {
-		(*pos)[1] = 0;
+	if (pos->y < 0) {
+		pos->y = 0;
 		out_of_bound = true;
 	}
-	else if (p.y > hf_sl / 2.0f - 1) {
-		(*pos)[1] = hf_sl / 2.0f - 1;
-		out_of_bound = true;
-	}
-
-	if (p.z < -hf_sl) {
-		(*pos)[2] = -hf_sl;
-		out_of_bound = true;
-	}
-	else if (p.z > hf_sl - 1) {
-		(*pos)[2] = hf_sl - 1;
+	else if (pos->y > hf_sl / 2.0f - 1) {
+		pos->y = hf_sl / 2.0f - 1;
 		out_of_bound = true;
 	}
 
-	if (p.x < -hf_sl) {
-		(*pos)[0] =  -hf_sl;
+	if (pos->z < -hf_sl) {
+		pos->z = -hf_sl;
 		out_of_bound = true;
 	}
-	else if (p.x > hf_sl - 1) {
-		(*pos)[0] = hf_sl - 1;
+	else if (pos->z > hf_sl - 1) {
+		pos->z  = hf_sl - 1;
+		out_of_bound = true;
+	}
+
+	if (pos->x < -hf_sl) {
+		pos->x =  -hf_sl;
+		out_of_bound = true;
+	}
+	else if (pos->x > hf_sl - 1) {
+		pos->x = hf_sl - 1;
 		out_of_bound = true;
 	}
 	return (out_of_bound);
@@ -124,13 +123,14 @@ bool bound(__global float **pos) {
 float surface_height(__global t_constants *constants, __global t_cp *control_points, float3 pos) {
 	float num = 0;
 	float denum = 0;
-	float w;
+	float w, sqsum;
+	float3 diff;
 	for (unsigned int i = 0, c = constants->n_cp; i < c; ++i) { // todo: how about using control points only on the neighbour cells in hmap? it has position pre-calculated already
 		w = 0;
 		float3 cppos = (float3)(control_points[i].x, control_points[i].y, control_points[i].z);
-		float3 diff = pos - cppos;
+		diff = pos - cppos;
 		diff *= diff;
-		float sqsum = diff.x + diff.z;
+		sqsum = diff.x + diff.z;
 		w = 1.0f / (pow(sqsum, 1.3f) + 0.0001f);
 		num += w * cppos.y;
 		denum += w;
@@ -139,12 +139,8 @@ float surface_height(__global t_constants *constants, __global t_cp *control_poi
 }
 
 float3 surface_normal(__global t_constants *c, __global t_cp *cp, float3 pos) {
-	float3 xleft = (float3)(pos.x + 0.5f, pos.y, pos.z);
-	float3 xright = (float3)(pos.x - 0.5f, pos.y, pos.z);
-	float3 zleft = (float3)(pos.x, pos.y, pos.z + 0.5f);
-	float3 zright = (float3)(pos.x, pos.y, pos.z - 0.5f);
-	float dx = surface_height(c, cp, xleft) - surface_height(c, cp, xright);
-	float dz = surface_height(c, cp, zleft) - surface_height(c, cp, zright);
+	float dx = surface_height(c, cp, (float3)(pos.x + 0.5f, pos.y, pos.z)) - surface_height(c, cp, (float3)(pos.x - 0.5f, pos.y, pos.z));
+	float dz = surface_height(c, cp, (float3)(pos.x, pos.y, pos.z + 0.5f)) - surface_height(c, cp, (float3)(pos.x, pos.y, pos.z - 0.5f));
 	return normalize((float3)(-dx, 1.0f, -dz));
 }
 
@@ -154,14 +150,7 @@ float3 surface_collision(__global t_constants *constants, __global t_cp *control
 	float3 vel_normalized = vel / vel_mag;
 	float3 reflected = vel_normalized - (2 * dot(vel_normalized, normal) * normal);
 	float3 renormalized = reflected * vel_mag;
-	// Easy way
-//	glm::vec3 frictioned = renormalized * RESTITUTION;
-	// we prefer tangenial speed over
-	float3 frictioned = renormalized - renormalized * RESTITUTION * fabs(dot(vel_normalized, normal));
-	return frictioned;
-	// p->vel[0] = frictioned.x;
-	// p->vel[1] = frictioned.y;
-	// p->vel[2] = frictioned.z;
+	return renormalized - renormalized * RESTITUTION * fabs(dot(vel_normalized, normal));
 }
 
 // step 2: accumulate forces from pressure and viscosity
@@ -172,13 +161,13 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 	float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
 	val = TIME_STEP * val / PARTICLE_MASS;
 
-	p->vel[0] += val[0];
-	p->vel[1] += val[1];
-	p->vel[2] += val[2];
+	p->vel.x += val.x;
+	p->vel.y += val.y;
+	p->vel.z += val.z;
 
-	p->pos[0] += TIME_STEP * p->vel[0];
-	p->pos[1] += TIME_STEP * p->vel[1];
-	p->pos[2] += TIME_STEP * p->vel[2];
+	p->pos.x += TIME_STEP * p->vel.x;
+	p->pos.y += TIME_STEP * p->vel.y;
+	p->pos.z += TIME_STEP * p->vel.z;
 
 	// Collision resolution
 	if (bound(&p->pos)) {
@@ -187,15 +176,13 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 		p->vel[2] *= -DAMPING;
 	}
 	// No boundary crossing, maybe there's a surface?
-	float3 pos = (float3)(p->pos[0], p->pos[1], p->pos[2]);
-	float3 vel = (float3)(p->vel[0], p->vel[1], p->vel[2]);
-	float h = surface_height(constants, control_points, pos);
-	if (h > pos.y)
+	float h = surface_height(constants, control_points, p->pos);
+	if (h > p->pos.y)
 	{
-		float3 new_vel = surface_collision(constants, control_points, pos, vel);
-		p->vel[0] = new_vel.x;
-		p->vel[1] = new_vel.y;
-		p->vel[2] = new_vel.z;
-		p->pos[1] = h;
+		float3 new_vel = surface_collision(constants, control_points, p->pos, p->vel);
+		p->vel.x = new_vel.x;
+		p->vel.y = new_vel.y;
+		p->vel.z = new_vel.z;
+		p->pos.y = h;
 	}
 }
