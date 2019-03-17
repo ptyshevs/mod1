@@ -55,17 +55,17 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.idx_num = w.data->numOfParticles();
 	int err = 0;
 
-//	w.cl_cp = clCreateBuffer(w.cl.context, CL_MEM_READ_ONLY, hmap->_cpoints._arr.size() * sizeof(glm::vec3), NULL, &err);
-//	w.cl_hmap = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, hmap->hmap.size() * sizeof(Cell), NULL, &err);
+	w.cl_cp = clCreateBuffer(w.cl.context, CL_MEM_READ_ONLY, hmap->_cpoints._arr.size() * sizeof(glm::vec3), NULL, &err);
+	w.cl_hmap = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, hmap->hmap.size() * sizeof(Cell), NULL, &err);
 	w.cl_vbo = clCreateFromGLBuffer(w.cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
 
-//	err = 0;
-//	err = clEnqueueWriteBuffer(w.cl.queue, w.cl_cp, CL_TRUE, 0, hmap->_cpoints._arr.size() * sizeof(glm::vec3), hmap->_cpoints._arr.data(), 0, NULL, NULL);
-//	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_hmap, CL_TRUE, 0, hmap->hmap.size() * sizeof(Cell), hmap->hmap.data(), 0, NULL, NULL);
-//	if (err != CL_SUCCESS) {
-//		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
-//		exit(1);
-//	}
+	err = 0;
+	err = clEnqueueWriteBuffer(w.cl.queue, w.cl_cp, CL_TRUE, 0, hmap->_cpoints._arr.size() * sizeof(glm::vec3), hmap->_cpoints._arr.data(), 0, NULL, NULL);
+	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_hmap, CL_TRUE, 0, hmap->hmap.size() * sizeof(Cell), hmap->hmap.data(), 0, NULL, NULL);
+	if (err != CL_SUCCESS) {
+		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
+		exit(1);
+	}
 	return (w);
 }
 
@@ -75,8 +75,8 @@ Water::Water() : hmap(nullptr), solver(nullptr)
 
 Water::~Water()
 {
-//	clReleaseMemObject(cl_hmap);
-//	clReleaseMemObject(cl_cp);
+	clReleaseMemObject(cl_hmap);
+	clReleaseMemObject(cl_cp);
 	clReleaseProgram(cl.program);
 	clReleaseKernel(cl.kernel);
 	clReleaseCommandQueue(cl.queue);
@@ -84,11 +84,11 @@ Water::~Water()
 	clReleaseContext(cl.context);
 }
 
+
 void Water::update_particles()
 {
-	static size_t global_work_size = data->_particles.size();
-	solver->simulation_step();
-	_updateBuffer();
+//	solver->simulation_step();
+//	_updateBuffer();
 ///////////////////////////////////////////////////////////////////////////////
 	glFinish();
 
@@ -98,14 +98,14 @@ void Water::update_particles()
 //	emit();
 
 	int err = 0;
-//	err = clSetKernelArg(cl.kernel, 0, sizeof(cl_cp), &cl_cp);
-//	err |= clSetKernelArg(cl.kernel, 1, sizeof(cl_hmap), &cl_hmap);
-	err |= clSetKernelArg(cl.kernel, 0, sizeof(cl_vbo), &cl_vbo);
+	err = clSetKernelArg(cl.kernel, 0, sizeof(cl_cp), &cl_cp);
+	err |= clSetKernelArg(cl.kernel, 1, sizeof(cl_hmap), &cl_hmap);
+	err |= clSetKernelArg(cl.kernel, 2, sizeof(cl_vbo), &cl_vbo);
 	if (err != CL_SUCCESS) {
 		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
 		exit(1);
 	}
-//	size_t global_work_size = data->numOfParticles() ;
+	size_t global_work_size = data->numOfParticles() ;
     err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
     if (err != CL_SUCCESS) {
         std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";

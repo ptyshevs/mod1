@@ -37,11 +37,12 @@ int main(int ac, char *av[]) {
 	data.hmap = &map;
 	Emitter emitter(data);
 	emitter.setStep(1);
-	emitter.cube(glm::vec3(0, 40, 0), 3);
+	emitter.cube(glm::vec3(0, 40, 0), 10);
 //	emitter.cube(glm::vec3(0, 1, hf_sl - 5), 3);
 //	emitter.cuboid(-5, 5, 0, 20, hf_sl - 7, hf_sl - 5);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
 	std::cout << "Num of particles=" << data._particles.size() << std::endl;
+	std::cout << "sizeof(Particle)=" << sizeof(Particle) << std::endl;
 	// right near the camera
 //	data.addParticle(glm::vec3(0,25, hf_sl - 2));
 //	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));

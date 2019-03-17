@@ -75,9 +75,11 @@ void	cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_nam
 	{
 		size_t len;
 		char buffer[2048];
-
+		// first get length of the log
+		clGetProgramBuildInfo(cl.program, cl.device, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
 		printf("Error: Failed to build program executable! %d \n", err);
-		clGetProgramBuildInfo(cl.program, cl.device, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+		// get the log itself
+		clGetProgramBuildInfo(cl.program, cl.device, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
 		printf("%s\n", buffer);
 		exit(1);
 	}

@@ -1,10 +1,10 @@
 
 #include "Particle.hpp"
 
-Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f), n_neighbors(0) {};
+Particle::Particle()  : position(glm::vec3(0.0f)), velocity(glm::vec3(0.0f)), force(glm::vec3(0.0f)), density(0.0f), pressure(0.0f) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
-		position(position), velocity(velocity), force(force), n_neighbors(0)
+		position(position), velocity(velocity), force(force)
 {
 	density = 0.0f;
 	pressure = 0.0f;
@@ -15,7 +15,6 @@ Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const g
 {
 	this->density = density;
 	this->pressure = pressure;
-	n_neighbors = 0;
 }
 
 void	Particle::show() const {
