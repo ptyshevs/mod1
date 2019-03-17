@@ -70,6 +70,23 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 		std::cout << "Error: " << __LINE__ << "code: " << err << ".\n";
 		exit(1);
 	}
+
+	err = 0;
+	err = clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.kernel, 1, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.kernel, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	w.no_err(err, __LINE__);
+
+	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.accumForces, 1, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.accumForces, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	w.no_err(err, __LINE__);
+
+	err = clSetKernelArg(w.cl.integrateResolve, 0, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.integrateResolve, 1, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_vbo), &w.cl_vbo);
+	w.no_err(err, __LINE__);
+
 	return (w);
 }
 
@@ -91,6 +108,8 @@ Water::~Water()
 
 void Water::update_particles()
 {
+	static size_t global_work_size = data->numOfParticles() ;
+	int err;
 //	solver->simulation_step();
 //	_updateBuffer();
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,23 +120,9 @@ void Water::update_particles()
 	// Emit some water
 //	emit();
 
-	int err = 0;
-	err = clSetKernelArg(cl.kernel, 0, sizeof(cl_cp), &cl_cp);
-	err |= clSetKernelArg(cl.kernel, 1, sizeof(cl_hmap), &cl_hmap);
-	err |= clSetKernelArg(cl.kernel, 2, sizeof(cl_vbo), &cl_vbo);
-	no_err(err, __LINE__);
-	size_t global_work_size = data->numOfParticles() ;
+
     err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-    no_err(err, __LINE__);
-    clFinish(cl.queue);
-	err = clSetKernelArg(cl.accumForces, 0, sizeof(cl_cp), &cl_cp);
-	err |= clSetKernelArg(cl.accumForces, 1, sizeof(cl_hmap), &cl_hmap);
-	err |= clSetKernelArg(cl.accumForces, 2, sizeof(cl_vbo), &cl_vbo);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-	no_err(err, __LINE__);
-	err = clSetKernelArg(cl.integrateResolve, 0, sizeof(cl_cp), &cl_cp);
-	err |= clSetKernelArg(cl.integrateResolve, 1, sizeof(cl_hmap), &cl_hmap);
-	err |= clSetKernelArg(cl.integrateResolve, 2, sizeof(cl_vbo), &cl_vbo);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	no_err(err, __LINE__);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
