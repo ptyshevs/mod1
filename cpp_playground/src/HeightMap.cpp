@@ -108,7 +108,6 @@ bool HeightMap::out_of_bound(const glm::vec3 &position) const
 
 glm::vec3 HeightMap::normal(const glm::vec3 &position)
 {
-	Cell &c = address(position);
 	glm::vec3 normal(-_dx(position), 1.0f, -_dz(position));
 	glm::vec3 normed_normal = normal / glm::length(normal);
 	return (normed_normal);
