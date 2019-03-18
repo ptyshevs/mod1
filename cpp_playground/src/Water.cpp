@@ -26,7 +26,8 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.constants.n_non_empty_cells = 0;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
-	cl_compile_kernel(w.cl, "src/kernels/neighbor_caching.cl", "neighbor_caching");
+	cl_compile_kernel(w.cl, "src/kernels/clear_caching.cl", "clear_caching");
+	cl_compile_water_kernel(w.cl, w.cl.neighborCachingProgram, w.cl.neighborCaching, "src/kernels/neighbor_caching.cl", "neighbor_caching");
 	cl_compile_water_kernel(w.cl, w.cl.simUpdateProgram, w.cl.simUpdate, "src/kernels/sim_update.cl", "sim_update");
 	cl_compile_water_kernel(w.cl, w.cl.accumForcesProgram, w.cl.accumForces, "src/kernels/accum_forces.cl", "accum_forces");
 	cl_compile_water_kernel(w.cl, w.cl.integrateResolveProgram, w.cl.integrateResolve, "src/kernels/integrate_resolve.cl", "integrate_resolve");
@@ -84,6 +85,12 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	err |= clSetKernelArg(w.cl.kernel, 3, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
+	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_constants), &w.cl_constants);
+	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_cp), &w.cl_cp);
+	err |= clSetKernelArg(w.cl.neighborCaching, 2, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.neighborCaching, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+
+	w.no_err(err, __LINE__);
 	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_constants), &w.cl_constants);
 	err |= clSetKernelArg(w.cl.simUpdate, 1, sizeof(w.cl_cp), &w.cl_cp);
 	err |= clSetKernelArg(w.cl.simUpdate, 2, sizeof(w.cl_hmap), &w.cl_hmap);
@@ -115,6 +122,10 @@ Water::~Water()
 	clReleaseMemObject(cl_cp);
 	clReleaseProgram(cl.program);
 	clReleaseKernel(cl.kernel);
+	clReleaseKernel(cl.accumForces);
+	clReleaseKernel(cl.integrateResolve);
+	clReleaseKernel(cl.simUpdate);
+	clReleaseKernel(cl.neighborCaching);
 	clReleaseCommandQueue(cl.queue);
 	clReleaseDevice(cl.device);
 	clReleaseContext(cl.context);
@@ -123,7 +134,7 @@ Water::~Water()
 
 void Water::update_particles()
 {
-	static size_t global_neighbor_caching_jobs = 1;
+	static size_t global_neighbor_caching_jobs = data->hmap->hmap.size();
 	static size_t global_work_size = data->numOfParticles() ;
 	int err;
 //	solver->simulation_step();
@@ -136,7 +147,8 @@ void Water::update_particles()
 	// Emit some water
 //	emit();
 
-	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
+	err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.simUpdate, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);

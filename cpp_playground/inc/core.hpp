@@ -104,6 +104,8 @@ struct CLWaterCore: CLCore {
 	cl_program          integrateResolveProgram;
 	cl_kernel           simUpdate;
 	cl_program          simUpdateProgram;
+	cl_kernel           neighborCaching;
+	cl_program          neighborCachingProgram;
 };
 
 struct CLGLDoubleBufferedItem: GLItem {

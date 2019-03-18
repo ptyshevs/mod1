@@ -139,50 +139,52 @@ float kernel_weight(float d) {
 // step 1: find neighbors, compute density and pressure, and apply external forces
 __kernel void sim_update(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
+	float dist;
+	unsigned int np_idx;
 	size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];
 	p->n_neighbors = 0;
 	float density_accum = 0;
 
-	// for (int offset_idx = 0; offset_idx < 27; ++offset_idx){
-	// 	if (p->n_neighbors == MAX_NEIGHBORS)
-	// 		break ;
-	// 	__global t_cell *cell = &hmap[hash(p->pos)];
-	// 	__constant int *offset = offsets[offset_idx];
-	// 	float3 offset_pos = (float3)(p->pos.x + offset[0], p->pos.y + offset[1], p->pos.z + offset[2]);
-	// 	if (out_of_bound(offset_pos))
-	// 		continue ;
-	// 	__global t_cell *neigh_cell = &hmap[hash(offset_pos)];
-	// 	for (unsigned int j = 0; j < neigh_cell->n_inside; ++j) {
-	// 		unsigned int np_idx = neigh_cell->particles[j];
-	// 		if (particle_offset != np_idx) {
-	// 			__global t_particle *np = &particles[np_idx];
-	// 			float dist = k_distance(p->pos, np->pos);
-	// 			if (dist < NEIGHBOR_RADIUS && p->n_neighbors < MAX_NEIGHBORS) {
-	// 				p->neighbors[p->n_neighbors] = np_idx;
-	// 				p->n_neighbors += 1;
-	// 				density_accum += kernel_weight(dist);
-	// 				if (p->n_neighbors == MAX_NEIGHBORS) {
-	// 					break ;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	for (size_t i = 0, c = constants->n_particles; i < c; ++i) {
-		if (i == offset)
-			continue ;
-		__global t_particle *np = &particles[i];
+	for (int offset_idx = 0; offset_idx < 27; ++offset_idx){
 		if (p->n_neighbors == MAX_NEIGHBORS)
 			break ;
-		float dist = k_distance(p->pos, np->pos);
-		if (dist < NEIGHBOR_RADIUS) {
-			p->neighbors[p->n_neighbors] = i;
-			p->n_neighbors += 1;
-			density_accum += kernel_weight(dist);
+		__global t_cell *cell = &hmap[hash(p->pos)];
+		__constant int *cell_offset = offsets[offset_idx];
+		float3 offset_pos = (float3)(p->pos.x + cell_offset[0], p->pos.y + cell_offset[1], p->pos.z + cell_offset[2]);
+		if (out_of_bound(offset_pos))
+			continue ;
+		__global t_cell *neigh_cell = &hmap[hash(offset_pos)];
+		for (unsigned int j = 0, k = neigh_cell->n_inside; j < k; ++j) {
+			np_idx = neigh_cell->particles[j];
+			if (offset != np_idx) {
+				__global t_particle *np = &particles[np_idx];
+				dist = k_distance(p->pos, np->pos);
+				if (dist < NEIGHBOR_RADIUS && p->n_neighbors < MAX_NEIGHBORS) {
+					p->neighbors[p->n_neighbors] = np_idx;
+					p->n_neighbors += 1;
+					density_accum += kernel_weight(dist);
+					if (p->n_neighbors == MAX_NEIGHBORS) {
+						break ;
+					}
+				}
+			}
 		}
 	}
+
+	// for (size_t i = 0, c = constants->n_particles; i < c; ++i) {
+	// 	if (i == offset)
+	// 		continue ;
+	// 	__global t_particle *np = &particles[i];
+	// 	if (p->n_neighbors == MAX_NEIGHBORS)
+	// 		break ;
+	// 	float dist = k_distance(p->pos, np->pos);
+	// 	if (dist < NEIGHBOR_RADIUS) {
+	// 		p->neighbors[p->n_neighbors] = i;
+	// 		p->n_neighbors += 1;
+	// 		density_accum += kernel_weight(dist);
+	// 	}
+	// }
 	p->density = PARTICLE_MASS * (density_accum + kernel_weight(0));
 	p->pressure = PRESSURE_CONST * (p->density - TARGET_DENSITY);
 	p->force[0] = 0;
