@@ -142,7 +142,7 @@ void ParticleSystemData::cacheNeighbors()
 
 void	ParticleSystemData::fill_hmap()
 {
-////	 step 1: clear non-empty cells
+//	 step 1: clear non-empty cells
 //	for (auto const &idx: hmap->nempty_cells) {
 //		std::fill(hmap->hmap[idx].particles, hmap->hmap[idx].particles + MAX_PER_CELL, nullptr);
 //		hmap->hmap[idx].n_inside = 0;
@@ -162,7 +162,7 @@ void	ParticleSystemData::fill_hmap()
 ////				cnt_max = cell.n_inside;
 //		}
 //	}
-////	std::cout << "Max p in cell=" << cnt_max << std::endl;
+//	std::cout << "Max p in cell=" << cnt_max << std::endl;
 }
 
 

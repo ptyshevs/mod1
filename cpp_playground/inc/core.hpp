@@ -102,6 +102,8 @@ struct CLWaterCore: CLCore {
 	cl_program          accumForcesProgram;
 	cl_kernel           integrateResolve;
 	cl_program          integrateResolveProgram;
+	cl_kernel           simUpdate;
+	cl_program          simUpdateProgram;
 };
 
 struct CLGLDoubleBufferedItem: GLItem {
@@ -118,12 +120,10 @@ struct CLGLDoubleBufferedItem: GLItem {
 
 struct Cell
 {
-	glm::vec3	pos;
-	int			is_solid;
-	size_t      n_inside;
-	Particle    *particles[MAX_PER_CELL];
+	cl_uint      n_inside;
+	cl_uint      particles[MAX_PER_CELL];
 public:
-	Cell(glm::vec3 pos, bool is_solid, float volume) : pos(pos), is_solid(is_solid), n_inside(0) {};
+	Cell() : n_inside(0) {};
 };
 
 #define EMITER_RAIN 1

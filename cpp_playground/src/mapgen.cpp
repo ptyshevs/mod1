@@ -106,7 +106,6 @@ void interpolate_using_control_points(const std::vector<glm::vec3> &cp, std::vec
 
 HeightMap generate_map(const ControlPoints &control_points) {
 	HeightMap heightMap(control_points);
-	heightMap.hmap.reserve(sizeof(Cell) * sl * sl * (sl / 4));
 
 	std::vector<glm::vec3> map(sl * sl, glm::vec3(0.0f));
 	for (size_t i = 0; i < sl; i++) {
@@ -124,19 +123,19 @@ HeightMap generate_map(const ControlPoints &control_points) {
 	interpolate_using_control_points(control_points._arr, map);
 
 	// Remap interpolated map on height map
-	for (size_t i = 0; i < sl; i++)
-	{
-		for (size_t j = 0; j < hf_sl / 2; j++)
-		{
-			for (size_t k = 0; k < sl; k++)
-			{
-				auto &point = map[i * sl + k];
-				heightMap.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
-								  (float)j <= point.y,
-								  0.0f);
-			}
-		}
-	}
+//	for (size_t i = 0; i < sl; i++)
+//	{
+//		for (size_t j = 0; j < hf_sl / 2; j++)
+//		{
+//			for (size_t k = 0; k < sl; k++)
+//			{
+//				auto &point = map[i * sl + k];
+//				heightMap.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
+//								  (float)j <= point.y,
+//								  0.0f);
+//			}
+//		}
+//	}
 	// Create object suitable for rendering
 
 	heightMap.model = glm::mat4(1.0f);

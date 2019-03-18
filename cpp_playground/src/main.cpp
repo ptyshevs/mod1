@@ -37,7 +37,7 @@ int main(int ac, char *av[]) {
 	data.hmap = &map;
 	Emitter emitter(data);
 	emitter.setStep(0.65);
-	emitter.cube(glm::vec3(0, 40, 0), 10);
+	emitter.cube(glm::vec3(10, 47, 10), 1);
 //	emitter.cuboid(-10, 20, 40, 42, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);
 //	emitter.cube(glm::vec3(10, 40, 10), 5);

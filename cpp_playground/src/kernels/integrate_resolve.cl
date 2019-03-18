@@ -2,6 +2,8 @@
 #define hf_sl 100
 #define MAX_NEIGHBORS 26
 #define MAX_PER_CELL 100
+#define MAX_NONEMPTY_CELLS 1000
+
 
 #define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
@@ -32,6 +34,8 @@ typedef struct {
 	unsigned int     n_cp;
 	unsigned int     hmap_size;
 	unsigned int     n_particles;
+	unsigned int	n_non_empty_cells;
+	unsigned int	non_empty_cells[MAX_NONEMPTY_CELLS];
 } t_constants;
 
 
@@ -53,10 +57,6 @@ typedef struct s_particle {
 } t_particle;
 
 typedef struct {
-    float x;
-    float y;
-    float z;
-    int is_solid;
     unsigned int n_inside;
     unsigned int particles[MAX_PER_CELL];
 

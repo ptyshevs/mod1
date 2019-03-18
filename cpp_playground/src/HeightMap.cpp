@@ -20,11 +20,11 @@ void	HeightMap::show() const
 		{
 			for (int k = 0; k < sl; k++)
 			{
-				Cell c= hmap[hash(i, j, k)];
-
-				std::cout << "C [" << glm::to_string(c.pos);
-				std::cout << "] contains " << c.n_inside << "elements";
-				std::cout << " is_solid: " << c.is_solid << std::endl;
+//				Cell c= hmap[hash(i, j, k)];
+//
+//				std::cout << "C [" << glm::to_string(c.pos);
+//				std::cout << "] contains " << c.n_inside << "elements";
+//				std::cout << " is_solid: " << c.is_solid << std::endl;
 			}
 		}
 	}
