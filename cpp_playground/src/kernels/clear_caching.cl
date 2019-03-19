@@ -33,6 +33,7 @@ typedef struct {
 	unsigned int     n_cp;
 	unsigned int     hmap_size;
 	unsigned int     n_particles;
+	unsigned int	n_cells;
 	unsigned int	n_non_empty_cells;
 	unsigned int	non_empty_cells[MAX_NONEMPTY_CELLS];
 } t_constants;
@@ -72,5 +73,9 @@ unsigned int hash(float3 pos) {
 __kernel void clear_caching(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_cells)
+		return ;
+	for (size_t i = 0, c = MAX_PER_CELL; i < c; ++i)
+		hmap[offset].particles[i] = constants->n_particles + 1000;
 	hmap[offset].n_inside = 0;
 }

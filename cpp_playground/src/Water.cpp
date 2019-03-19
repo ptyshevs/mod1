@@ -23,6 +23,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->numOfParticles();
+	w.constants.n_cells = w.hmap->hmap.size();
 	w.constants.n_non_empty_cells = 0;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
@@ -148,9 +149,14 @@ void Water::update_particles()
 //	emit();
 
 	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
+	    clFinish(cl.queue);
+
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    clFinish(cl.queue);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.simUpdate, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    clFinish(cl.queue);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    clFinish(cl.queue);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	no_err(err, __LINE__);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);

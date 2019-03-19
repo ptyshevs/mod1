@@ -33,6 +33,7 @@ typedef struct {
 	unsigned int     n_cp;
 	unsigned int     hmap_size;
 	unsigned int     n_particles;
+	unsigned int	n_cells;
 	unsigned int	n_non_empty_cells;
 	unsigned int	non_empty_cells[MAX_NONEMPTY_CELLS];
 } t_constants;
@@ -72,8 +73,12 @@ unsigned int hash(float3 pos) {
 __kernel void neighbor_caching(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	__global t_particle *p = &particles[offset];
 	unsigned int h = hash(p->pos);
+	if (h >= constants->n_cells)
+		return ;
 	__global t_cell *cell = &hmap[h];
 	if (cell->n_inside < MAX_PER_CELL) {
 		atomic_xchg(&cell->particles[cell->n_inside], offset);

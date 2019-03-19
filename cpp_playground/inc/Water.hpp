@@ -24,6 +24,7 @@ struct WaterConstants {
 	unsigned int	n_control_points;
 	unsigned int 	hmap_size;
 	unsigned int	n_particles;
+	unsigned int	n_cells;
 	unsigned int	n_non_empty_cells;
 	unsigned int	non_empty_cells[MAX_NONEMPTY_CELLS];
 };
