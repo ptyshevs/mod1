@@ -15,12 +15,8 @@
 // Tmp
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL
+#include "algo_defines.hpp"
 
-// number of points per axis
-# define sl 200
-// half the number (used for centering in NDC
-# define hf_sl 100
-# define MAX_PER_CELL 100  // max amount of particles pointers stored in a single cell
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
 #include <glm/glm.hpp>
@@ -55,7 +51,7 @@ struct SDLCore {
 	SDL_Event		event;
 };
 
-struct GLItem {
+struct GLItem  {
     GLuint vao;
     GLuint vbo;
     GLuint ibo;
@@ -128,10 +124,6 @@ public:
 	Cell() : n_inside(0) {};
 };
 
-#define EMITER_RAIN 1
-#define EMITER_WAVE 2
-#define EMITER_UNDERGROUND 4
-#define EMITER_BOUNDARIES 8
 
 struct Emiter: CLCore {
 	void	emit(cl_mem &cl_vbo);
@@ -166,8 +158,8 @@ typedef struct {
 
 // cl_init.cpp
 
-void     cl_host_part(CLCore &cl_core, bool wGLInterop = false);
-void    cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);
+void	cl_host_part(CLCore &cl_core, bool wGLInterop = false);
+void	cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);
 void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kernel &kernel_field, const char *filepath, const char *program_name);
 
 // textures.cpp

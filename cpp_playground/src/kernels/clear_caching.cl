@@ -1,7 +1,7 @@
 #define sl 200
 #define hf_sl 100
 #define MAX_NEIGHBORS 26
-#define MAX_PER_CELL 100
+#define MAX_PER_CELL 50
 #define MAX_NONEMPTY_CELLS 1000
 
 #define PARTICLE_MASS 1.0f
@@ -72,5 +72,7 @@ unsigned int hash(float3 pos) {
 __kernel void clear_caching(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
+	for (unsigned int i = 0, c = hmap[offset].n_inside; i < c; ++i)
+		hmap[offset].particles[i] = 0;
 	hmap[offset].n_inside = 0;
 }

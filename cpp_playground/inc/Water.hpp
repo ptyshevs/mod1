@@ -13,7 +13,6 @@
 #ifndef WATER_H
 #define WATER_H
 
-#define MAX_NONEMPTY_CELLS 1000
 
 #include <core.hpp>
 #include <HeightMap.hpp>

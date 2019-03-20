@@ -8,6 +8,7 @@
 #include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include "algo_defines.hpp"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
@@ -18,7 +19,6 @@
 #include <OpenCL/cl.h>
 #include <OpenCL/cl_gl.h>
 #include <OpenCL/cl_gl_ext.h>
-# define MAX_NEIGHBORS 26
 
 struct Particle {
 	cl_float3		position;
@@ -28,7 +28,6 @@ struct Particle {
 	cl_float		pressure;
 	cl_uint			n_neighbors; // 52 bytes
 	cl_uint			neighbors_idx[MAX_NEIGHBORS];
-//	Particle	*neighbors[MAX_NEIGHBORS];
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,

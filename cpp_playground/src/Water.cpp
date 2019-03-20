@@ -136,6 +136,7 @@ void Water::update_particles()
 {
 	static size_t global_neighbor_caching_jobs = data->hmap->hmap.size();
 	static size_t global_work_size = data->numOfParticles() ;
+	static size_t n_iter = 0;
 	int err;
 //	solver->simulation_step();
 //	_updateBuffer();
@@ -146,9 +147,12 @@ void Water::update_particles()
 
 	// Emit some water
 //	emit();
-
-	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
-	err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	if (n_iter % UPDATE_NEIGHBORS_EVERY_N_ITER == 0) {
+		err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
+		err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	}
+	else
+		err = 0;
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.simUpdate, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
@@ -156,6 +160,7 @@ void Water::update_particles()
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 
     clFinish(cl.queue);
+    ++n_iter;
 }
 
 void Water::_updateBuffer()

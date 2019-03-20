@@ -1,7 +1,7 @@
 #define sl 200
 #define hf_sl 100
 #define MAX_NEIGHBORS 26
-#define MAX_PER_CELL 100
+#define MAX_PER_CELL 50
 #define MAX_NONEMPTY_CELLS 1000
 
 
