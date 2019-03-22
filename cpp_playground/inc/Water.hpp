@@ -38,11 +38,16 @@ private:
 	void					_updateBuffer();
 public:
 	explicit Water();
+	GLuint					vao2;
+	GLuint					vbo2; // second VBO used for ping-pong technique
+	bool					state;
+	cl_mem 					cl_zidx;
 
 	CLWaterCore				cl;
 	cl_mem					cl_cp;
 	cl_mem					cl_hmap;
 	cl_mem					cl_vbo; // particles
+	cl_mem					cl_vbo2; // second buffer for particles
 	cl_mem					cl_constants;
 	WaterConstants			constants;
 
@@ -51,6 +56,7 @@ public:
 	ParticleSystemSolver	*solver;
 	std::vector<glm::vec3>	indices;
 //	Emiter emiter;
+	virtual void	draw(const glm::mat4 &vp, GLenum type) override;
 	virtual ~Water() override;
 	void	update_particles();
 //	void	emit();
