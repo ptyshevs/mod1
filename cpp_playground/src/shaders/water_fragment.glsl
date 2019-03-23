@@ -2,9 +2,9 @@
 in vec4 position;
 in vec3 velocity;
 in vec3 force;
-flat in float density;
-flat in float pressure;
-flat in uint n_neighbors;
+in float density;
+in float pressure;
+in float n_neighbors;
 
 float Ns = 250;
 vec4 mat_specular=vec4(1);
@@ -28,5 +28,5 @@ void main() {
     float spec = max( pow(dot(N,halfVector), Ns), 0.);
     vec4 S = light_specular*mat_specular* spec;
     float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
-    color = vec4(0.3f + vel_mag, 0.3f + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
+    color = vec4(float(pressure), float(pressure), float(pressure), 1.0f);
 }

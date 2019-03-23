@@ -10,9 +10,9 @@ layout (location = 5) in uint in_n_neighbors;
 out vec4 position;
 out vec3 velocity;
 out vec3 force;
-flat out float density;
-flat out float pressure;
-flat out uint n_neighbors;
+out float density;
+out float pressure;
+out float n_neighbors;
 
 uniform mat4 MVP;
 
@@ -23,5 +23,5 @@ void main() {
     force = in_force;
     density = in_density;
     pressure = in_pressure;
-    n_neighbors = in_n_neighbors;
+    n_neighbors = float(in_n_neighbors);
 }

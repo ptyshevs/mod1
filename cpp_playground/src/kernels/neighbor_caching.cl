@@ -73,10 +73,7 @@ __kernel void neighbor_caching(__global t_constants *constants, __global t_cp *c
 {
 	size_t offset = get_global_id(0);
 	__global t_particle *p = &particles[offset];
-	unsigned int h = hash(p->pos);
-	__global t_cell *cell = &hmap[h];
-	if (cell->n_inside < MAX_PER_CELL) {
-		atomic_xchg(&cell->particles[cell->n_inside], offset);
-		atomic_inc(&cell->n_inside);
-	}
+	p->n_neighbors=1;
+	p->density = 1;
+	p->pressure = 1;
 }
