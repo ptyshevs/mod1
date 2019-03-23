@@ -26,6 +26,7 @@ struct Particle {
 	cl_float3		force;
 	cl_float		density;
 	cl_float		pressure;
+	cl_uint			z_idx;
 	cl_uint			n_neighbors; // 52 bytes
 	cl_uint			neighbors_idx[MAX_NEIGHBORS];
 	Particle();

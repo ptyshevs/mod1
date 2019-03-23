@@ -70,7 +70,8 @@ void	cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_nam
 	}
 	free(kernel);
 	// Compile
-	err = clBuildProgram(cl.program, 1, &(cl.device), NULL, NULL, NULL);
+	// todo: fix hardcode part here
+	err = clBuildProgram(cl.program, 1, &(cl.device), "-I ../cpp_playground/src/kernels", NULL, NULL);
 	if (err != CL_SUCCESS)
 	{
 		size_t len;
@@ -106,7 +107,7 @@ void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kern
 	}
 	free(kernel);
 	// Compile
-	err = clBuildProgram(program_field, 1, &(cl.device), NULL, NULL, NULL);
+	err = clBuildProgram(program_field, 1, &(cl.device), "-I ../cpp_playground/src/kernels", NULL, NULL);
 	if (err != CL_SUCCESS)
 	{
 		size_t len;

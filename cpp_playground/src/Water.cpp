@@ -27,7 +27,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.constants.n_non_empty_cells = 0;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
-	cl_compile_kernel(w.cl, "src/kernels/clear_caching.cl", "clear_caching");
+	cl_compile_kernel(w.cl, "src/kernels/z_idx.cl", "z_idx");
 	cl_compile_water_kernel(w.cl, w.cl.neighborCachingProgram, w.cl.neighborCaching, "src/kernels/neighbor_caching.cl", "neighbor_caching");
 	cl_compile_water_kernel(w.cl, w.cl.simUpdateProgram, w.cl.simUpdate, "src/kernels/sim_update.cl", "sim_update");
 	cl_compile_water_kernel(w.cl, w.cl.accumForcesProgram, w.cl.accumForces, "src/kernels/accum_forces.cl", "accum_forces");
@@ -55,7 +55,6 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
-//	glEnableVertexAttribArray(6);
 
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
 	glBufferData(GL_ARRAY_BUFFER, w.data->_particles.size()* sizeof(Particle), w.data->_particles.data(), GL_DYNAMIC_DRAW);

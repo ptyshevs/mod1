@@ -1,8 +1,16 @@
+//
+// Created by Pavlo TYSHEVSKYI on 2019-03-23.
+//
+
+#ifndef PROJECT_KERNELS_HEADER_HPP
+#define PROJECT_KERNELS_HEADER_HPP
+
 #define sl 200
 #define hf_sl 100
 #define MAX_NEIGHBORS 26
 #define MAX_PER_CELL 50
 #define MAX_NONEMPTY_CELLS 1000
+
 
 #define PARTICLE_MASS 1.0f
 #define NEIGHBOR_RADIUS 1.5f
@@ -22,12 +30,6 @@
 #define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
 #define VISCOSITY 0.18f
-
-__constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
-// pow(K_RADIUS, 9)
-__constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
-__constant float k_dconst = 45.0f / (M_PI * 11.390625);
-
 
 typedef struct {
 	unsigned int     n_cp;
@@ -50,6 +52,7 @@ typedef struct s_particle {
 	float3 force;
 	float density;
 	float pressure;
+	unsigned int z_idx;
 	unsigned int n_neighbors;
 	unsigned int neighbors[MAX_NEIGHBORS];
 
@@ -61,18 +64,4 @@ typedef struct {
 
 } t_cell;
 
-///////////////////////// PROTOTYPES
-unsigned int hash(float3 pos);
-
-unsigned int hash(float3 pos) {
-	return (unsigned int)((ceil(pos.x) + hf_sl) * (sl * (sl / 4.0)) + sl * ceil(pos.y) + (ceil(pos.z) + hf_sl));
-}
-
-// step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void clear_caching(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
-{
-	size_t offset = get_global_id(0);
-	for (unsigned int i = 0, c = hmap[offset].n_inside; i < c; ++i)
-		hmap[offset].particles[i] = 0;
-	hmap[offset].n_inside = 0;
-}
+#endif //PROJECT_KERNELS_HEADER_HPP
