@@ -115,7 +115,7 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 	p.pos.y += TIME_STEP * p.vel.y;
 	p.pos.z += TIME_STEP * p.vel.z;
 
-	// Collision resolution
+	// Bounding box collision resolution
 	if (bound(&p.pos)) {
 		p.vel.x *= -DAMPING;
 		p.vel.y *= -DAMPING;

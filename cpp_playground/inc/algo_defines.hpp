@@ -5,8 +5,8 @@
 # define sl 200
 // half the number (used for centering in NDC
 # define hf_sl 100
-# define MAX_NEIGHBORS 26
-# define MAX_PER_CELL 50  // max amount of particles pointers stored in a single cell
+# define MAX_NEIGHBORS 5
+# define MAX_PER_CELL 30  // max amount of particles pointers stored in a single cell
 # define MAX_NONEMPTY_CELLS 1000
 # define UPDATE_NEIGHBORS_EVERY_N_ITER 10
 
