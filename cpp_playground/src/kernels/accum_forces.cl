@@ -47,6 +47,8 @@ __kernel void accum_forces(__global t_particle *particles)
 	size_t offset = get_global_id(0);
 	t_particle p = particles[offset];
 	for (unsigned int i=0; i < p.n_neighbors; ++i) {
+		if (p.neighbors[i] == NO_NEIGHBOR_PH)
+			continue;
 		t_particle np = particles[p.neighbors[i]];
 
 		float dist = k_distance(p.pos, np.pos);

@@ -104,8 +104,7 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 {
 	size_t offset = get_global_id(0);
 	t_particle p = particles[offset];
-	// float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
-	float3 val = TIME_STEP * p.force / PARTICLE_MASS;
+	float3 val = TIME_STEP * p.force;
 
 	p.vel.x += val.x;
 	p.vel.y += val.y;
@@ -121,7 +120,7 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 		p.vel.y *= -DAMPING;
 		p.vel.z *= -DAMPING;
 	}
-	// No boundary crossing, maybe there's a surface?
+	// No boundary crossing, maybe there's a surface collision?
 	float h = surface_height(constants, control_points, p.pos);
 	if (h > p.pos.y)
 	{

@@ -18,7 +18,9 @@ __kernel void clear_caching(__global t_cell *hmap)
 {
 	size_t offset = get_global_id(0);
 	#pragma unroll
-	for (unsigned int i = 0, c = hmap[offset].n_inside; i < c; ++i)
-		hmap[offset].particles[i] = 0;
-	hmap[offset].n_inside = 0;
+	t_cell cell = hmap[offset];
+	for (unsigned int i = 0, c = MAX_PER_CELL; i < c; ++i)
+		cell.particles[i] = 0;
+	cell.n_inside = 0;
+	hmap[offset] = cell;
 }

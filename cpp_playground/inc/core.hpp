@@ -102,6 +102,8 @@ struct CLWaterCore: CLCore {
 	cl_program          simUpdateProgram;
 	cl_kernel           neighborCaching;
 	cl_program          neighborCachingProgram;
+	cl_kernel           findNeighbors;
+	cl_program          findNeighborsProgram;
 };
 
 struct CLGLDoubleBufferedItem: GLItem {

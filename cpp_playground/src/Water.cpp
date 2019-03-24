@@ -28,6 +28,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	cl_host_part(w.cl, true);
 	cl_compile_kernel(w.cl, "src/kernels/clear_caching.cl", "clear_caching");
 	cl_compile_water_kernel(w.cl, w.cl.neighborCachingProgram, w.cl.neighborCaching, "src/kernels/neighbor_caching.cl", "neighbor_caching");
+	cl_compile_water_kernel(w.cl, w.cl.findNeighborsProgram, w.cl.findNeighbors, "src/kernels/find_neighbors.cl", "find_neighbors");
 	cl_compile_water_kernel(w.cl, w.cl.simUpdateProgram, w.cl.simUpdate, "src/kernels/sim_update.cl", "sim_update");
 	cl_compile_water_kernel(w.cl, w.cl.accumForcesProgram, w.cl.accumForces, "src/kernels/accum_forces.cl", "accum_forces");
 	cl_compile_water_kernel(w.cl, w.cl.integrateResolveProgram, w.cl.integrateResolve, "src/kernels/integrate_resolve.cl", "integrate_resolve");
@@ -84,8 +85,12 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 
 	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_vbo), &w.cl_vbo);
-
 	w.no_err(err, __LINE__);
+
+	err = clSetKernelArg(w.cl.findNeighbors, 0, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.findNeighbors, 1, sizeof(w.cl_vbo), &w.cl_vbo);
+	w.no_err(err, __LINE__);
+
 	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	err |= clSetKernelArg(w.cl.simUpdate, 1, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
@@ -139,9 +144,11 @@ void Water::update_particles()
 	if (n_iter % UPDATE_NEIGHBORS_EVERY_N_ITER == 0) {
 		err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
 		err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+		err |= clEnqueueNDRangeKernel(cl.queue, cl.findNeighbors, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	}
 	else
 		err = 0;
+	no_err(err, __LINE__);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.simUpdate, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
