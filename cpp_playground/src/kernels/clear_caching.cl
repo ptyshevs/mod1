@@ -17,6 +17,7 @@ unsigned int hash(float3 pos) {
 __kernel void clear_caching(__global t_cell *hmap)
 {
 	size_t offset = get_global_id(0);
+	#pragma unroll
 	for (unsigned int i = 0, c = hmap[offset].n_inside; i < c; ++i)
 		hmap[offset].particles[i] = 0;
 	hmap[offset].n_inside = 0;

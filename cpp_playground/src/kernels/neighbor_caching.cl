@@ -17,11 +17,10 @@ unsigned int hash(float3 pos) {
 __kernel void neighbor_caching(__global t_cell *hmap, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
-	__global t_particle *p = &particles[offset];
-	unsigned int h = hash(p->pos);
-	__global t_cell *cell = &hmap[h];
-	if (cell->n_inside < MAX_PER_CELL) {
-		atomic_xchg(&cell->particles[cell->n_inside], offset);
-		atomic_inc(&cell->n_inside);
+	unsigned int h = hash(particles[offset].pos);
+	t_cell cell = hmap[h];
+	if (cell.n_inside < MAX_PER_CELL) {
+		atomic_xchg(&hmap[h].particles[cell.n_inside], offset);
+		atomic_inc(&hmap[h].n_inside);
 	}
 }

@@ -10,7 +10,7 @@ __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 ///////////////////////// PROTOTYPES
 float k_distance(float3 a, float3 b);
 float kernel_weight(float d);
-bool  bound(__global float3 *pos);
+bool  bound(float3 *pos);
 float surface_height(__global t_constants *constants, __global t_cp *control_points, float3 pos);
 float3 surface_normal(__global t_constants *c, __global t_cp *cp, float3 pos);
 float3 surface_collision(__global t_constants *constants, __global t_cp *control_points, float3 pos, float3 vel);
@@ -31,7 +31,7 @@ float kernel_weight(float d) {
 	return (k_const * x * x * x);
 }
 
-bool bound(__global float3 *pos) {
+bool bound(float3 *pos) {
 	bool out_of_bound = false;
 	if (pos->y < 0) {
 		pos->y = 0;
@@ -103,32 +103,33 @@ float3 surface_collision(__global t_constants *constants, __global t_cp *control
 __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *control_points, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
-	__global t_particle *p = &particles[offset];
-	float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
-	val = TIME_STEP * val / PARTICLE_MASS;
+	t_particle p = particles[offset];
+	// float3 val = (float3)(p->force[0], p->force[1], p->force[2]);
+	float3 val = TIME_STEP * p.force / PARTICLE_MASS;
 
-	p->vel.x += val.x;
-	p->vel.y += val.y;
-	p->vel.z += val.z;
+	p.vel.x += val.x;
+	p.vel.y += val.y;
+	p.vel.z += val.z;
 
-	p->pos.x += TIME_STEP * p->vel.x;
-	p->pos.y += TIME_STEP * p->vel.y;
-	p->pos.z += TIME_STEP * p->vel.z;
+	p.pos.x += TIME_STEP * p.vel.x;
+	p.pos.y += TIME_STEP * p.vel.y;
+	p.pos.z += TIME_STEP * p.vel.z;
 
 	// Collision resolution
-	if (bound(&p->pos)) {
-		p->vel[0] *= -DAMPING;
-		p->vel[1] *= -DAMPING;
-		p->vel[2] *= -DAMPING;
+	if (bound(&p.pos)) {
+		p.vel.x *= -DAMPING;
+		p.vel.y *= -DAMPING;
+		p.vel.z *= -DAMPING;
 	}
 	// No boundary crossing, maybe there's a surface?
-	float h = surface_height(constants, control_points, p->pos);
-	if (h > p->pos.y)
+	float h = surface_height(constants, control_points, p.pos);
+	if (h > p.pos.y)
 	{
-		float3 new_vel = surface_collision(constants, control_points, p->pos, p->vel);
-		p->vel.x = new_vel.x;
-		p->vel.y = new_vel.y;
-		p->vel.z = new_vel.z;
-		p->pos.y = h;
+		float3 new_vel = surface_collision(constants, control_points, p.pos, p.vel);
+		p.vel.x = new_vel.x;
+		p.vel.y = new_vel.y;
+		p.vel.z = new_vel.z;
+		p.pos.y = h;
 	}
+	particles[offset] = p;
 }

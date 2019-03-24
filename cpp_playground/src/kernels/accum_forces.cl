@@ -45,27 +45,19 @@ float k_second_derivative(float d)
 __kernel void accum_forces(__global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
-	__global t_particle *p = &particles[offset];
-	for (unsigned int i=0; i < p->n_neighbors; ++i) {
-		__global t_particle *np = &particles[p->neighbors[i]];
+	t_particle p = particles[offset];
+	for (unsigned int i=0; i < p.n_neighbors; ++i) {
+		t_particle np = particles[p.neighbors[i]];
 
-		float dist = k_distance(p->pos, np->pos);
+		float dist = k_distance(p.pos, np.pos);
 		if (dist > 0) {
-			float3 dir = (p->pos - np->pos) / dist; // normed vector
-			float3 val = PARTICLE_MASS * (p->pressure + np->pressure) /
-						(2 * p->density * np->density) * k_first_derivative(dist) * dir;
+			float3 dir = (p.pos - np.pos) / dist; // normed vector
+			float3 val = PARTICLE_MASS * (p.pressure + np.pressure) /
+						(2 * p.density * np.density) * k_first_derivative(dist) * dir;
 
-			p->force[0] -= val[0];
-			p->force[1] -= val[1];
-			p->force[2] -= val[2];
-
-			float3 pvel = (float3)(p->vel[0], p->vel[1], p->vel[2]);
-			float3 npvel = (float3)(np->vel[0], np->vel[1], np->vel[2]);
-			val = VISCOSITY * (npvel - pvel) / np->density * k_second_derivative(dist);
-
-			p->force[0] += val[0];
-			p->force[1] += val[1];
-			p->force[2] += val[2];
+			p.force -= val;
+			p.force += VISCOSITY * (np.vel - p.vel) / np.density * k_second_derivative(dist);
 		}
 	}
+	particles[offset] = p;
 }
