@@ -38,8 +38,8 @@ int main(int ac, char *av[]) {
 	Emitter emitter(data);
 	emitter.setStep(1);
 	emitter.setScale(0.5);
-	emitter.fromFile(glm::vec3(-25, 10, -25), "res/bunny/reconstruction/bun_zipper.mod1");
-	emitter.fromFile(glm::vec3(0, 35, 0), "res/bunny/reconstruction/bun_zipper_res4.mod1");
+	emitter.fromFile(glm::vec3(-50, 20, -70), "res/bunny/reconstruction/bun_zipper.mod1");
+	emitter.fromFile(glm::vec3(25, 15, 70), "res/bunny/reconstruction/bun_zipper_res4.mod1");
 //	emitter.cube(glm::vec3(10, 40, 10), 10);
 //	emitter.cuboid(-10, 20, 47, 49, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);

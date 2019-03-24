@@ -13,7 +13,7 @@
 #include "Emitter.hpp"
 
 Emitter::Emitter(ParticleSystemData &data) : _data(data),
-	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _step(0.5f), _scale(1.0f)
+	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _step(0.5f), _scale(0.3f), _inflate(1.4f)
 {
 }
 
@@ -43,6 +43,10 @@ void	Emitter::setStep(float step) {
 
 void	Emitter::setScale(float scale) {
 	_scale = scale;
+}
+
+void	Emitter::setInflate(float inflate) {
+	_inflate = inflate;
 }
 
 void	Emitter::cuboid(float x_start, float x_end,
@@ -105,6 +109,14 @@ void scale_back(std::vector<glm::vec3> &points) {
 	}
 }
 
+glm::vec3	centroid(std::vector<glm::vec3> const &points) {
+	glm::vec3 center(0);
+	for (auto const &point: points) {
+		center += point;
+	}
+	return (center / points.size());
+}
+
 void Emitter::fromFile(std::string const &path)
 {
 	std::vector<glm::vec3> points = readFile((char *)path.c_str());
@@ -120,8 +132,9 @@ void Emitter::fromFile(glm::vec3 const &origin, std::string const &path)
 	std::vector<glm::vec3> points = readFile((char *)path.c_str());
 	rescale(points);
 	scale_back(points);
+	glm::vec3 center = centroid(points);
 	for (auto const &v: points) {
-		_data.addParticle(origin + _scale * v, _velocity, _force, _density, _pressure);
+		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure);
 	}
 }
 

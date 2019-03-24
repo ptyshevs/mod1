@@ -26,6 +26,7 @@ private:
 
 	float				_step;
 	float				_scale;
+	float				_inflate;
 public:
 	Emitter(ParticleSystemData &data);
 	void	setVelocity(const glm::vec3 &velocity);
@@ -34,6 +35,7 @@ public:
 	void	setPressure(float pressure);
 	void	setStep(float step);
 	void	setScale(float scale);
+	void	setInflate(float inflate);
 	void	cuboid(float x_start = 0, float x_end = 1,
 				float y_start = 0, float y_end = 1,
 				float z_start = 0, float z_end = 1);
