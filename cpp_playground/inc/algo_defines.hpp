@@ -7,7 +7,7 @@
 # define hf_sl 100
 # define MAX_NEIGHBORS 5
 # define MAX_PER_CELL 30  // max amount of particles pointers stored in a single cell
-# define MAX_NONEMPTY_CELLS 1000
+# define CP_STEP 3.5f
 # define UPDATE_NEIGHBORS_EVERY_N_ITER 10
 
 #define EMITER_RAIN 1
