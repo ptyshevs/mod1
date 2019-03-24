@@ -28,5 +28,5 @@ void main() {
     float spec = max( pow(dot(N,halfVector), Ns), 0.);
     vec4 S = light_specular*mat_specular* spec;
     float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
-    color = vec4(n_neighbors * 100, 0, 0, 0.2f) * diffuse + S;
+    color = vec4(0.3f + vel_mag, 0.3f + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
 }

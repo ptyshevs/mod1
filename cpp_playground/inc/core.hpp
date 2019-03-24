@@ -94,13 +94,15 @@ struct CLCore {
 
 struct CLWaterCore: CLCore {
 	// kernel is used for neighbors search and density/pressure update
+	cl_kernel           zidxSort;
+	cl_program          zidxSortProgram;
 	cl_kernel           accumForces;
 	cl_program          accumForcesProgram;
 	cl_kernel           integrateResolve;
 	cl_program          integrateResolveProgram;
 	cl_kernel           simUpdate;
 	cl_program          simUpdateProgram;
-	cl_kernel           neighborCaching;
+	cl_kernel           zidxSwap;
 	cl_program          neighborCachingProgram;
 };
 

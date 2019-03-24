@@ -49,6 +49,7 @@ public:
 	cl_mem					cl_vbo; // particles
 	cl_mem					cl_vbo2; // second buffer for particles
 	cl_mem					cl_constants;
+	cl_mem					cl_indices;
 	WaterConstants			constants;
 
 	HeightMap				*hmap;

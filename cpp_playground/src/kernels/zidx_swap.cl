@@ -14,14 +14,14 @@ unsigned int hash(float3 pos) {
 }
 
 // step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void neighbor_caching(__global t_constants *constants, __global t_cp *control_points, __global t_cell *hmap, __global t_particle *particles)
+__kernel void zidx_swap(__global unsigned int *indices, __global t_constants *constants, __global t_particle *particles_from, __global t_particle *particles_to)
 {
-	// size_t offset = get_global_id(0);
-	// __global t_particle *p = &particles[offset];
-	// unsigned int h = hash(p->pos);
-	// __global t_cell *cell = &hmap[h];
-	// if (cell->n_inside < MAX_PER_CELL) {
-	// 	atomic_xchg(&cell->particles[cell->n_inside], offset);
-	// 	atomic_inc(&cell->n_inside);
-	// }
+	size_t offset = get_global_id(0);
+	__global t_particle *p = &particles_from[offset];
+	unsigned int idx_to = indices[offset];
+	__global t_particle *p_to = &particles_to[idx_to];
+	p_to->pos = p->pos;
+	p_to->vel = p->vel;
+	p_to->force = p->force;
+	p_to->z_idx = p->z_idx;
 }

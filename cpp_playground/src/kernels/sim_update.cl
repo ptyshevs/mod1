@@ -115,20 +115,34 @@ __kernel void sim_update(__global t_constants *constants, __global t_cp *control
 	// 		}
 	// 	}
 	// }
-
-	for (size_t i = 0, c = constants->n_particles; i < c; ++i) {
+	int k = 10;
+	int	left_bound = offset < k ? 0 : offset - k;
+	int right_bound = offset > (constants->n_particles - k) ? offset : offset + k;
+	for (int i = left_bound; i < right_bound; ++i) {
 		if (i == offset)
 			continue ;
-		__global t_particle *np = &particles[i];
-		if (p->n_neighbors == MAX_NEIGHBORS)
-			break ;
-		float dist = k_distance(p->pos, np->pos);
+		
+		float dist = k_distance(p->pos, particles[i].pos);
 		if (dist < NEIGHBOR_RADIUS) {
 			p->neighbors[p->n_neighbors] = i;
 			p->n_neighbors += 1;
 			density_accum += kernel_weight(dist);
 		}
 	}
+
+	// for (size_t i = 0, c = constants->n_particles; i < c; ++i) {
+	// 	if (i == offset)
+	// 		continue ;
+	// 	__global t_particle *np = &particles[i];
+	// 	if (p->n_neighbors == MAX_NEIGHBORS)
+	// 		break ;
+	// 	float dist = k_distance(p->pos, np->pos);
+	// 	if (dist < NEIGHBOR_RADIUS) {
+	// 		p->neighbors[p->n_neighbors] = i;
+	// 		p->n_neighbors += 1;
+	// 		density_accum += kernel_weight(dist);
+	// 	}
+	// }
 	p->density = PARTICLE_MASS * (density_accum + kernel_weight(0));
 	p->pressure = PRESSURE_CONST * (p->density - TARGET_DENSITY);
 	p->force[0] = 0;

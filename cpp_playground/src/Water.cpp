@@ -27,8 +27,9 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.constants.n_non_empty_cells = 0;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
-	cl_compile_kernel(w.cl, "src/kernels/z_idx.cl", "z_idx");
-	cl_compile_water_kernel(w.cl, w.cl.neighborCachingProgram, w.cl.neighborCaching, "src/kernels/neighbor_caching.cl", "neighbor_caching");
+	cl_compile_kernel(w.cl, "src/kernels/zidx_calc.cl", "zidx_calc");
+	cl_compile_water_kernel(w.cl, w.cl.zidxSortProgram, w.cl.zidxSort, "src/kernels/zidx_sort.cl", "zidx_sort");
+	cl_compile_water_kernel(w.cl, w.cl.neighborCachingProgram, w.cl.zidxSwap, "src/kernels/zidx_swap.cl", "zidx_swap");
 	cl_compile_water_kernel(w.cl, w.cl.simUpdateProgram, w.cl.simUpdate, "src/kernels/sim_update.cl", "sim_update");
 	cl_compile_water_kernel(w.cl, w.cl.accumForcesProgram, w.cl.accumForces, "src/kernels/accum_forces.cl", "accum_forces");
 	cl_compile_water_kernel(w.cl, w.cl.integrateResolveProgram, w.cl.integrateResolve, "src/kernels/integrate_resolve.cl", "integrate_resolve");
@@ -87,6 +88,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.cl_constants = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, sizeof(WaterConstants), NULL, &err);
 	w.cl_cp = clCreateBuffer(w.cl.context, CL_MEM_READ_ONLY, hmap->_cpoints._arr.size() * sizeof(glm::vec3), NULL, &err);
 	w.cl_hmap = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, hmap->hmap.size() * sizeof(Cell), NULL, &err);
+	w.cl_indices = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, sizeof(unsigned int) * data->numOfParticles(), NULL, &err);
 	w.cl_vbo = clCreateFromGLBuffer(w.cl.context, CL_MEM_READ_WRITE, w.vbo, &err);
 	w.cl_vbo2 = clCreateFromGLBuffer(w.cl.context, CL_MEM_READ_WRITE, w.vbo2, &err);
 
@@ -97,15 +99,18 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_constants, CL_TRUE, 0, sizeof(WaterConstants), &w.constants, 0, NULL, NULL);
 	w.no_err(err, __LINE__);
 
+	// zidx_calc
 	err = 0;
-	err = clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.kernel, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.kernel, 2, sizeof(w.cl_hmap), &w.cl_hmap);
 	w.no_err(err, __LINE__);
 
-	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.neighborCaching, 2, sizeof(w.cl_hmap), &w.cl_hmap);
+	// zidx_sort
+	err = clSetKernelArg(w.cl.zidxSort, 0, sizeof(w.cl_indices), &w.cl_indices); // indices of sorted particles
+	err |= clSetKernelArg(w.cl.zidxSort, 1, sizeof(w.cl_constants), &w.cl_constants);
+	w.no_err(err, __LINE__);
+
+	// zidx_swap
+	err = clSetKernelArg(w.cl.zidxSwap, 0, sizeof(w.cl_indices), &w.cl_indices);
+	err |= clSetKernelArg(w.cl.zidxSwap, 1, sizeof(w.cl_constants), &w.cl_constants);
 
 	w.no_err(err, __LINE__);
 	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_constants), &w.cl_constants);
@@ -122,6 +127,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	err = clSetKernelArg(w.cl.integrateResolve, 1, sizeof(w.cl_cp), &w.cl_cp);
 	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_hmap), &w.cl_hmap);
 	w.no_err(err, __LINE__);
+
 
 	return (w);
 }
@@ -142,7 +148,7 @@ Water::~Water()
 	clReleaseKernel(cl.accumForces);
 	clReleaseKernel(cl.integrateResolve);
 	clReleaseKernel(cl.simUpdate);
-	clReleaseKernel(cl.neighborCaching);
+	clReleaseKernel(cl.zidxSwap);
 	clReleaseCommandQueue(cl.queue);
 	clReleaseDevice(cl.device);
 	clReleaseContext(cl.context);
@@ -159,38 +165,41 @@ void Water::update_particles()
 //	_updateBuffer();
 ///////////////////////////////////////////////////////////////////////////////
 	glFinish();
+	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
+	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
 	if (state)
 	{
-		clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
-		err = clSetKernelArg(cl.kernel, 3, sizeof(cl_vbo), &cl_vbo);
-		err |= clSetKernelArg(cl.neighborCaching, 3, sizeof(cl_vbo), &cl_vbo);
-		err |= clSetKernelArg(cl.simUpdate, 3, sizeof(cl_vbo), &cl_vbo);
-		err |= clSetKernelArg(cl.accumForces, 3, sizeof(cl_vbo), &cl_vbo);
-		err |= clSetKernelArg(cl.integrateResolve, 3, sizeof(cl_vbo), &cl_vbo);
-	}
-	else
-	{
-		clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
-		err = clSetKernelArg(cl.kernel, 3, sizeof(cl_vbo2), &cl_vbo2);
-		err |= clSetKernelArg(cl.neighborCaching, 3, sizeof(cl_vbo2), &cl_vbo2);
+		err = clSetKernelArg(cl.kernel, 0, sizeof(cl_vbo), &cl_vbo); // zidx_calc
+		err |= clSetKernelArg(cl.zidxSort, 2, sizeof(cl_vbo), &cl_vbo); // zidx_sort
+		err |= clSetKernelArg(cl.zidxSwap, 2, sizeof(cl_vbo), &cl_vbo); // zidx_swap | particles_from
+		err |= clSetKernelArg(cl.zidxSwap, 3, sizeof(cl_vbo2), &cl_vbo2); // zidx_swap | particles_to
 		err |= clSetKernelArg(cl.simUpdate, 3, sizeof(cl_vbo2), &cl_vbo2);
 		err |= clSetKernelArg(cl.accumForces, 3, sizeof(cl_vbo2), &cl_vbo2);
 		err |= clSetKernelArg(cl.integrateResolve, 3, sizeof(cl_vbo2), &cl_vbo2);
 	}
+	else
+	{
+		err = clSetKernelArg(cl.kernel, 0, sizeof(cl_vbo2), &cl_vbo2); // zidx_calc
+		err |= clSetKernelArg(cl.zidxSort, 2, sizeof(cl_vbo2), &cl_vbo2);
+		err |= clSetKernelArg(cl.zidxSwap, 2, sizeof(cl_vbo2), &cl_vbo2); // zidx_swap | particles_from
+		err |= clSetKernelArg(cl.zidxSwap, 3, sizeof(cl_vbo), &cl_vbo); // zidx_swap | particles_to
+		err |= clSetKernelArg(cl.simUpdate, 3, sizeof(cl_vbo), &cl_vbo);
+		err |= clSetKernelArg(cl.accumForces, 3, sizeof(cl_vbo), &cl_vbo);
+		err |= clSetKernelArg(cl.integrateResolve, 3, sizeof(cl_vbo), &cl_vbo);
+	}
 	no_err(err, __LINE__);
 	// Emit some water
 //	emit();
-err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	err |= clEnqueueNDRangeKernel(cl.queue, cl.zidxSort, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+	err |= clEnqueueNDRangeKernel(cl.queue, cl.zidxSwap, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.simUpdate, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.accumForces, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	err |= clEnqueueNDRangeKernel(cl.queue, cl.integrateResolve, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 	no_err(err, __LINE__);
-	if (state)
-		clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
-	else
-		clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
+	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
+	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo2, 0, NULL, NULL);
 
     clFinish(cl.queue);
     ++n_iter;
