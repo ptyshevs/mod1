@@ -79,34 +79,23 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	w.no_err(err, __LINE__);
 
 	err = 0;
-	err = clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.kernel, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.kernel, 2, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.kernel, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.kernel, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	w.no_err(err, __LINE__);
 
-	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.neighborCaching, 2, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.neighborCaching, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_vbo), &w.cl_vbo);
 
 	w.no_err(err, __LINE__);
-	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.simUpdate, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.simUpdate, 2, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.simUpdate, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_hmap), &w.cl_hmap);
+	err |= clSetKernelArg(w.cl.simUpdate, 1, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
-	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_constants), &w.cl_constants);
-	err |= clSetKernelArg(w.cl.accumForces, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.accumForces, 2, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.accumForces, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
 	err = clSetKernelArg(w.cl.integrateResolve, 0, sizeof(w.cl_constants), &w.cl_constants);
 	err = clSetKernelArg(w.cl.integrateResolve, 1, sizeof(w.cl_cp), &w.cl_cp);
-	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_hmap), &w.cl_hmap);
-	err |= clSetKernelArg(w.cl.integrateResolve, 3, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
 	return (w);
