@@ -19,7 +19,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 
 	w.hmap = hmap;
 	w.data = data;
-
+	w.running = false;
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->numOfParticles();
@@ -155,8 +155,8 @@ void Water::update_particles()
 	no_err(err, __LINE__);
 	clEnqueueReleaseGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 
-    clFinish(cl.queue);
-    ++n_iter;
+	clFinish(cl.queue);
+	++n_iter;
 }
 
 void Water::_updateBuffer()

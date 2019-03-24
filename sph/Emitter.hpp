@@ -25,6 +25,7 @@ private:
 	float				_pressure;
 
 	float				_step;
+	float				_scale;
 public:
 	Emitter(ParticleSystemData &data);
 	void	setVelocity(const glm::vec3 &velocity);
@@ -32,10 +33,14 @@ public:
 	void	setDensity(float density);
 	void	setPressure(float pressure);
 	void	setStep(float step);
+	void	setScale(float scale);
 	void	cuboid(float x_start = 0, float x_end = 1,
 				float y_start = 0, float y_end = 1,
 				float z_start = 0, float z_end = 1);
 	void	cube(const glm::vec3 &origin, float side);
+	void	fromFile(std::string const &path);
+	void	fromFile(glm::vec3 const &origin, std::string const &path);
+
 	};
 
 #endif

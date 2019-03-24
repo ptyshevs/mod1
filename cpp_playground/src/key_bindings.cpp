@@ -12,6 +12,7 @@
 
 #include <core.hpp>
 #include <camera.hpp>
+#include <Water.hpp>
 
 void	process_input(GLCamera &camera, GLItem &map,  GLItem &water, bool *quit)
 {
@@ -19,6 +20,8 @@ void	process_input(GLCamera &camera, GLItem &map,  GLItem &water, bool *quit)
 
 	if (keystate[SDL_SCANCODE_ESCAPE])
 		*quit = true;
+	if (keystate[SDL_SCANCODE_SPACE])
+		dynamic_cast<Water *>(&water)->running = !dynamic_cast<Water *>(&water)->running;
 	if (keystate[SDL_SCANCODE_W])
 		camera.pos += 0.1 * camera.speed * camera.dir;
 	if (keystate[SDL_SCANCODE_S])

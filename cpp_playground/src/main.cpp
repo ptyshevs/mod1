@@ -37,8 +37,11 @@ int main(int ac, char *av[]) {
 	data.hmap = &map;
 	Emitter emitter(data);
 	emitter.setStep(1);
+	emitter.setScale(0.5);
+	emitter.fromFile(glm::vec3(-25, 10, -25), "res/bunny/reconstruction/bun_zipper.mod1");
+	emitter.fromFile(glm::vec3(0, 35, 0), "res/bunny/reconstruction/bun_zipper_res4.mod1");
 //	emitter.cube(glm::vec3(10, 40, 10), 10);
-	emitter.cuboid(-80, 80, 47, 49, -80, 80);
+//	emitter.cuboid(-10, 20, 47, 49, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);
 //	emitter.cube(glm::vec3(10, 40, 10), 5);
 //	emitter.cube(glm::vec3(20, 40, 20), 5);
@@ -68,7 +71,8 @@ int main(int ac, char *av[]) {
 		SDL_PollEvent(&(core.event));
 		process_input(camera, static_cast<GLItem &>(map), water, &quit);
 		// Simulation step
-		water.update_particles();
+		if (water.running)
+			water.update_particles();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
