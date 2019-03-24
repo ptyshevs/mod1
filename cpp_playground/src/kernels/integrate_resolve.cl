@@ -106,9 +106,10 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 	t_particle p = particles[offset];
 	float3 val = TIME_STEP * p.force;
 
-	p.vel.x += val.x;
-	p.vel.y += val.y;
-	p.vel.z += val.z;
+	// this fixes random explosions (hopefully)
+	p.vel.x += clamp(val.x, -0.8f, 0.8f);
+	p.vel.y += clamp(val.y, -0.8f, 0.8f);
+	p.vel.z += clamp(val.z, -0.8f, 0.8f);
 
 	p.pos.x += TIME_STEP * p.vel.x;
 	p.pos.y += TIME_STEP * p.vel.y;

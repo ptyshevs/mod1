@@ -37,8 +37,7 @@ __kernel void sim_update(__global t_cell *hmap, __global t_particle *particles)
 	t_particle p = particles[offset];
 
 	float density_accum = 0;
-	unsigned int c = min(p.n_neighbors, (unsigned int)MAX_NEIGHBORS);
-	for (unsigned int i = 0; i < c; ++i) {
+	for (unsigned int i = 0, c = p.n_neighbors; i < c; ++i) {
 		if (p.neighbors[i] == NO_NEIGHBOR_PH)
 			continue;
 		dist = k_distance(p.pos, particles[p.neighbors[i]].pos);
