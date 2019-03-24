@@ -75,9 +75,9 @@ void ControlPoints::_scale_back()
 	for (glm::vec3 &cp: this->_arr)
 	{
 		cp *= (float)hf_sl; // scaling
-		cp -= (float)hf_sl * 0.5; // centering
-		cp.y += (float)hf_sl; // scale down height
-		cp.y *= 0.3; // scale height more
+		cp.z -= (float)hf_sl / 2; // centering
+		cp.x -= (float)hf_sl / 2;
+		cp.y *= 0.5; // scale height more
 	}
 }
 
