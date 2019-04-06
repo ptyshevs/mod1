@@ -103,6 +103,8 @@ float3 surface_collision(__global t_constants *constants, __global t_cp *control
 __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *control_points, __global t_particle *particles)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	t_particle p = particles[offset];
 	float3 val = TIME_STEP * p.force;
 

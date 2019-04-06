@@ -67,9 +67,11 @@ bool out_of_bound(float3 pos) {
 }
 
 // step 1: find neighbors
-__kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particles)
+__kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particles, __global t_constants *constants)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	t_particle p = particles[offset];
 	p.n_neighbors = 0;
 	#pragma unroll

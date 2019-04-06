@@ -126,32 +126,18 @@ public:
 	Cell() : n_inside(0) {};
 };
 
-
-struct Emiter: CLCore {
-	void	emit(cl_mem &cl_vbo);
-	void 	prepare_emit(CLCore &core);
-	int		type; // rain, wave of underground
-	int 	pps; // particles per second
-	cl_mem  cl_emiter;
-};
-
-
+/*
+ * Constants used for map interpolation
+ */
 typedef struct  s_constants {
     cl_int      map_size;
     cl_int      cp_size;
 }               t_constants;
 
-/*
-** CL Interop
-*/
-typedef struct {
-    cl_float x;
-    cl_float y;
-    cl_float z;
-    cl_int is_solid;
-    cl_float in_volume;
-} t_cell;
 
+/*
+ * Emitter parameters passed to kernel
+ */
 typedef struct {
     cl_int type;
     cl_uint pps;
@@ -162,7 +148,8 @@ typedef struct {
 
 void	cl_host_part(CLCore &cl_core, bool wGLInterop = false);
 void	cl_compile_kernel(CLCore &cl, const char *filepath, const char *program_name);
-void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kernel &kernel_field, const char *filepath, const char *program_name);
+void	cl_compile_water_kernel(CLWaterCore &cl, cl_program &program_field, cl_kernel &kernel_field,
+		const char *filepath, const char *program_name);
 
 // textures.cpp
 

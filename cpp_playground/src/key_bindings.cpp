@@ -10,11 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <core.hpp>
-#include <camera.hpp>
-#include <Water.hpp>
+#include "key_bindings.hpp"
 
-void	process_input(GLCamera &camera, GLItem &map,  GLItem &water, bool *quit)
+void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit)
 {
 	auto keystate = SDL_GetKeyboardState(NULL);
 
@@ -72,28 +70,28 @@ void	process_input(GLCamera &camera, GLItem &map,  GLItem &water, bool *quit)
 //		points.model = glm::rotate(points.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 		water.model = glm::rotate(water.model, camera.speed * glm::radians(-0.1f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-//	if (keystate[SDL_SCANCODE_1])
-//	{
-//		water.emiter.type = EMITER_RAIN;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_2])
-//	{
-//		water.emiter.type = EMITER_WAVE;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_3])
-//	{
-//		water.emiter.type = EMITER_UNDERGROUND;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_4])
-//	{
-//		water.emiter.type = EMITER_BOUNDARIES;
-//		water.emiter.pps = 1000;
-//	}
-//	if (keystate[SDL_SCANCODE_KP_MINUS])
-//		water.emiter.pps = abs(water.emiter.pps + 100);
-//	if (keystate[SDL_SCANCODE_KP_PLUS])
-//		water.emiter.pps = abs(water.emiter.pps - 100);
+	if (keystate[SDL_SCANCODE_1])
+	{
+		water.emitter->type = EMITER_RAIN;
+		water.emitter->pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_2])
+	{
+		water.emitter->type = EMITER_WAVE;
+		water.emitter->pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_3])
+	{
+		water.emitter->type = EMITER_UNDERGROUND;
+		water.emitter->pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_4])
+	{
+		water.emitter->type = EMITER_BOUNDARIES;
+		water.emitter->pps = 1000;
+	}
+	if (keystate[SDL_SCANCODE_KP_MINUS])
+		water.emitter->pps = abs(water.emitter->pps + 100);
+	if (keystate[SDL_SCANCODE_KP_PLUS])
+		water.emitter->pps = abs(water.emitter->pps - 100);
 }

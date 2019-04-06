@@ -13,9 +13,12 @@
 
 #ifndef KEY_BINDIGNS_HPP
 #define KEY_BINDIGNS_HPP
-#include <camera.hpp>
 
-void	process_input(GLCamera &camera, GLItem &map,  GLItem &water, bool *quit);
+#include <core.hpp>
+#include <camera.hpp>
+#include <Water.hpp>
+
+void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit);
 
 
 #endif

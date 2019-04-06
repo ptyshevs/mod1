@@ -30,10 +30,12 @@ float kernel_weight(float d) {
 }
 
 // step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void sim_update(__global t_cell *hmap, __global t_particle *particles)
+__kernel void sim_update(__global t_cell *hmap, __global t_particle *particles, __global t_constants *constants)
 {
 	float dist;
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	t_particle p = particles[offset];
 
 	float density_accum = 0;

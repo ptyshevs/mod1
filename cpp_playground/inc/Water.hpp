@@ -18,6 +18,7 @@
 #include <HeightMap.hpp>
 #include <ParticleSystemData.hpp>
 #include <ParticleSystemSolver.hpp>
+#include <Emitter.hpp>
 
 struct WaterConstants {
 	unsigned int	n_control_points;
@@ -32,8 +33,6 @@ struct WaterConstants {
  */
 struct Water: public GLItem
 {
-private:
-	void					_updateBuffer();
 public:
 	explicit Water();
 
@@ -49,13 +48,13 @@ public:
 	ParticleSystemSolver	*solver;
 	std::vector<glm::vec3>	indices;
 	bool					running;
-//	Emiter emiter;
-	virtual ~Water() override;
-	void	update_particles();
-//	void	emit();
+	Emitter					*emitter;
+	virtual					~Water() override;
+	void					update_particles();
+	void					emit();
 };
 
 
-Water	instance_water(HeightMap *hmap, ParticleSystemData *data);
+Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter);
 
 #endif

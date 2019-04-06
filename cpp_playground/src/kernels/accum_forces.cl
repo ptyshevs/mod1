@@ -42,9 +42,11 @@ float k_second_derivative(float d)
 
 
 // step 2: accumulate forces from pressure and viscosity
-__kernel void accum_forces(__global t_particle *particles)
+__kernel void accum_forces(__global t_particle *particles, __global t_constants *constants)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	t_particle p = particles[offset];
 	for (unsigned int i=0; i < p.n_neighbors; ++i) {
 		t_particle np = particles[p.neighbors[i]];

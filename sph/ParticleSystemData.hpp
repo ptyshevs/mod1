@@ -13,6 +13,7 @@
 #ifndef PARTICLE_SYSTEM_DATA_HPP
 #define PARTICLE_SYSTEM_DATA_HPP
 
+#include "algo_defines.hpp"
 #include <HeightMap.hpp>
 #include "Particle.hpp"
 #include <PolyMixedKernel.hpp>
@@ -23,14 +24,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
-
-#define PARTICLE_MASS 1.0f
-#define NEIGHBOR_RADIUS 1.5f
-
-#define PRESSURE_CONST 7.5f
-#define TARGET_DENSITY 0.01f
-#define NEGATIVE_PRESSURE_SCALE 0.5f
-#define VISCOSITY 0.18f
 
 struct ParticleSystemData {
 private:

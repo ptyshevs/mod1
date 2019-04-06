@@ -1,10 +1,9 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#define sl 200
-#define hf_sl 100
-#define MAX_NEIGHBORS 5
-#define MAX_PER_CELL 30
+#include "algo_defines.hpp"
+
+
 #define MAX_NONEMPTY_CELLS 1000
 #define NO_NEIGHBOR_PH 4294967294
 

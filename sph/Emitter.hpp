@@ -16,7 +16,12 @@
 
 #include "ParticleSystemData.hpp"
 
-class Emitter {
+#include <core.hpp>
+#include <stdlib.h>
+#include <time.h>
+
+
+class Emitter: CLCore {
 private:
 	ParticleSystemData	&_data;
 	glm::vec3			_velocity;
@@ -27,8 +32,10 @@ private:
 	float				_step;
 	float				_scale;
 	float				_inflate;
+
+
 public:
-	Emitter(ParticleSystemData &data);
+	explicit Emitter(ParticleSystemData &data);
 	void	setVelocity(const glm::vec3 &velocity);
 	void	setForce(const glm::vec3 &force);
 	void	setDensity(float density);
@@ -43,6 +50,13 @@ public:
 	void	fromFile(std::string const &path);
 	void	fromFile(glm::vec3 const &origin, std::string const &path);
 
+	void	emit();
+	void 	prepare_emit(CLCore &core);
+	int		type; // rain, wave of underground
+	int 	pps; // particles per second
+	cl_mem  cl_emitter;
+	cl_mem  cl_vbo;
+	cl_mem  cl_constants;
 	};
 
 #endif

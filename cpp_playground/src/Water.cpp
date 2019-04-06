@@ -13,13 +13,14 @@
 #include "core.hpp"
 #include <Water.hpp>
 
-Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
+Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter)
 {
 	Water w;
 
 	w.hmap = hmap;
 	w.data = data;
-	w.running = false;
+	w.emitter = emitter;
+	w.running = true;
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->numOfParticles();
@@ -55,7 +56,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 //	glEnableVertexAttribArray(6);
 
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
-	glBufferData(GL_ARRAY_BUFFER, w.data->_particles.size()* sizeof(Particle), w.data->_particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * sizeof(Particle), w.data->_particles.data(), GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 6));
@@ -63,7 +64,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 10));
 	glVertexAttribPointer(5, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 11));
 	glBindVertexArray(0);
-	w.idx_num = w.data->numOfParticles();
+	w.idx_num = MAX_PARTICLES;
 	int err = 0;
 
 	w.cl_constants = clCreateBuffer(w.cl.context, CL_MEM_READ_WRITE, sizeof(WaterConstants), NULL, &err);
@@ -84,17 +85,21 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 
 	err = clSetKernelArg(w.cl.neighborCaching, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	err |= clSetKernelArg(w.cl.neighborCaching, 1, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.neighborCaching, 2, sizeof(w.cl_constants), &w.cl_constants);
 	w.no_err(err, __LINE__);
 
 	err = clSetKernelArg(w.cl.findNeighbors, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	err |= clSetKernelArg(w.cl.findNeighbors, 1, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.findNeighbors, 2, sizeof(w.cl_constants), &w.cl_constants);
 	w.no_err(err, __LINE__);
 
 	err = clSetKernelArg(w.cl.simUpdate, 0, sizeof(w.cl_hmap), &w.cl_hmap);
 	err |= clSetKernelArg(w.cl.simUpdate, 1, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.simUpdate, 2, sizeof(w.cl_constants), &w.cl_constants);
 	w.no_err(err, __LINE__);
 
 	err = clSetKernelArg(w.cl.accumForces, 0, sizeof(w.cl_vbo), &w.cl_vbo);
+	err |= clSetKernelArg(w.cl.accumForces, 1, sizeof(w.cl_constants), &w.cl_constants);
 	w.no_err(err, __LINE__);
 
 	err = clSetKernelArg(w.cl.integrateResolve, 0, sizeof(w.cl_constants), &w.cl_constants);
@@ -102,6 +107,9 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data)
 	err |= clSetKernelArg(w.cl.integrateResolve, 2, sizeof(w.cl_vbo), &w.cl_vbo);
 	w.no_err(err, __LINE__);
 
+	w.emitter->prepare_emit(w.cl);
+	w.emitter->cl_vbo = w.cl_vbo;
+	w.emitter->cl_constants = w.cl_constants;
 	return (w);
 }
 
@@ -125,22 +133,28 @@ Water::~Water()
 	clReleaseContext(cl.context);
 }
 
+void 	Water::emit() {
+	static uint last_emit_time = SDL_GetTicks();
+
+	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emitter->pps)) {
+		emitter->emit();
+		last_emit_time = SDL_GetTicks();
+	}
+}
 
 void Water::update_particles()
 {
 	static size_t global_neighbor_caching_jobs = data->hmap->hmap.size();
-	static size_t global_work_size = data->numOfParticles() ;
+	static size_t global_work_size = MAX_PARTICLES;
 	static size_t n_iter = 0;
 	int err;
-//	solver->simulation_step();
-//	_updateBuffer();
 ///////////////////////////////////////////////////////////////////////////////
 	glFinish();
 
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
 
 	// Emit some water
-//	emit();
+	emit();
 	if (n_iter % UPDATE_NEIGHBORS_EVERY_N_ITER == 0) {
 		err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
 		err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
@@ -157,14 +171,4 @@ void Water::update_particles()
 
 	clFinish(cl.queue);
 	++n_iter;
-}
-
-void Water::_updateBuffer()
-{
-//	static bool first_time = true;
-//	glBindVertexArray(vao);
-//	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-//	glBufferData(GL_ARRAY_BUFFER, data->numOfParticles() * sizeof(Particle), data->_particles.data(), GL_DYNAMIC_DRAW);
-//	glBindVertexArray(0);
-//	idx_num = data->numOfParticles();
 }

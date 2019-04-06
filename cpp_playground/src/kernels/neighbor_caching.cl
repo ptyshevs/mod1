@@ -14,9 +14,11 @@ unsigned int hash(float3 pos) {
 }
 
 // step 1: find neighbors, compute density and pressure, and apply external forces
-__kernel void neighbor_caching(__global t_cell *hmap, __global t_particle *particles)
+__kernel void neighbor_caching(__global t_cell *hmap, __global t_particle *particles, __global t_constants *constants)
 {
 	size_t offset = get_global_id(0);
+	if (offset >= constants->n_particles)
+		return ;
 	unsigned int h = hash(particles[offset].pos);
 	t_cell cell = hmap[h];
 	if (cell.n_inside < MAX_PER_CELL) {
