@@ -121,6 +121,16 @@ void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
 	}
 }
 
+void Emitter::sphere(glm::vec3 origin, float width, float radius)
+{
+	for (float t = -M_PI; t < M_PI; t += _step) {
+		for (float p = -M_PI; p < M_PI; p += _step) {
+			glm::vec3 pos(origin.x + _inflate * radius * cos(t) * cos(p), origin.y + _inflate * radius * sin(t), origin.z + _inflate * radius * cos(t) * sin(p));
+			_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type, _id);
+		}
+	}
+}
+
 void rescale(std::vector<glm::vec3> &points) {
 	float x_max, y_max, z_max;
 

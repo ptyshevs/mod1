@@ -37,12 +37,14 @@ int main(int ac, char *av[]) {
 	data.hmap = &map;
 	Emitter emitter(data);
 	emitter.setScale(0.7);
+	emitter.setStep(0.25);
 //	emitter.setPointType(P_STATIC);
+	emitter.sphere(glm::vec3(-50, 17, 70), 2, 5);
 //	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
-	emitter.fromFile(glm::vec3(35, 3, 88), "res/ply/bun_zipper_res3.mod1");
-	emitter.setViscosity(3);
-	emitter.setId(1);
-	emitter.fromFile(glm::vec3(-35, 3, 88), "res/ply/bun_zipper_res3.mod1");
+//	emitter.fromFile(glm::vec3(35, 3, 88), "res/ply/bun_zipper_res3.mod1");
+//	emitter.setViscosity(3);
+//	emitter.setId(1);
+//	emitter.fromFile(glm::vec3(-35, 3, 88), "res/ply/bun_zipper_res3.mod1");
 //	emitter.wall(-70, -69.5f, 1, 10, 10, 15);
 //	emitter.pillow(glm::vec3(-75, 0, 70), 1, 3, 30);
 //	emitter.pillow(glm::vec3(-75, 0, 50), 1, 3, 30);
