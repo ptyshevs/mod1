@@ -6,6 +6,7 @@ in float density;
 in float pressure;
 in float viscosity;
 in float ptype;
+in float id;
 in float n_neighbors;
 
 float Ns = 250;
@@ -32,4 +33,8 @@ void main() {
     float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
     float v = float(viscosity);
     color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
+//    if (id == 0)
+//        color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
+//    else
+//        color = vec4(0.5f + vel_mag, 0.2f + vel_mag, 0.2f + vel_mag, 0.5f) * diffuse + S;
 }

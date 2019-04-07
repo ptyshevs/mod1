@@ -44,7 +44,8 @@ public:
 					  float density,
 					  float pressure,
 					  float viscosity,
-					  unsigned int point_type = P_DYNAMIC);
+					  unsigned int point_type = P_DYNAMIC,
+					  unsigned int id = 0);
 
 	void addParticle(const glm::vec3 &position,
 					 const glm::vec3 &velocity = glm::vec3(0.0f, 0.0f, 0.0f),

@@ -56,6 +56,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	glEnableVertexAttribArray(5);
 	glEnableVertexAttribArray(6);
 	glEnableVertexAttribArray(7);
+	glEnableVertexAttribArray(8);
 
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * sizeof(Particle), w.data->_particles.data(), GL_DYNAMIC_DRAW);
@@ -66,7 +67,8 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 13)); // pressure
 	glVertexAttribPointer(5, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 14)); // viscosity
 	glVertexAttribPointer(6, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 15)); // particle type
-	glVertexAttribPointer(7, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 16)); // n_neighbors
+	glVertexAttribPointer(7, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 16)); // particle id
+	glVertexAttribPointer(8, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 17)); // n_neighbors
 	glBindVertexArray(0);
 	w.idx_num = MAX_PARTICLES;
 	int err = 0;

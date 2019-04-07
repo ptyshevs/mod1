@@ -8,9 +8,11 @@
 # define MAX_NEIGHBORS 15
 # define MAX_PER_CELL 30  // max amount of particles pointers stored in a single cell
 # define CP_STEP 3.5f
-# define UPDATE_NEIGHBORS_EVERY_N_ITER 1
+# define UPDATE_NEIGHBORS_EVERY_N_ITER 2
 # define MAX_PARTICLES 100000
+
 # define PARTICLE_MASS 1.0f
+# define NEIGHBOR_RADIUS 1.5f
 # define VISCOSITY 0.08f
 
 #define EMITER_RAIN 1

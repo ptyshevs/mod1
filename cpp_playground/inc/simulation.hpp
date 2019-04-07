@@ -8,8 +8,6 @@
 #define NO_NEIGHBOR_PH 4294967294
 
 
-#define PARTICLE_MASS 1.0f
-#define NEIGHBOR_RADIUS 1.5f
 
 // like 60 FPS = 1/60 SPF
 #define TIME_STEP 0.0166f
@@ -47,6 +45,7 @@ typedef struct s_particle {
 	float pressure;
 	float viscosity;
 	unsigned int type;
+	unsigned int id;
 	unsigned int n_neighbors;
 	unsigned int neighbors[MAX_NEIGHBORS];
 

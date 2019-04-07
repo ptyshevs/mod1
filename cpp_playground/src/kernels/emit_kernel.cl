@@ -23,6 +23,8 @@ void boundaries(__global t_particle *particles, __global t_constants *constants)
 
 void flush(__global t_particle *particles, __global t_constants *constants);
 
+t_particle make_particle();
+
 /*
 */
 
@@ -58,14 +60,7 @@ __kernel void emit_kernel(__global t_particle *particles,
 void flush(__global t_particle *particles, __global t_constants *constants)
 {
 	unsigned int n = constants->n_particles;
-	t_particle p;
-	p.pos = (float3)(0, 0, 0);
-	p.vel = (float3)(0, 0, 0);
-	p.force = (float3)(0, 0, 0);
-	p.pressure = 0;
-	p.density = 0;
-	p.viscosity = VISCOSITY;
-	p.n_neighbors = 0;
+	t_particle p = make_particle();
 	for (unsigned int i = 0; i < n; ++i) {
 		particles[i] = p;
 	}
@@ -80,11 +75,10 @@ void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_co
 	size_t offset = to_address((float)foo,
 							(float)hf_hf_sl - 1,
 							(float)foo2);
-	t_particle p;
+	t_particle p = make_particle();
 	p.pos.x = foo;
 	p.pos.z = foo2;
 	p.pos.y = hf_hf_sl - 1;
-	p.viscosity = VISCOSITY;
 	particles[constants->n_particles] = p;
 	constants->n_particles += 1;
 }
@@ -96,11 +90,10 @@ void havaji(__global t_particle *particles, __global t_constants *constants)
 	for (int i = -hf_sl; i < hf_sl; i++) {
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
-		t_particle p;
+		t_particle p = make_particle();
 		p.pos.x = -hf_sl;
 		p.pos.z = i;
 		p.pos.y = 1;
-		p.viscosity = VISCOSITY;
 		particles[store_n + cnt] = p;
 		cnt += 1;
 	}
@@ -115,8 +108,7 @@ void boundaries(__global t_particle *particles, __global t_constants *constants)
 	{
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
-		t_particle p;
-		p.viscosity = VISCOSITY;
+		t_particle p = make_particle();
 		p.pos = (float3)(i - (float)hf_sl, 1, -(float)hf_sl);
 		particles[store_n + cnt] = p;
 		cnt++;
@@ -150,4 +142,18 @@ size_t rand(size_t seed)
 {
 	uint t = seed ^ (seed << 11);
 	return (seed ^ (seed >> 19) ^ (t ^ (t >> 8)));
+}
+
+t_particle make_particle() {
+	t_particle p;
+	p.pos = (float3)(0, 0, 0);
+	p.vel = (float3)(0, 0, 0);
+	p.force = (float3)(0, 0, 0);
+	p.density = 0;
+	p.pressure = 0;
+	p.viscosity = VISCOSITY;
+	p.type = P_DYNAMIC;
+	p.id = 0;
+	p.n_neighbors = 0;
+	return (p);
 }

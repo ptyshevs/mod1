@@ -7,7 +7,8 @@ layout (location = 3) in float in_density;
 layout (location = 4) in float in_pressure;
 layout (location = 5) in float in_viscosity;
 layout (location = 6) in uint in_ptype;
-layout (location = 7) in uint in_n_neighbors;
+layout (location = 7) in uint in_id;
+layout (location = 8) in uint in_n_neighbors;
 
 out vec4 position;
 out vec4 velocity;
@@ -16,6 +17,7 @@ out float density;
 out float pressure;
 out float viscosity;
 out float ptype;
+out float id;
 out float n_neighbors;
 
 uniform mat4 MVP;
@@ -29,5 +31,6 @@ void main() {
     pressure = in_pressure;
     viscosity = in_viscosity;
     ptype = float(in_ptype);
+    id = float(in_id);
     n_neighbors = float(in_n_neighbors);
 }

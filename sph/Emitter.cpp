@@ -13,7 +13,8 @@
 #include "Emitter.hpp"
 
 Emitter::Emitter(ParticleSystemData &data) : _data(data),
-	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _viscosity(VISCOSITY), _step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC)
+	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _viscosity(VISCOSITY),
+	_step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC), _id(0)
 {
 }
 
@@ -42,6 +43,11 @@ void Emitter::setViscosity(float viscosity)
 	_viscosity = viscosity;
 }
 
+void Emitter::setId(unsigned int id)
+{
+	_id = id;
+}
+
 void	Emitter::setStep(float step) {
 	_step = step;
 }
@@ -65,7 +71,7 @@ void	Emitter::cuboid(float x_start, float x_end,
 		for (float j = y_start; j <= y_end; j += _step) {
 			for (float k = z_start; k <= z_end; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type, _id);
 			}
 		}
 	}
@@ -76,7 +82,7 @@ void	Emitter::cube(const glm::vec3 &origin, float side) {
 		for (float j = origin.y; j < origin.y + side; j += _step) {
 			for (float k = origin.z; k < origin.z + side; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type, _id);
 			}
 		}
 	}
@@ -109,7 +115,7 @@ void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
 			glm::vec3 pos(origin.x + (radius - j) * cos(angle), 0, origin.z + (radius - j) * sin(angle));
 			for (float i = 0; i < height; i += _step) {
 				pos.y = i;
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type, _id);
 			}
 		}
 	}
@@ -177,7 +183,7 @@ void Emitter::fromFile(glm::vec3 const &origin, std::string const &path)
 	glm::vec3 center = centroid(points);
 	for (auto const &v: points) {
 		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure, _viscosity,
-				point_type);
+				point_type, _id);
 	}
 }
 

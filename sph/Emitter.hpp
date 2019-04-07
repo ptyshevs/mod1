@@ -29,6 +29,7 @@ private:
 	float				_density;
 	float				_pressure;
 	float				_viscosity;
+	unsigned int		_id;
 
 	float				_step;
 	float				_scale;
@@ -42,6 +43,7 @@ public:
 	void	setDensity(float density);
 	void	setPressure(float pressure);
 	void	setViscosity(float viscosity);
+	void	setId(unsigned int id);
 	void	setStep(float step);
 	void	setScale(float scale);
 	void	setInflate(float inflate);
