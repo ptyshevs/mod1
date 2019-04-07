@@ -82,11 +82,6 @@ void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit)
 	}
 	if (keystate[SDL_SCANCODE_3])
 	{
-		water.emitter->type = EMITER_UNDERGROUND;
-		water.emitter->pps = 1000;
-	}
-	if (keystate[SDL_SCANCODE_4])
-	{
 		water.emitter->type = EMITER_BOUNDARIES;
 		water.emitter->pps = 1000;
 	}

@@ -14,7 +14,6 @@
 
 #define EMITER_RAIN 1
 #define EMITER_WAVE 2
-#define EMITER_UNDERGROUND 4
-#define EMITER_BOUNDARIES 8
+#define EMITER_BOUNDARIES 4
 
 #endif
