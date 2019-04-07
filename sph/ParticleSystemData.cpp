@@ -41,35 +41,40 @@ static int offsets[27][3] = {
 							{1, 1, 1},
 							{-1, -1, -1}};
 
-ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0))
+ParticleSystemData::ParticleSystemData(size_t numOfParticles) : _mass(PARTICLE_MASS), _gravity(glm::vec3(0.0, -9.81, 0.0)), n_particles(0)
 {
 	if (numOfParticles > 0)
 	{
 		this->_particles.reserve(numOfParticles);
-
 	}
+	for (size_t i = 0; i < MAX_PARTICLES; ++i)
+		_particles.emplace_back();
 }
 
 size_t ParticleSystemData::numOfParticles() const {
-	return (this->_particles.size());
+	return (n_particles);
 }
 
 void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) {
-	this->_particles.emplace_back(position, velocity, force);
+	if (n_particles < MAX_PARTICLES)
+		this->_particles[n_particles++] = Particle(position, velocity, force);
 }
 
 void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
 									  float density, float pressure)
 {
-	this->_particles.emplace_back(position, velocity, force, density, pressure);
+	if (n_particles < MAX_PARTICLES)
+		this->_particles[n_particles++] = Particle(position, velocity, force, density, pressure);
 }
 
 
 void ParticleSystemData::addParticles(std::vector<glm::vec3> positions, std::vector<glm::vec3> velocities,
 									  std::vector<glm::vec3> forces) {
 	for (size_t i = 0; i < positions.size(); ++i) {
-		this->_particles.emplace_back(positions[i], velocities[i], forces[i]);
-
+		if (n_particles < MAX_PARTICLES)
+			this->_particles[n_particles++] = Particle(positions[i], velocities[i], forces[i]);
+		else
+			break ;
 	}
 }
 

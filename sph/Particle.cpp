@@ -1,7 +1,7 @@
 
 #include "Particle.hpp"
 
-Particle::Particle()  : position(cl_float3()), velocity(cl_float3()), force(cl_float3()), density(0.0f), pressure(0.0f) {};
+Particle::Particle()  : position(cl_float3()), velocity(cl_float3()), force(cl_float3()), density(0.0f), pressure(0.0f), n_neighbors(0) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
 		position({position.x, position.y, position.z}), velocity({velocity.x, velocity.y, velocity.z}),

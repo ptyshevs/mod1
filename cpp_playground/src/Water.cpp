@@ -23,7 +23,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	w.running = true;
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
-	w.constants.n_particles = w.data->numOfParticles();
+	w.constants.n_particles = w.data->n_particles;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
 	cl_compile_kernel(w.cl, "src/kernels/clear_caching.cl", "clear_caching");

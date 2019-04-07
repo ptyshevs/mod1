@@ -33,13 +33,13 @@ int main(int ac, char *av[]) {
 	auto core = sdl_gl_init();
 	auto map = generate_map(controlPoints);
 
-	ParticleSystemData data;
+	ParticleSystemData data(MAX_PARTICLES);
 	data.hmap = &map;
 	Emitter emitter(data);
-//	emitter.setStep(1);
-//	emitter.setScale(0.5);
-//	emitter.fromFile(glm::vec3(-50, 20, -70), "res/ply/bun_zipper.mod1");
-//	emitter.fromFile(glm::vec3(25, 15, 70), "res/ply/bun_zipper_res4.mod1");
+	emitter.setStep(1);
+	emitter.setScale(0.5);
+	emitter.fromFile(glm::vec3(-50, 20, -70), "res/ply/bun_zipper.mod1");
+	emitter.fromFile(glm::vec3(25, 15, 70), "res/ply/bun_zipper_res4.mod1");
 //	emitter.cube(glm::vec3(10, 40, 10), 10);
 //	emitter.cuboid(-10, 20, 47, 49, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);

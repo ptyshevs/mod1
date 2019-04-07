@@ -32,6 +32,7 @@ private:
 	const glm::vec3			_gravity;
 public:
 	std::vector<Particle>	_particles;
+	size_t					n_particles; // actual # of particles, as whole vector is pre-allocated for MAX_PARTICLES
 	HeightMap				*hmap;
 	PolyMixedKernel			kernel;
 
