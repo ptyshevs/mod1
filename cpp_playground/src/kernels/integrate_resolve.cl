@@ -10,10 +10,12 @@ __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 ///////////////////////// PROTOTYPES
 float k_distance(float3 a, float3 b);
 float kernel_weight(float d);
-bool  bound(float3 *pos);
+bool  out_of_bound(float3 *pos);
 float surface_height(__global t_constants *constants, __global t_cp *control_points, float3 pos);
 float3 surface_normal(__global t_constants *c, __global t_cp *cp, float3 pos);
 float3 surface_collision(__global t_constants *constants, __global t_cp *control_points, float3 pos, float3 vel);
+float3 bbox_collision(__global t_constants *constants, __global t_cp *control_points, float3 *pos, float3 vel);
+float3 bbox_normal(float3 *pos);
 
 
 
@@ -31,35 +33,57 @@ float kernel_weight(float d) {
 	return (k_const * x * x * x);
 }
 
-bool bound(float3 *pos) {
+bool out_of_bound(float3 *pos) {
 	bool out_of_bound = false;
-	if (pos->y < 0) {
-		pos->y = 0;
-		out_of_bound = true;
-	}
-	else if (pos->y > hf_sl / 2.0f - 1) {
-		pos->y = hf_sl / 2.0f - 1;
+
+	if (pos->y > (hf_sl / 2.0f - 1)) {
 		out_of_bound = true;
 	}
 
 	if (pos->z < -hf_sl) {
-		pos->z = -hf_sl;
 		out_of_bound = true;
 	}
-	else if (pos->z > hf_sl - 1) {
-		pos->z  = hf_sl - 1;
+	else if (pos->z > (hf_sl - 1)) {
 		out_of_bound = true;
 	}
 
 	if (pos->x < -hf_sl) {
-		pos->x =  -hf_sl;
 		out_of_bound = true;
 	}
-	else if (pos->x > hf_sl - 1) {
-		pos->x = hf_sl - 1;
+	else if (pos->x > (hf_sl - 1)) {
 		out_of_bound = true;
 	}
 	return (out_of_bound);
+}
+
+float3 bbox_normal(float3 *pos) {
+	float3 normal = (float3)(0, 0, 0);
+	// if (pos->y < 0) {
+	// 	pos->y = 0;
+	// 	return (float3)(0, 1, 0);
+	// }
+	if (pos->y > hf_sl / 2.0f - 1) {
+		pos->y = hf_sl / 2.0f - 1;
+		normal.y = -1;
+	}
+	if (pos->z < -hf_sl) {
+		pos->z = -hf_sl;
+		normal.z = 1;
+	}
+	else if (pos->z > (hf_sl - 1)) {
+		pos->z  = hf_sl - 1;
+		normal.z = -1;
+	}
+
+	if (pos->x < -hf_sl) {
+		pos->x =  -hf_sl;
+		normal.x = 1;
+	}
+	else if (pos->x > (hf_sl - 1)) {
+		pos->x = hf_sl - 1;
+		normal.x = -1;
+	}
+	return normal;
 }
 
 
@@ -99,6 +123,15 @@ float3 surface_collision(__global t_constants *constants, __global t_cp *control
 	return renormalized - renormalized * RESTITUTION * fabs(dot(vel_normalized, normal));
 }
 
+float3 bbox_collision(__global t_constants *constants, __global t_cp *control_points, float3 *pos, float3 vel) {
+	float3 normal = bbox_normal(pos);
+	float vel_mag = length(vel);
+	float3 vel_normalized = vel / vel_mag;
+	float3 reflected = vel_normalized - (2 * dot(vel_normalized, normal) * normal);
+	float3 renormalized = reflected * vel_mag;
+	return renormalized - renormalized * RESTITUTION * fabs(dot(vel_normalized, normal));
+}
+
 // step 2: accumulate forces from pressure and viscosity
 __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *control_points, __global t_particle *particles)
 {
@@ -118,10 +151,14 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 	p.pos.z += TIME_STEP * p.vel.z;
 
 	// Bounding box collision resolution
-	if (bound(&p.pos)) {
-		p.vel.x *= -DAMPING;
-		p.vel.y *= -DAMPING;
-		p.vel.z *= -DAMPING;
+	if (out_of_bound(&p.pos)) {
+		float3 new_vel = bbox_collision(constants, control_points, &p.pos, p.vel);
+		p.vel.x = new_vel.x;
+		p.vel.y = new_vel.y;
+		p.vel.z = new_vel.z;
+		// p.vel.x *= -DAMPING;
+		// p.vel.y *= -DAMPING;
+		// p.vel.z *= -DAMPING;
 	}
 	// No boundary crossing, maybe there's a surface collision?
 	float h = surface_height(constants, control_points, p.pos);

@@ -48,6 +48,7 @@ public:
 	ParticleSystemSolver	*solver;
 	std::vector<glm::vec3>	indices;
 	bool					running;
+	bool					emitting;
 	Emitter					*emitter;
 	virtual					~Water() override;
 	void					update_particles();

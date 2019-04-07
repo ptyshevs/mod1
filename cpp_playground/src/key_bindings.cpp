@@ -89,4 +89,6 @@ void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit)
 		water.emitter->pps = abs(water.emitter->pps + 100);
 	if (keystate[SDL_SCANCODE_KP_PLUS])
 		water.emitter->pps = abs(water.emitter->pps - 100);
+	if (keystate[SDL_SCANCODE_R])
+		water.emitting = !water.emitting;
 }
