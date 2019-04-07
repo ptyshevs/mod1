@@ -26,13 +26,14 @@ struct Particle {
 	cl_float3		force;
 	cl_float		density;
 	cl_float		pressure;
+	cl_float		viscosity;
 	cl_uint			type;
 	cl_uint			n_neighbors; // 52 bytes
 	cl_uint			neighbors_idx[MAX_NEIGHBORS];
 	Particle();
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force);
 	Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
-			float density, float pressure, unsigned int type = P_DYNAMIC);
+			float density, float pressure, float viscosity, unsigned int type = P_DYNAMIC);
 	void	show() const;
 };
 

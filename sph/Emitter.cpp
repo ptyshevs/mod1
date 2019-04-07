@@ -13,7 +13,7 @@
 #include "Emitter.hpp"
 
 Emitter::Emitter(ParticleSystemData &data) : _data(data),
-	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC)
+	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _viscosity(VISCOSITY), _step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC)
 {
 }
 
@@ -35,6 +35,11 @@ void Emitter::setDensity(float density)
 void Emitter::setPressure(float pressure)
 {
 	_pressure = pressure;
+}
+
+void Emitter::setViscosity(float viscosity)
+{
+	_viscosity = viscosity;
 }
 
 void	Emitter::setStep(float step) {
@@ -60,7 +65,7 @@ void	Emitter::cuboid(float x_start, float x_end,
 		for (float j = y_start; j <= y_end; j += _step) {
 			for (float k = z_start; k <= z_end; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
 			}
 		}
 	}
@@ -71,7 +76,7 @@ void	Emitter::cube(const glm::vec3 &origin, float side) {
 		for (float j = origin.y; j < origin.y + side; j += _step) {
 			for (float k = origin.z; k < origin.z + side; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
 			}
 		}
 	}
@@ -84,11 +89,14 @@ void Emitter::wall(float x_start, float x_end, float y_start, float y_end, float
 {
 	auto save_step = _step;
 	auto save_ptype = point_type;
+	auto save_viscosity = _viscosity;
 	setStep(.25);
 	setPointType(P_STATIC);
+	setViscosity(0.4);
 	cuboid(x_start, x_end, y_start, y_end, z_start, z_end);
 	setStep(save_step);
 	setPointType(save_ptype);
+	setViscosity(save_viscosity);
 }
 
 /*
@@ -101,7 +109,7 @@ void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
 			glm::vec3 pos(origin.x + (radius - j) * cos(angle), 0, origin.z + (radius - j) * sin(angle));
 			for (float i = 0; i < height; i += _step) {
 				pos.y = i;
-				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, _viscosity, point_type);
 			}
 		}
 	}
@@ -168,7 +176,8 @@ void Emitter::fromFile(glm::vec3 const &origin, std::string const &path)
 	scale_back(points);
 	glm::vec3 center = centroid(points);
 	for (auto const &v: points) {
-		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure, point_type);
+		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure, _viscosity,
+				point_type);
 	}
 }
 

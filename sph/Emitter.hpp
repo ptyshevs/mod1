@@ -28,6 +28,7 @@ private:
 	glm::vec3			_force;
 	float				_density;
 	float				_pressure;
+	float				_viscosity;
 
 	float				_step;
 	float				_scale;
@@ -40,6 +41,7 @@ public:
 	void	setForce(const glm::vec3 &force);
 	void	setDensity(float density);
 	void	setPressure(float pressure);
+	void	setViscosity(float viscosity);
 	void	setStep(float step);
 	void	setScale(float scale);
 	void	setInflate(float inflate);

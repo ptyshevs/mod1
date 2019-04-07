@@ -60,7 +60,7 @@ __kernel void accum_forces(__global t_particle *particles, __global t_constants 
 						(2 * p.density * np.density) * k_first_derivative(dist) * dir;
 
 			p.force -= val;
-			p.force += VISCOSITY * (np.vel - p.vel) / np.density * k_second_derivative(dist);
+			p.force += (p.viscosity + np.viscosity) / 2 * (np.vel - p.vel) / np.density * k_second_derivative(dist);
 		}
 	}
 	particles[offset] = p;

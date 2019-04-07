@@ -20,8 +20,8 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	w.hmap = hmap;
 	w.data = data;
 	w.emitter = emitter;
-	w.running = true;
-	w.emitting = true;
+	w.running = false;
+	w.emitting = false;
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->n_particles;
@@ -54,16 +54,19 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
-//	glEnableVertexAttribArray(6);
+	glEnableVertexAttribArray(6);
+	glEnableVertexAttribArray(7);
 
 	glBindBuffer(GL_ARRAY_BUFFER, w.vbo);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * sizeof(Particle), w.data->_particles.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 6));
-	glVertexAttribPointer(3, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 9));
-	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 10));
-	glVertexAttribPointer(5, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 11));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_TRUE, sizeof(Particle), 0); // position
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 4)); // velocity
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 8)); // force
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 12)); // density
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 13)); // pressure
+	glVertexAttribPointer(5, 1, GL_FLOAT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 14)); // viscosity
+	glVertexAttribPointer(6, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 15)); // particle type
+	glVertexAttribPointer(7, 1, GL_UNSIGNED_INT, GL_TRUE, sizeof(Particle), (void *)(sizeof(float) * 16)); // n_neighbors
 	glBindVertexArray(0);
 	w.idx_num = MAX_PARTICLES;
 	int err = 0;

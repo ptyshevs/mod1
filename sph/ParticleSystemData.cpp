@@ -61,10 +61,10 @@ void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 
 }
 
 void ParticleSystemData::addParticle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force,
-									  float density, float pressure, unsigned int point_type)
+									  float density, float pressure, float viscosity, unsigned int point_type)
 {
 	if (n_particles < MAX_PARTICLES)
-		this->_particles[n_particles++] = Particle(position, velocity, force, density, pressure, point_type);
+		this->_particles[n_particles++] = Particle(position, velocity, force, density, pressure, viscosity, point_type);
 }
 
 

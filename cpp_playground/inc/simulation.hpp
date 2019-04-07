@@ -25,7 +25,6 @@
 #define PRESSURE_CONST 7.5f
 #define TARGET_DENSITY 0.01f
 #define NEGATIVE_PRESSURE_SCALE 0.5f
-#define VISCOSITY 0.05f
 
 typedef struct {
 	unsigned int     n_cp;
@@ -46,6 +45,7 @@ typedef struct s_particle {
 	float3 force;
 	float density;
 	float pressure;
+	float viscosity;
 	unsigned int type;
 	unsigned int n_neighbors;
 	unsigned int neighbors[MAX_NEIGHBORS];

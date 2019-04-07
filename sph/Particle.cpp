@@ -12,10 +12,11 @@ Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const g
 };
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force, float density,
-				   float pressure, unsigned int type) : Particle(position, velocity, force)
+				   float pressure, float viscosity, unsigned int type) : Particle(position, velocity, force)
 {
 	this->density = density;
 	this->pressure = pressure;
+	this->viscosity = viscosity;
 	this->type = type;
 	n_neighbors = 0;
 }

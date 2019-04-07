@@ -64,6 +64,7 @@ void flush(__global t_particle *particles, __global t_constants *constants)
 	p.force = (float3)(0, 0, 0);
 	p.pressure = 0;
 	p.density = 0;
+	p.viscosity = VISCOSITY;
 	p.n_neighbors = 0;
 	for (unsigned int i = 0; i < n; ++i) {
 		particles[i] = p;
@@ -83,6 +84,7 @@ void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_co
 	p.pos.x = foo;
 	p.pos.z = foo2;
 	p.pos.y = hf_hf_sl - 1;
+	p.viscosity = VISCOSITY;
 	particles[constants->n_particles] = p;
 	constants->n_particles += 1;
 }
@@ -98,6 +100,7 @@ void havaji(__global t_particle *particles, __global t_constants *constants)
 		p.pos.x = -hf_sl;
 		p.pos.z = i;
 		p.pos.y = 1;
+		p.viscosity = VISCOSITY;
 		particles[store_n + cnt] = p;
 		cnt += 1;
 	}
@@ -113,6 +116,7 @@ void boundaries(__global t_particle *particles, __global t_constants *constants)
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
 		t_particle p;
+		p.viscosity = VISCOSITY;
 		p.pos = (float3)(i - (float)hf_sl, 1, -(float)hf_sl);
 		particles[store_n + cnt] = p;
 		cnt++;
