@@ -36,10 +36,11 @@ int main(int ac, char *av[]) {
 	ParticleSystemData data(MAX_PARTICLES);
 	data.hmap = &map;
 	Emitter emitter(data);
-	emitter.setStep(1);
 	emitter.setScale(0.5);
-	emitter.fromFile(glm::vec3(-50, 20, -70), "res/ply/bun_zipper.mod1");
-	emitter.fromFile(glm::vec3(25, 15, 70), "res/ply/bun_zipper_res4.mod1");
+	emitter.setPointType(P_STATIC);
+	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
+	emitter.fromFile(glm::vec3(-25, 3, 70), "res/ply/bun_zipper_res4.mod1");
+	emitter.wall(-70, -69.5f, 1, 10, 10, 15);
 //	emitter.cube(glm::vec3(10, 40, 10), 10);
 //	emitter.cuboid(-10, 20, 47, 49, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);
@@ -49,7 +50,7 @@ int main(int ac, char *av[]) {
 //	emitter.cube(glm::vec3(0, 1, hf_sl - 5), 3);
 //	emitter.cuboid(-5, 5, 0, 20, hf_sl - 7, hf_sl - 5);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
-	std::cout << "Num of particles=" << data._particles.size() << std::endl;
+	std::cout << "Num of particles=" << data.numOfParticles() << std::endl;
 	std::cout << "sizeof(Particle)=" << sizeof(Particle) << std::endl;
 	// right near the camera
 //	data.addParticle(glm::vec3(0,25, hf_sl - 2));

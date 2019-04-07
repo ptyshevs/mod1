@@ -45,6 +45,8 @@ __kernel void sim_update(__global t_cell *hmap, __global t_particle *particles, 
 		dist = k_distance(p.pos, particles[p.neighbors[i]].pos);
 		density_accum += kernel_weight(dist);
 	}
+	if (p.type == P_STATIC)
+		p.density += 100000;
 	p.density = PARTICLE_MASS * (density_accum + kernel_weight(0));
 	p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
 	p.force = PARTICLE_MASS * gravity - DRAG_COEF * p.vel;

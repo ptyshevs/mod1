@@ -42,7 +42,8 @@ public:
 					  const glm::vec3 &velocity,
 					  const glm::vec3 &force,
 					  float density,
-					  float pressure);
+					  float pressure,
+					  unsigned int point_type = P_DYNAMIC);
 
 	void addParticle(const glm::vec3 &position,
 					 const glm::vec3 &velocity = glm::vec3(0.0f, 0.0f, 0.0f),

@@ -43,15 +43,18 @@ public:
 	void	setStep(float step);
 	void	setScale(float scale);
 	void	setInflate(float inflate);
+	void	setPointType(unsigned int type);
 	void	cuboid(float x_start = 0, float x_end = 1,
 				float y_start = 0, float y_end = 1,
 				float z_start = 0, float z_end = 1);
 	void	cube(const glm::vec3 &origin, float side);
 	void	fromFile(std::string const &path);
 	void	fromFile(glm::vec3 const &origin, std::string const &path);
+	void	wall(float x_start, float x_end, float y_start, float y_end, float z_start, float z_end);
 
 	void	emit();
 	void 	prepare_emit(CLCore &core);
+	unsigned int point_type;
 	int		type; // rain, wave or boundaries
 	int		prev_type;
 	int 	pps; // particles per second

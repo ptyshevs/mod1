@@ -48,6 +48,8 @@ __kernel void accum_forces(__global t_particle *particles, __global t_constants 
 	if (offset >= constants->n_particles)
 		return ;
 	t_particle p = particles[offset];
+	if (p.type == P_STATIC)
+		return ;
 	for (unsigned int i=0; i < p.n_neighbors; ++i) {
 		t_particle np = particles[p.neighbors[i]];
 

@@ -13,7 +13,7 @@
 #include "Emitter.hpp"
 
 Emitter::Emitter(ParticleSystemData &data) : _data(data),
-	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _step(0.5f), _scale(0.3f), _inflate(1.4f)
+	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC)
 {
 }
 
@@ -49,6 +49,10 @@ void	Emitter::setInflate(float inflate) {
 	_inflate = inflate;
 }
 
+void	Emitter::setPointType(unsigned int type) {
+	point_type = type;
+}
+
 void	Emitter::cuboid(float x_start, float x_end,
 		float y_start, float y_end, float z_start, float z_end)
 {
@@ -56,7 +60,7 @@ void	Emitter::cuboid(float x_start, float x_end,
 		for (float j = y_start; j <= y_end; j += _step) {
 			for (float k = z_start; k <= z_end; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
 			}
 		}
 	}
@@ -67,10 +71,24 @@ void	Emitter::cube(const glm::vec3 &origin, float side) {
 		for (float j = origin.y; j < origin.y + side; j += _step) {
 			for (float k = origin.z; k < origin.z + side; k += _step) {
 				glm::vec3 pos(i, j, k);
-				_data.addParticle(pos, _velocity, _force, _density, _pressure);
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
 			}
 		}
 	}
+}
+
+/*
+ * Axis-aligned wall
+ */
+void Emitter::wall(float x_start, float x_end, float y_start, float y_end, float z_start, float z_end)
+{
+	auto save_step = _step;
+	auto save_ptype = point_type;
+	setStep(.25);
+	setPointType(P_STATIC);
+	cuboid(x_start, x_end, y_start, y_end, z_start, z_end);
+	setStep(save_step);
+	setPointType(save_ptype);
 }
 
 void rescale(std::vector<glm::vec3> &points) {
@@ -123,7 +141,7 @@ void Emitter::fromFile(std::string const &path)
 	rescale(points);
 	scale_back(points);
 	for (auto const &v: points) {
-		_data.addParticle(_scale * v, _velocity, _force, _density, _pressure);
+		_data.addParticle(_scale * v, _velocity, _force, _density, _pressure, point_type);
 	}
 }
 
@@ -134,7 +152,7 @@ void Emitter::fromFile(glm::vec3 const &origin, std::string const &path)
 	scale_back(points);
 	glm::vec3 center = centroid(points);
 	for (auto const &v: points) {
-		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure);
+		_data.addParticle(origin + _scale * v + _inflate * (v - center), _velocity, _force, _density, _pressure, point_type);
 	}
 }
 

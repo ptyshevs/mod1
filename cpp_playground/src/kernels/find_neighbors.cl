@@ -73,6 +73,10 @@ __kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particl
 	if (offset >= constants->n_particles)
 		return ;
 	t_particle p = particles[offset];
+	if (p.type == P_STATIC)
+		return ;
+	unsigned int dynamic_neigh_idx[MAX_NEIGHBORS];
+	unsigned int n_dynamic_neighbors = 0;
 	p.n_neighbors = 0;
 	#pragma unroll
 	for (unsigned int i = 0; i < MAX_NEIGHBORS; ++i) {
@@ -82,8 +86,8 @@ __kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particl
 	float dist;
 	#pragma unroll
 	for (int offset_idx = 0; offset_idx < 27; ++offset_idx){
-		if (p.n_neighbors >= MAX_NEIGHBORS)
-			break ;
+		// if (p.n_neighbors >= MAX_NEIGHBORS)
+		// 	break ;
 		__constant int *cell_offset = offsets[offset_idx];
 		float3 offset_pos = (float3)(p.pos.x + cell_offset[0], p.pos.y + cell_offset[1], p.pos.z + cell_offset[2]);
 		if (out_of_bound(offset_pos))
@@ -91,12 +95,23 @@ __kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particl
 		t_cell neigh_cell = hmap[hash(offset_pos)];
 		for (unsigned int j = 0, k = neigh_cell.n_inside; j < k; ++j) {
 			np_idx = neigh_cell.particles[j];
+			t_particle np = particles[np_idx];
 			if (offset != np_idx) {
-				dist = length(p.pos - particles[np_idx].pos);
-				if (dist < NEIGHBOR_RADIUS && p.n_neighbors < MAX_NEIGHBORS) {
-					p.neighbors[p.n_neighbors] = np_idx;
-					p.n_neighbors += 1;
-					if (p.n_neighbors >= MAX_NEIGHBORS) {
+				dist = length(p.pos - np.pos);
+				if (dist < NEIGHBOR_RADIUS) {
+					if (p.n_neighbors < MAX_NEIGHBORS) {
+						p.neighbors[p.n_neighbors] = np_idx;
+						if (np.type == P_DYNAMIC) {
+							dynamic_neigh_idx[n_dynamic_neighbors] = p.n_neighbors;
+							n_dynamic_neighbors += 1;
+						}
+						p.n_neighbors += 1;
+					}
+					else if (n_dynamic_neighbors > 0 && np.type == P_STATIC) {
+						p.neighbors[dynamic_neigh_idx[n_dynamic_neighbors - 1]] = np_idx;
+						n_dynamic_neighbors -= 1;
+					} else {
+					// if (p.n_neighbors >= MAX_NEIGHBORS) {
 						break ;
 					}
 				}

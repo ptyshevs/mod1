@@ -129,7 +129,7 @@ float3 bbox_collision(__global t_constants *constants, __global t_cp *control_po
 	float3 vel_normalized = vel / vel_mag;
 	float3 reflected = vel_normalized - (2 * dot(vel_normalized, normal) * normal);
 	float3 renormalized = reflected * vel_mag;
-	return renormalized - renormalized * RESTITUTION * fabs(dot(vel_normalized, normal));
+	return renormalized - renormalized * 0.9f * fabs(dot(vel_normalized, normal));
 }
 
 // step 2: accumulate forces from pressure and viscosity
@@ -139,6 +139,8 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 	if (offset >= constants->n_particles)
 		return ;
 	t_particle p = particles[offset];
+	if (p.type == P_STATIC)
+		return ;
 	float3 val = TIME_STEP * p.force;
 
 	// this fixes random explosions (hopefully)

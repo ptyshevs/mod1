@@ -17,4 +17,8 @@
 #define EMITER_BOUNDARIES 4
 #define EMITER_FLUSH 8
 
+#define P_DYNAMIC 1
+#define P_STATIC  2
+#define P_SOLID   4
+
 #endif

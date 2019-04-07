@@ -1,7 +1,7 @@
 
 #include "Particle.hpp"
 
-Particle::Particle()  : position(cl_float3()), velocity(cl_float3()), force(cl_float3()), density(0.0f), pressure(0.0f), n_neighbors(0) {};
+Particle::Particle()  : position(cl_float3()), velocity(cl_float3()), force(cl_float3()), density(0.0f), pressure(0.0f), type(P_DYNAMIC), n_neighbors(0) {};
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force) :
 		position({position.x, position.y, position.z}), velocity({velocity.x, velocity.y, velocity.z}),
@@ -12,10 +12,12 @@ Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const g
 };
 
 Particle::Particle(const glm::vec3 &position, const glm::vec3 &velocity, const glm::vec3 &force, float density,
-				   float pressure) : Particle(position, velocity, force)
+				   float pressure, unsigned int type) : Particle(position, velocity, force)
 {
 	this->density = density;
 	this->pressure = pressure;
+	this->type = type;
+	n_neighbors = 0;
 }
 
 void	Particle::show() const {
