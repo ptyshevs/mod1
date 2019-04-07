@@ -20,8 +20,6 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	w.hmap = hmap;
 	w.data = data;
 	w.emitter = emitter;
-	w.running = false;
-	w.emitting = false;
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->n_particles;

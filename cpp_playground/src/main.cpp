@@ -18,28 +18,25 @@
 #include <Water.hpp>
 #include "Emitter.hpp"
 
+
 int main(int ac, char *av[]) {
 	ControlPoints controlPoints;
+	bool running = true;
+	bool emitting = true;
+	std::string scene_path;
 
-	if (!inputIsGood(ac, av))
-		panic("File is not readable");
-	try {
-		controlPoints = readFile(av[1]);
-		controlPoints.prepare(true);
-		} catch (std::exception &e) {
-		panic(e.what());
-	}
+	ParticleSystemData data(MAX_PARTICLES);
+	Emitter emitter(data);
+	emitter.setScale(0.7);
+
+	parse_arguments(ac, av, &controlPoints, running, emitting, emitter);
 
 	auto core = sdl_gl_init();
 	auto map = generate_map(controlPoints);
-
-	ParticleSystemData data(MAX_PARTICLES);
 	data.hmap = &map;
-	Emitter emitter(data);
-	emitter.setScale(0.7);
-	emitter.setStep(0.25);
-//	emitter.setPointType(P_STATIC);
-	emitter.sphere(glm::vec3(-50, 17, 70), 2, 5);
+
+	//	emitter.setPointType(P_STATIC);
+//	emitter.sphere(glm::vec3(-50, 17, 70), 2, 5);
 //	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
 //	emitter.fromFile(glm::vec3(35, 3, 88), "res/ply/bun_zipper_res3.mod1");
 //	emitter.setViscosity(3);
@@ -60,14 +57,14 @@ int main(int ac, char *av[]) {
 //	emitter.cuboid(-5, 5, 0, 20, hf_sl - 7, hf_sl - 5);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
 	std::cout << "Num of particles=" << data.numOfParticles() << std::endl;
-	std::cout << "sizeof(Particle)=" << sizeof(Particle) << std::endl;
 	// right near the camera
 //	data.addParticle(glm::vec3(0,25, hf_sl - 2));
 //	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
 //	data.addParticle(glm::vec3(1,25, hf_sl - 2));
 
 	auto water = instance_water(&map, &data, &emitter);
-
+	water.running = running;
+	water.emitting = emitting;
 	water.solver = new ParticleSystemSolver(data);
 	auto camera = GLCamera();
 	bool quit = false;

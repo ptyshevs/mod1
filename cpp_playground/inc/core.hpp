@@ -17,6 +17,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "algo_defines.hpp"
 
+struct ControlPoints;
+struct Emitter;
+
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate
 #include <glm/glm.hpp>
@@ -30,8 +33,9 @@
 #include <regex>
 #include <cstring>
 // - Custom
-bool inputIsGood(int ac, char *av[]);
 std::vector<glm::vec3> readFile(char *filePath);
+void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, Emitter &emitter);
+
 
 // sdl_gl_init.cpp
 // OpenGL & SDL
@@ -74,6 +78,7 @@ void	deinit(SDLCore &core);
 // compileshaders.cpp
 char	*reader(const char *path);
 GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
+void	show_usage(void);
 void	panic(const std::string &message);
 
 // mapgen.cpp

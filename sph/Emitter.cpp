@@ -121,6 +121,9 @@ void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
 	}
 }
 
+/*
+ * Sphere is ... well, a sphere
+ */
 void Emitter::sphere(glm::vec3 origin, float width, float radius)
 {
 	for (float t = -M_PI; t < M_PI; t += _step) {
