@@ -52,7 +52,8 @@ public:
 
 	void	emit();
 	void 	prepare_emit(CLCore &core);
-	int		type; // rain, wave of underground
+	int		type; // rain, wave or boundaries
+	int		prev_type;
 	int 	pps; // particles per second
 	cl_mem  cl_emitter;
 	cl_mem  cl_vbo;

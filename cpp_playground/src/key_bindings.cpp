@@ -91,4 +91,9 @@ void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit)
 		water.emitter->pps = abs(water.emitter->pps - 100);
 	if (keystate[SDL_SCANCODE_R])
 		water.emitting = !water.emitting;
+	if (keystate[SDL_SCANCODE_F]) {
+		if (water.emitter->type != EMITER_FLUSH)
+			water.emitter->prev_type = water.emitter->type;
+		water.emitter->type = EMITER_FLUSH;
+	}
 }

@@ -21,6 +21,8 @@ void havaji(__global t_particle *particles, __global t_constants *constants);
 
 void boundaries(__global t_particle *particles, __global t_constants *constants);
 
+void flush(__global t_particle *particles, __global t_constants *constants);
+
 /*
 */
 
@@ -36,11 +38,15 @@ __kernel void emit_kernel(__global t_particle *particles,
 						  __global t_emiter *emiter,
 						  __global t_constants *constants)
 {
-	if (constants->n_particles >= MAX_PARTICLES)
-		return ;
+
 	const t_emiter _emiter = emiter[0];
 
+	if (_emiter.type == EMITER_FLUSH)
+		flush(particles, constants);
 
+	if (constants->n_particles >= MAX_PARTICLES)
+		return ;
+	
 	if (_emiter.type == EMITER_RAIN)
 		it_s_raining_man(particles, (size_t)_emiter.seed, constants);
 	else if (_emiter.type == EMITER_WAVE)
@@ -49,22 +55,36 @@ __kernel void emit_kernel(__global t_particle *particles,
 		boundaries(particles, constants);
 }
 
+void flush(__global t_particle *particles, __global t_constants *constants)
+{
+	unsigned int n = constants->n_particles;
+	t_particle p;
+	p.pos = (float3)(0, 0, 0);
+	p.vel = (float3)(0, 0, 0);
+	p.force = (float3)(0, 0, 0);
+	p.pressure = 0;
+	p.density = 0;
+	p.n_neighbors = 0;
+	for (unsigned int i = 0; i < n; ++i) {
+		particles[i] = p;
+	}
+	constants->n_particles = 0;
+}
+
 void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_constants *constants)
 {
-	for (size_t i = 0; i < RAIN_PPI; i++) {
-		float foo = ((float)(seed % sl)) - hf_sl;
-		float foo2 = ((float)(rand(seed) % sl)) - hf_sl;
+	float foo = ((float)(seed % sl)) - hf_sl;
+	float foo2 = ((float)(rand(seed) % sl)) - hf_sl;
 
-		size_t offset = to_address((float)foo,
-								(float)hf_hf_sl - 1,
-								(float)foo2);
-		t_particle p;
-		p.pos.x = foo;
-		p.pos.z = foo2;
-		p.pos.y = hf_hf_sl - 1;
-		particles[constants->n_particles] = p;
-		constants->n_particles += 1;
-	}
+	size_t offset = to_address((float)foo,
+							(float)hf_hf_sl - 1,
+							(float)foo2);
+	t_particle p;
+	p.pos.x = foo;
+	p.pos.z = foo2;
+	p.pos.y = hf_hf_sl - 1;
+	particles[constants->n_particles] = p;
+	constants->n_particles += 1;
 }
 
 void havaji(__global t_particle *particles, __global t_constants *constants)

@@ -137,9 +137,11 @@ Water::~Water()
 void 	Water::emit() {
 	static uint last_emit_time = SDL_GetTicks();
 
-	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emitter->pps)) {
+	if (SDL_TICKS_PASSED(SDL_GetTicks(), last_emit_time + emitter->pps) || emitter->type == EMITER_FLUSH) {
 		emitter->emit();
 		last_emit_time = SDL_GetTicks();
+		if (emitter->type == EMITER_FLUSH)
+			emitter->type = emitter->prev_type;
 	}
 }
 
