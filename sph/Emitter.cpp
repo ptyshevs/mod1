@@ -78,7 +78,7 @@ void	Emitter::cube(const glm::vec3 &origin, float side) {
 }
 
 /*
- * Axis-aligned wall
+ * Wall is a dense static cuboid
  */
 void Emitter::wall(float x_start, float x_end, float y_start, float y_end, float z_start, float z_end)
 {
@@ -89,6 +89,22 @@ void Emitter::wall(float x_start, float x_end, float y_start, float y_end, float
 	cuboid(x_start, x_end, y_start, y_end, z_start, z_end);
 	setStep(save_step);
 	setPointType(save_ptype);
+}
+
+/*
+ * Pillow is a static cilinder
+ */
+void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
+{
+	for (float angle = 0; angle < 2 * M_PI; angle += 0.1) {
+		for (float j = 0; j < width; j += _step) {
+			glm::vec3 pos(origin.x + (radius - j) * cos(angle), 0, origin.z + (radius - j) * sin(angle));
+			for (float i = 0; i < height; i += _step) {
+				pos.y = i;
+				_data.addParticle(pos, _velocity, _force, _density, _pressure, point_type);
+			}
+		}
+	}
 }
 
 void rescale(std::vector<glm::vec3> &points) {

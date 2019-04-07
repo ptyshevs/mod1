@@ -38,9 +38,13 @@ int main(int ac, char *av[]) {
 	Emitter emitter(data);
 	emitter.setScale(0.5);
 	emitter.setPointType(P_STATIC);
-	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
-	emitter.fromFile(glm::vec3(-25, 3, 70), "res/ply/bun_zipper_res4.mod1");
-	emitter.wall(-70, -69.5f, 1, 10, 10, 15);
+//	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
+//	emitter.fromFile(glm::vec3(-25, 3, 70), "res/ply/bun_zipper_res4.mod1");
+//	emitter.wall(-70, -69.5f, 1, 10, 10, 15);
+	emitter.pillow(glm::vec3(-75, 0, 70), 1, 3, 30);
+	emitter.pillow(glm::vec3(-75, 0, 50), 1, 3, 30);
+	emitter.pillow(glm::vec3(0, 0, 85), 1, 3, 30);
+	emitter.pillow(glm::vec3(0, 0, 94), 1, 3, 30);
 //	emitter.cube(glm::vec3(10, 40, 10), 10);
 //	emitter.cuboid(-10, 20, 47, 49, -10, 20);
 //	emitter.cube(glm::vec3(5, 40, 5), 5);

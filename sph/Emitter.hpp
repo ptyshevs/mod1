@@ -51,6 +51,7 @@ public:
 	void	fromFile(std::string const &path);
 	void	fromFile(glm::vec3 const &origin, std::string const &path);
 	void	wall(float x_start, float x_end, float y_start, float y_end, float z_start, float z_end);
+	void	pillow(glm::vec3 origin, float width=1, float radius=3, float height=20);
 
 	void	emit();
 	void 	prepare_emit(CLCore &core);
