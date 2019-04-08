@@ -35,6 +35,7 @@ struct Emitter;
 // - Custom
 std::vector<glm::vec3> readFile(char *filePath);
 void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, bool &offline, Emitter &emitter);
+void save_image(std::string &&dirname);
 
 
 // sdl_gl_init.cpp

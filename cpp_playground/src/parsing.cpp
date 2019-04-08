@@ -162,3 +162,18 @@ void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &
 			panic(std::string(av[i]) + " is not a valid command");
 	}
 }
+
+
+void save_image(std::string &&dirname) {
+	static int cnt = 0;
+	unsigned char pixels[4 * WINX * WINY];
+	glReadPixels(0, 0, WINX, WINY, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	std::stringstream stream;
+	stream << dirname << "/f" << std::setfill('0') << std::setw(8) << cnt << ".png";
+	unsigned int err = lodepng::encode(stream.str(), pixels, WINX, WINY);
+	if (err)
+		panic("Failed to save screenshot with error: " + std::string(lodepng_error_text(err)));
+	cnt++;
+	if (cnt > 0 && cnt % 50 == 0)
+		std::cout << cnt << " frames processed" << std::endl;
+}
