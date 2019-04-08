@@ -133,7 +133,7 @@ void parse_scene(Emitter &emitter, std::string const &scene_path) {
     }
 }
 
-void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, Emitter &emitter)
+void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, bool &offline, Emitter &emitter)
 {
 	if (ac == 1)
 		show_usage();
@@ -156,6 +156,8 @@ void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &
 			running = false;
 		else if (strcmp(av[i], "--no-emit") == 0)
 			emitting = false;
+		else if (strcmp(av[i], "--offline") == 0)
+			offline = true;
 		else
 			panic(std::string(av[i]) + " is not a valid command");
 	}

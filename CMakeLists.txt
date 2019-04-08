@@ -11,8 +11,8 @@ add_executable(mod1 ${MOD_SRC} ${SPH_SRC})
 
 add_subdirectory(cpp_playground/libs/libglm)
 
-add_library(lodepng STATIC IMPORTED)
-set_target_properties(lodepng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/cpp_playground/libs/liblodepng/libLodePNG.a)
+aux_source_directory(cpp_playground/libs/liblodepng LIBLODEPNG_SRC)
+add_library(lodepng STATIC ${LIBLODEPNG_SRC})
 
 add_subdirectory(cpp_playground/libs/libglew/src/build/cmake)
 target_link_libraries(mod1 glew glm "-framework OpenGL" "-framework SDL2" "-framework OpenCL" lodepng)

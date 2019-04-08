@@ -2,7 +2,7 @@
 
 void	show_usage(void)
 {
-	std::cout << "usage: ./mod1 file.mod1 [-s scene_path] --paused --no-emit" << std::endl;
+	std::cout << "usage: ./mod1 file.mod1 [-s scene_path] [--paused] [--no-emit] [--offline]" << std::endl;
 	exit(1);
 }
 

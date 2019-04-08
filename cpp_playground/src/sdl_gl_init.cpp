@@ -34,13 +34,16 @@ void	gl_version_info(void) {
     std::cout << "OpenGL version: " << major_version << "." << minor_version << std::endl; 
 }
 
-SDLCore	sdl_gl_init(void) {
+SDLCore	sdl_gl_init(bool offline) {
     SDLCore core = SDLCore();
 	assert(SDL_Init(SDL_INIT_VIDEO) == 0);
 	gl_attr_init();
+	unsigned int flags = SDL_WINDOW_OPENGL;
+	if (offline)
+		flags |= SDL_WINDOW_HIDDEN;
 	core.win = SDL_CreateWindow(WINNAME,SDL_WINDOWPOS_CENTERED,
 										SDL_WINDOWPOS_CENTERED,
-										WINX, WINY, SDL_WINDOW_OPENGL);
+										WINX, WINY, flags);
 	assert(core.win != NULL);
 	core.ctx = SDL_GL_CreateContext(core.win);
 	glViewport(0, 0, WINX, WINY);
@@ -51,8 +54,8 @@ SDLCore	sdl_gl_init(void) {
 	glClearColor(0.863, 0.863, 0.863, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(core.win);
-	gl_version_info();
-    return core;
+//	gl_version_info();
+	return core;
 }
 
 void	deinit(SDLCore &core) {

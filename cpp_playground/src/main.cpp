@@ -16,22 +16,38 @@
 #include <ControlPoints.hpp>
 #include <HeightMap.hpp>
 #include <Water.hpp>
+#include <sstream>
+#include <iomanip>
 #include "Emitter.hpp"
 
+void save_image(std::string &&dirname) {
+	static int cnt = 0;
+	unsigned char pixels[4 * WINX * WINY];
+	glReadPixels(0, 0, WINX, WINY, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	std::stringstream stream;
+	stream << dirname << "/f" << std::setfill('0') << std::setw(8) << cnt << ".png";
+	unsigned int err = lodepng::encode(stream.str(), pixels, WINX, WINY);
+	if (err)
+		panic("Failed to save screenshot with error: " + std::string(lodepng_error_text(err)));
+	cnt++;
+	if (cnt > 0 && cnt % 50 == 0)
+		std::cout << cnt << " frames processed" << std::endl;
+}
 
 int main(int ac, char *av[]) {
 	ControlPoints controlPoints;
 	bool running = true;
 	bool emitting = true;
+	bool offline = false;
 	std::string scene_path;
 
 	ParticleSystemData data(MAX_PARTICLES);
 	Emitter emitter(data);
 	emitter.setScale(0.7);
 
-	parse_arguments(ac, av, &controlPoints, running, emitting, emitter);
+	parse_arguments(ac, av, &controlPoints, running, emitting, offline, emitter);
 
-	auto core = sdl_gl_init();
+	auto core = sdl_gl_init(offline);
 	auto map = generate_map(controlPoints);
 	data.hmap = &map;
 
@@ -42,21 +58,8 @@ int main(int ac, char *av[]) {
 //	emitter.setViscosity(3);
 //	emitter.setId(1);
 //	emitter.fromFile(glm::vec3(-35, 3, 88), "res/ply/bun_zipper_res3.mod1");
-//	emitter.wall(-70, -69.5f, 1, 10, 10, 15);
-//	emitter.pillow(glm::vec3(-75, 0, 70), 1, 3, 30);
-//	emitter.pillow(glm::vec3(-75, 0, 50), 1, 3, 30);
-//	emitter.pillow(glm::vec3(0, 0, 85), 1, 3, 30);
-//	emitter.pillow(glm::vec3(0, 0, 94), 1, 3, 30);
-//	emitter.cube(glm::vec3(10, 40, 10), 10);
-//	emitter.cuboid(-10, 20, 47, 49, -10, 20);
-//	emitter.cube(glm::vec3(5, 40, 5), 5);
-//	emitter.cube(glm::vec3(10, 40, 10), 5);
-//	emitter.cube(glm::vec3(20, 40, 20), 5);
-//	emitter.cube(glm::vec3(30, 40, 30), 5);
-//	emitter.cube(glm::vec3(0, 1, hf_sl - 5), 3);
-//	emitter.cuboid(-5, 5, 0, 20, hf_sl - 7, hf_sl - 5);
 //	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
-	std::cout << "Num of particles=" << data.numOfParticles() << std::endl;
+	std::cout << "Num of particles = " << data.numOfParticles() << std::endl;
 	// right near the camera
 //	data.addParticle(glm::vec3(0,25, hf_sl - 2));
 //	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
@@ -88,6 +91,8 @@ int main(int ac, char *av[]) {
 		water.draw(camera.vp(), GL_POINTS);
 		camera.frameEnd();
 
+		if (offline)
+			save_image(std::string("render"));
 		SDL_GL_SwapWindow(core.win);
 	} while (!(core.event.type == SDL_QUIT || quit));
 	deinit(core);

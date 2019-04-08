@@ -34,7 +34,7 @@ struct Emitter;
 #include <cstring>
 // - Custom
 std::vector<glm::vec3> readFile(char *filePath);
-void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, Emitter &emitter);
+void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, bool &offline, Emitter &emitter);
 
 
 // sdl_gl_init.cpp
@@ -72,7 +72,7 @@ struct GLItem  {
 	void	no_err(int err, int line) noexcept(false);
 };
 
-SDLCore	sdl_gl_init(void);
+SDLCore	sdl_gl_init(bool offline);
 void	deinit(SDLCore &core);
 
 // compileshaders.cpp

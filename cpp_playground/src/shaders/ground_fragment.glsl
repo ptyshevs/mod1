@@ -21,5 +21,5 @@ void main() {
     vec4 diffuse = max(dot(light_ray, world_normal), 0.0f) * texture(rough, uv);
     vec4 ambient = texture(albedo, uv);
 
-    color = mix(texture(albedo, uv) * diffuse, ambient, 0.8f);
+    color = mix(texture(albedo, uv) * diffuse, ambient, 1.0f);
 }
