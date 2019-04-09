@@ -252,3 +252,22 @@ void Emitter::emit()
     if (emit_calls % 300 == 0 && emit_calls < MAX_PARTICLES)
     	std::cout << "Approx. # of particles: " << emit_calls << std::endl;
 }
+
+void Emitter::cache_solid_neighbors()
+{
+	for (auto &particle: _data._particles) {
+		if (particle.type == P_SOLID) {
+			for (unsigned int i = 0; i < _data._particles.size(); ++i) {
+				auto const &p = _data._particles[i];
+				if (&p != &particle) {
+					if (glm::length(glm::vec3(p.position.x, p.position.y, p.position.z) - glm::vec3(particle.position.x,
+							particle.position.y, particle.position.z)) < 1500.0f) {
+						if (particle.n_neighbors < MAX_NEIGHBORS) {
+							particle.neighbors_idx[particle.n_neighbors++] = i;
+						}
+					}
+				}
+			}
+		}
+	}
+}

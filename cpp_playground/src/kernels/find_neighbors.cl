@@ -73,7 +73,7 @@ __kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particl
 	if (offset >= constants->n_particles)
 		return ;
 	t_particle p = particles[offset];
-	if (p.type == P_STATIC)
+	if (p.type != P_DYNAMIC)
 		return ;
 	unsigned int dynamic_neigh_idx[MAX_NEIGHBORS];
 	unsigned int n_dynamic_neighbors = 0;

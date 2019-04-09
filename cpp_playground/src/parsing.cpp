@@ -134,12 +134,13 @@ void parse_scene(Emitter &emitter, std::string const &scene_path) {
 					try
 					{
 						emitter.fromFile(origin, obj);
+						emitter.cache_solid_neighbors();
 					} catch (std::exception &e)
 					{
 						panic("Tried to read mod1 from ply file. Failed miserably");
 					}
 				} else
-					panic("object name is unrecognized: " + obj);
+					panic("Vertex object shouldn't have any parameters specified: " + obj);
 			}
 			line = matches.suffix();
 		}
