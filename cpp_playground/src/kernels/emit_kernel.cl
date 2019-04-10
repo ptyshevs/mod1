@@ -79,6 +79,7 @@ void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_co
 	p.pos.x = foo;
 	p.pos.z = foo2;
 	p.pos.y = hf_hf_sl - 1;
+	p.vel.y = -1;
 	particles[constants->n_particles] = p;
 	constants->n_particles += 1;
 }
