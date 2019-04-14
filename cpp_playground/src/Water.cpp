@@ -179,3 +179,25 @@ void Water::update_particles()
 	clFinish(cl.queue);
 	++n_iter;
 }
+
+void Water::draw(const glm::mat4 &view, const glm::mat4 &projection)
+{
+	glUseProgram(depth.program);
+	glBindFramebuffer(GL_FRAMEBUFFER, depth.fbo);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+	depth.bindVBO(vbo, 0);
+	depth.setMatrix(view, "view");
+	depth.setMatrix(projection, "projection");
+
+	glDrawArrays(GL_POINTS, 0, this->idx_num);
+
+	glUseProgram(final.program);
+	glBindFramebuffer(GL_FRAMEBUFFER, final.fbo);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depth.tex);
+	GLint depthTex = glGetUniformLocation(final.program, "depthTex");
+	glUniform1i(depthTex, 0);
+}

@@ -23,7 +23,8 @@ public:
 
 	virtual ~WaterShader();
 
-
+	void setMatrix(const glm::mat4 &m, const GLchar *name);
+	void bindVBO(GLuint &vbo, size_t offset);
 };
 
 #endif //PROJECT_SHADER_HPP

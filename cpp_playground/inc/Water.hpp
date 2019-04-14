@@ -19,6 +19,7 @@
 #include <ParticleSystemData.hpp>
 #include <ParticleSystemSolver.hpp>
 #include <Emitter.hpp>
+#include <Shader.hpp>
 
 struct WaterConstants {
 	unsigned int	n_control_points;
@@ -53,7 +54,9 @@ public:
 	virtual					~Water() override;
 	void					update_particles();
 	void					emit();
-	void					draw(const glm::mat4 &vp);
+	void					draw(const glm::mat4 &view, const glm::mat4 &projection);
+	WaterShader				depth;
+	WaterShader				final;
 };
 
 

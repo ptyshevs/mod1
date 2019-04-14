@@ -74,7 +74,7 @@ int main(int ac, char *av[]) {
 
 		camera.frameStart();
 		map.draw(camera.vp(), GL_TRIANGLES);
-		water.draw(camera.vp(), GL_POINTS);
+		water.draw(camera.view(), camera.projection());
 		camera.frameEnd();
 
 		if (offline)
