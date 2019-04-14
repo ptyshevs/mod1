@@ -53,6 +53,7 @@ public:
 	virtual					~Water() override;
 	void					update_particles();
 	void					emit();
+	void					draw(const glm::mat4 &vp);
 };
 
 

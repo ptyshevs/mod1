@@ -69,7 +69,7 @@ struct GLItem  {
     glm::mat4 model;
     std::function<void (const glm::mat4 &vp)> fill_uniforms;
 	virtual ~GLItem() = default;
-	void	draw(const glm::mat4 &vp, GLenum type);
+	virtual void	draw(const glm::mat4 &vp, GLenum type);
 	void	no_err(int err, int line) noexcept(false);
 };
 

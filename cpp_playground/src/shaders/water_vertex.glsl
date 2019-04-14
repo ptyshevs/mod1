@@ -33,4 +33,5 @@ void main() {
     ptype = float(in_ptype);
     id = float(in_id);
     n_neighbors = float(in_n_neighbors);
+    gl_PointSize = clamp(1/gl_Position.z * 500, 2, 15);
 }

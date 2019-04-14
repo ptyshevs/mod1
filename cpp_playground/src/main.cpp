@@ -37,7 +37,6 @@ int main(int ac, char *av[]) {
 	auto core = sdl_gl_init(offline);
 	auto map = generate_map(controlPoints);
 	data.hmap = &map;
-
 	//	emitter.setPointType(P_STATIC);
 //	emitter.sphere(glm::vec3(-50, 17, 70), 2, 5);
 //	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
@@ -61,7 +60,7 @@ int main(int ac, char *av[]) {
 	glPointSize(10);
 	glEnable (GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_PROGRAM_POINT_SIZE);
 	do
 	{
 		// Event handle
