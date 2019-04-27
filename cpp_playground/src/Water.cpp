@@ -35,6 +35,8 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	w.model = glm::mat4(1.0f);
 	w.shader_program = compile_shaders("src/shaders/water_vertex.glsl",
 										"src/shaders/water_fragment.glsl");
+	w.static_program = compile_shaders("src/shaders/static_particles.vert",
+										"src/shaders/static_particles.frag");
 	w.fill_uniforms = [&](const glm::mat4 &vp) {
 		auto mvp_id = glGetUniformLocation(w.shader_program, "MVP");
 		auto mvp = vp * w.model;
@@ -177,4 +179,24 @@ void Water::update_particles()
 
 	clFinish(cl.queue);
 	++n_iter;
+}
+
+/*
+ * Draw is divided into two steps:
+ * 1) Draw dynamic particles with screen-spaced rendering
+ * 2) Draw static particles with separate shader
+ */
+void Water::draw(const glm::mat4 &vp, GLenum type)
+{
+	// draw dynamic particles
+	glUseProgram(this->shader_program);
+	this->fill_uniforms(vp);
+	glBindVertexArray(vao);
+	glDrawArrays(GL_POINTS, 0, this->idx_num);
+
+	// 2) draw static particles
+//	glUseProgram(this->static_program);
+//	this->fill_uniforms(vp);
+//	glDrawArrays(GL_POINTS, 0, this->idx_num);
+	glBindVertexArray(0);
 }

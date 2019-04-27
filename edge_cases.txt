@@ -1,1 +1,0 @@
-* two points have same x,y coords.

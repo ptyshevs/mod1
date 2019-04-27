@@ -36,6 +36,8 @@ struct Water: public GLItem
 public:
 	explicit Water();
 
+	GLuint					static_program;
+
 	CLWaterCore				cl;
 	cl_mem					cl_cp;
 	cl_mem					cl_hmap;
@@ -53,6 +55,7 @@ public:
 	virtual					~Water() override;
 	void					update_particles();
 	void					emit();
+	void					draw(const glm::mat4 &vp, GLenum type) override;
 };
 
 

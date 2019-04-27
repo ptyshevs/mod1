@@ -23,10 +23,10 @@ out vec4 color;
 #define P_STATIC  2
 #define P_SOLID   4 // not used currently
 
+
 void main() {
-//  this hurts performance significantly
-//    if (ptype != P_DYNAMIC)
-//        discard ;
+    if (ptype == P_DYNAMIC)
+        discard ;
     vec3 N;
     N.xy = gl_PointCoord* 2.0 - vec2(1.0);
     float mag = dot(N.xy, N.xy);
@@ -42,9 +42,5 @@ void main() {
     vec4 S = light_specular*mat_specular* spec;
     float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
     float v = float(viscosity);
-    color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 1.0f) * diffuse + S;
-//    if (id == 0)
-//        color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
-//    else
-//        color = vec4(0.5f + vel_mag, 0.2f + vel_mag, 0.2f + vel_mag, 0.5f) * diffuse + S;
+    color = vec4(0.0f, 0.8f, 0.5f, 1.0f) * diffuse + S;
 }
