@@ -131,7 +131,7 @@ void parse_scene(Emitter &emitter, std::string const &scene_path) {
 			}
 			else if (obj == "sphere") {
 				if (properties.size() == 1)
-					emitter.sphere(origin, 1, properties[0]);
+					emitter.sphere(origin, properties[0]);
 				else
 					panic("Invalid amount of options for sphere, should be 1: radius");
 			}

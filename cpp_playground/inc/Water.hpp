@@ -17,7 +17,6 @@
 #include <core.hpp>
 #include <HeightMap.hpp>
 #include <ParticleSystemData.hpp>
-#include <ParticleSystemSolver.hpp>
 #include <Emitter.hpp>
 
 struct WaterConstants {
@@ -36,6 +35,7 @@ struct Water: public GLItem
 public:
 	explicit Water();
 
+	WaterConstants			constants;
 	GLuint					static_program;
 
 	CLWaterCore				cl;
@@ -43,22 +43,33 @@ public:
 	cl_mem					cl_hmap;
 	cl_mem					cl_vbo; // particles
 	cl_mem					cl_constants;
-	WaterConstants			constants;
 
 	HeightMap				*hmap;
 	ParticleSystemData		*data;
-	ParticleSystemSolver	*solver;
-	std::vector<glm::vec3>	indices;
+
 	bool					running;
 	bool					emitting;
 	Emitter					*emitter;
-	virtual					~Water() override;
+
+	~Water() override;
+	/*
+	 * simulation step update
+	 */
 	void					update_particles();
+	/*
+	 * Main emit routine
+	 */
 	void					emit();
+	/*
+	 * Overridden function to render water
+	 */
 	void					draw(const glm::mat4 &vp, GLenum type) override;
 };
 
-
+/*
+ * Main routine to instantiate Water object properly. It also set-ups all necessary
+ * fields for GPU simulation and rendering
+ */
 Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter);
 
 #endif

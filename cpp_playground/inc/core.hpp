@@ -18,7 +18,7 @@
 #include "algo_defines.hpp"
 
 struct ControlPoints;
-struct Emitter;
+class Emitter;
 
 // Include all GLM core / GLSL features & extensions
 // vec2, vec3, mat4, radians, perspective, translate, rotate

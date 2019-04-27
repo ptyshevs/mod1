@@ -1,7 +1,6 @@
 #include "simulation.hpp"
 
 __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
-// pow(K_RADIUS, 9)
 __constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
 __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 

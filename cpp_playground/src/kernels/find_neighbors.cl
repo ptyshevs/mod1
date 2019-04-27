@@ -1,7 +1,6 @@
 #include "simulation.hpp"
 
 __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
-// pow(K_RADIUS, 9)
 __constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
 __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 __constant int offsets[27][3] = {
@@ -111,7 +110,6 @@ __kernel void find_neighbors(__global t_cell *hmap, __global t_particle *particl
 						p.neighbors[dynamic_neigh_idx[n_dynamic_neighbors - 1]] = np_idx;
 						n_dynamic_neighbors -= 1;
 					} else {
-					// if (p.n_neighbors >= MAX_NEIGHBORS) {
 						break ;
 					}
 				}

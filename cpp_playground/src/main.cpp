@@ -42,7 +42,6 @@ int main(int ac, char *av[]) {
 	auto water = instance_water(&map, &data, &emitter);
 	water.running = running;
 	water.emitting = emitting;
-	water.solver = new ParticleSystemSolver(data);
 	auto camera = GLCamera();
 	bool quit = false;
 

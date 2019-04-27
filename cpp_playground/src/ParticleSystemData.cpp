@@ -184,6 +184,8 @@ void	ParticleSystemData::update_densities() {
 }
 
 void 	ParticleSystemData::compute_pressure(bool clamp_negative) {
+	(void)clamp_negative;
+	(void)offsets;
 //	for (auto &p: _particles) {
 //		p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
 //		if (clamp_negative && p.pressure < 0)

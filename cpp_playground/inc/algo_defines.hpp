@@ -57,8 +57,8 @@
 /*
  * Type of particle object
  */
-#define P_DYNAMIC 1
-#define P_STATIC  2
+#define P_DYNAMIC 1 // Dynamic particle - moves within space freely
+#define P_STATIC  2 // Static particle - contraint to the initial position
 #define P_SOLID   4 // not used currently
 
 #endif

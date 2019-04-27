@@ -56,17 +56,17 @@ public:
 	void	fromFile(glm::vec3 const &origin, std::string const &path);
 	void	wall(float x_start, float x_end, float y_start, float y_end, float z_start, float z_end);
 	void	pillow(glm::vec3 origin, float width=1, float radius=3, float height=20);
-	void	sphere(glm::vec3 origin, float width=1, float radius=3);
+	void	sphere(glm::vec3 origin, float radius=3);
 
 	void	emit();
 	void 	prepare_emit(CLCore &core);
 	unsigned int point_type;
-	int		type; // rain, wave or boundaries
-	int		prev_type;
-	int 	pps; // particles per second
-	cl_mem  cl_emitter;
-	cl_mem  cl_vbo;
-	cl_mem  cl_constants;
+	int		type{}; // rain, wave or boundaries
+	int		prev_type{};
+	int 	pps{}; // particles per second
+	cl_mem  cl_emitter{};
+	cl_mem  cl_vbo{};
+	cl_mem  cl_constants{};
 	};
 
 #endif

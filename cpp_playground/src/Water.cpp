@@ -119,7 +119,7 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	return (w);
 }
 
-Water::Water() : hmap(nullptr), solver(nullptr)
+Water::Water() : hmap(nullptr)
 {
 }
 
@@ -188,6 +188,7 @@ void Water::update_particles()
  */
 void Water::draw(const glm::mat4 &vp, GLenum type)
 {
+	(void)type;
 	// draw dynamic particles
 	glUseProgram(this->shader_program);
 	this->fill_uniforms(vp);

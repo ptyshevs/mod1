@@ -1,7 +1,6 @@
 #include "simulation.hpp"
 
 __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
-// pow(K_RADIUS, 9)
 __constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
 __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 
@@ -46,7 +45,7 @@ __kernel void sim_update(__global t_cell *hmap, __global t_particle *particles, 
 		density_accum += kernel_weight(dist);
 	}
 	if (p.type == P_STATIC)
-		p.density += 100000;
+		p.density += 100000;  // to push avay dynamic partics from the static one
 	p.density = PARTICLE_MASS * (density_accum + kernel_weight(0));
 	p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
 	p.force = PARTICLE_MASS * gravity - DRAG_COEF * p.vel;

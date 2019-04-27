@@ -12,9 +12,9 @@
 
 #include "Emitter.hpp"
 
-Emitter::Emitter(ParticleSystemData &data) : _data(data),
+Emitter::Emitter(ParticleSystemData &data) : CLCore(), _data(data),
 	_velocity(glm::vec3(0.0f)), _force(glm::vec3(0.0f)), _density(0.0f), _pressure(0.0f), _viscosity(VISCOSITY),
-	_step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC), _id(0)
+	_id(0), _step(0.5f), _scale(0.3f), _inflate(1.4f), point_type(P_DYNAMIC)
 {
 }
 
@@ -124,7 +124,7 @@ void Emitter::pillow(glm::vec3 origin, float width, float radius, float height)
 /*
  * Sphere is ... well, a sphere
  */
-void Emitter::sphere(glm::vec3 origin, float width, float radius)
+void Emitter::sphere(glm::vec3 origin, float radius)
 {
 	for (float t = -M_PI; t < M_PI; t += _step) {
 		for (float p = -M_PI; p < M_PI; p += _step) {

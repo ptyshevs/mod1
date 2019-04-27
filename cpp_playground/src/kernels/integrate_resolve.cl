@@ -1,7 +1,6 @@
 #include "simulation.hpp"
 
 __constant float3 gravity = (float3)(0.0f, -9.81f, 0.0f);
-// pow(K_RADIUS, 9)
 __constant float k_const = 315.0f / (64.0f * M_PI * 38.443359375);
 __constant float k_dconst = 45.0f / (M_PI * 11.390625);
 
@@ -158,9 +157,6 @@ __kernel void integrate_resolve(__global t_constants *constants, __global t_cp *
 		p.vel.x = new_vel.x;
 		p.vel.y = new_vel.y;
 		p.vel.z = new_vel.z;
-		// p.vel.x *= -DAMPING;
-		// p.vel.y *= -DAMPING;
-		// p.vel.z *= -DAMPING;
 	}
 	// No boundary crossing, maybe there's a surface collision?
 	float h = surface_height(constants, control_points, p.pos);
