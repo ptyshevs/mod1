@@ -1,7 +1,27 @@
 # mod1: Dynamic Fluid simulation
 
-This repo contains real-time water simulation program with various water emission
-scenarios.
+Real-time water simulation program with various water emission scenarios and
+complex surface collision using inverse-distance weighting interpolation.
+
+Simulation was written in C++ with vizualization part taken by OpenGL, but was
+later rewritten from scratch to happen completely on GPU.
+
+## Tutorial structure
+
+Part 1. Introduction and theory
+
+Part 2. Surface Interpolation
+
+Part 3. Neighbor search
+
+Part 4. Water simulation using SPH
+
+## How to install
+
+
+## How to use
+
+
 
 ## References
 
