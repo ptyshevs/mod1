@@ -17,17 +17,20 @@
 #include <ControlPoints.hpp>
 #include <unordered_set>
 
+/*
+ * Height map is a pseudo-3D data structure containing surface height at every point on
+ * a rectangular grid. It uses hashing for accessing individual cells
+ */
 class HeightMap: public GLItem {
 private:
 	float	_dx(const glm::vec3 &grid_position);
 	float	_dz(const glm::vec3 &grid_position);
 public:
-	explicit HeightMap(const ControlPoints &cpoints) : _cpoints(cpoints), hmap(sl * sl * (sl / 4), Cell()) {};
-	const ControlPoints &_cpoints;
+	const ControlPoints	&_cpoints;
 	std::vector<Cell>	hmap;
-	std::unordered_set<size_t> nempty_cells;
 
-	void show() const;
+	explicit		HeightMap(const ControlPoints &cpoints);
+	void		show() const;
 	ssize_t		hash(int i, int j, int k) const;
 	ssize_t		hash(glm::vec3 xyz) const;
 	Cell		&address(int i, int j, int k);
@@ -45,6 +48,11 @@ public:
 //	Cell		&find_surface(glm::vec3 &position const);
 };
 
+/*
+ * Generate HeightMap from a set of control points. This is the main routine
+ * that should be used for this purpose, as it also creates VBO and textures for
+ * further simulation and rendering purposes
+ */
 HeightMap generate_map(const ControlPoints &control_points);
 
 #endif

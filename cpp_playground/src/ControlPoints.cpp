@@ -108,10 +108,6 @@ void 	ControlPoints::_add_borders()
 	}
 }
 
-/*
-** @brief Rescale control points and add border optionally
-**
-*/
 
 void	ControlPoints::prepare(bool add_borders)
 {

@@ -15,7 +15,7 @@
 #define EMITTER_HPP
 
 #include "ParticleSystemData.hpp"
-
+#include <parsing.hpp>
 #include <core.hpp>
 #include <stdlib.h>
 #include <time.h>

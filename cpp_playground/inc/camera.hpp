@@ -14,6 +14,9 @@
 # define CAMERA_HPP
 #include <core.hpp>
 
+/*
+ * Camera object
+ */
 struct GLCamera {
     glm::vec3 pos;
     glm::vec3 front;

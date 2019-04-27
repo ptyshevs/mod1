@@ -119,24 +119,8 @@ HeightMap generate_map(const ControlPoints &control_points) {
 	// Generate triangulated indices for mesh opt rendering
 	std::vector<glm::ivec3> map_render_indices = generate_triangulated_mesh_indices();
 
-	// Interpolate stuff
+	// Interpolate every grid point
 	interpolate_using_control_points(control_points._arr, map);
-
-	// Remap interpolated map on height map
-//	for (size_t i = 0; i < sl; i++)
-//	{
-//		for (size_t j = 0; j < hf_sl / 2; j++)
-//		{
-//			for (size_t k = 0; k < sl; k++)
-//			{
-//				auto &point = map[i * sl + k];
-//				heightMap.hmap.emplace_back(glm::vec3((float)i - (int)hf_sl, (float)j, (float)k - (int)hf_sl),
-//								  (float)j <= point.y,
-//								  0.0f);
-//			}
-//		}
-//	}
-	// Create object suitable for rendering
 
 	heightMap.model = glm::mat4(1.0f);
 	heightMap.idx_num = map_render_indices.size() * 3;

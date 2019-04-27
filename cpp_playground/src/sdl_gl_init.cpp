@@ -13,7 +13,7 @@
 #include <core.hpp>
 
 void	gl_attr_init(void) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
 						SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -47,7 +47,10 @@ SDLCore	sdl_gl_init(bool offline) {
 	assert(core.win != NULL);
 	core.ctx = SDL_GL_CreateContext(core.win);
 	glViewport(0, 0, WINX, WINY);
+	glEnable (GL_BLEND);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
+	glPointSize(10);
 	glewExperimental = 1;
 	glewInit();
 	SDL_GL_SetSwapInterval(1);

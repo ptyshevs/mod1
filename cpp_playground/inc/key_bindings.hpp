@@ -11,13 +11,16 @@
 /* ************************************************************************** */
 
 
-#ifndef KEY_BINDIGNS_HPP
-#define KEY_BINDIGNS_HPP
+#ifndef KEY_BINDINGS_HPP
+#define KEY_BINDINGS_HPP
 
 #include <core.hpp>
 #include <camera.hpp>
 #include <Water.hpp>
 
+/*
+ * Process key press event on the SDL event queue
+ */
 void	process_input(GLCamera &camera, GLItem &map,  Water &water, bool *quit);
 
 

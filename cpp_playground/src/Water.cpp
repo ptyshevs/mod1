@@ -154,7 +154,6 @@ void Water::update_particles()
 	static size_t global_work_size = MAX_PARTICLES;
 	static size_t n_iter = 0;
 	int err;
-///////////////////////////////////////////////////////////////////////////////
 	glFinish();
 
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
@@ -162,7 +161,7 @@ void Water::update_particles()
 	// Emit some water
 	if (emitting)
 		emit();
-	if (n_iter % UPDATE_NEIGHBORS_EVERY_N_ITER == 0) {
+	if (n_iter % UPDATE_NEIGHBORS_EVERY_N_ITER == 0) {  // update neighbors
 		err = clEnqueueNDRangeKernel(cl.queue, cl.kernel, 1, NULL, &global_neighbor_caching_jobs, NULL, 0, NULL, NULL);
 		err |= clEnqueueNDRangeKernel(cl.queue, cl.neighborCaching, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 		err |= clEnqueueNDRangeKernel(cl.queue, cl.findNeighbors, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);

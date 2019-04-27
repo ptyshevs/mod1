@@ -12,19 +12,19 @@
 
 #include <HeightMap.hpp>
 
+HeightMap::HeightMap(const ControlPoints &cpoints)  : _cpoints(cpoints), hmap(sl * sl * (sl / 4), Cell()) {}
+
 void	HeightMap::show() const
 {
 	for (int i = 0; i < sl; i++)
 	{
 		for (int j = 0; j < sl; j++)
 		{
-			for (int k = 0; k < sl; k++)
+			for (int k = 0; k < hf_sl; k++)
 			{
-//				Cell c= hmap[hash(i, j, k)];
-//
-//				std::cout << "C [" << glm::to_string(c.pos);
-//				std::cout << "] contains " << c.n_inside << "elements";
-//				std::cout << " is_solid: " << c.is_solid << std::endl;
+				size_t h = hash(i, j, k);
+				Cell c= hmap[h];
+				std::cout << "C[" << h << "]:" << c.n_inside << "particles";
 			}
 		}
 	}
@@ -113,11 +113,17 @@ glm::vec3 HeightMap::normal(const glm::vec3 &position)
 	return (normed_normal);
 }
 
+/*
+ * partial derivative along x axis
+ */
 float HeightMap::_dx(const glm::vec3 &pos)
 {
 	return (interpolate(pos.x + 0.5f, pos.z) - interpolate(pos.x - 0.5f, pos.z));
 }
 
+/*
+ * partial derivative along y axis
+ */
 float HeightMap::_dz(const glm::vec3 &pos)
 {
 	return (interpolate(pos.x, pos.z + 0.5f) - interpolate(pos.x, pos.z - 0.5f));

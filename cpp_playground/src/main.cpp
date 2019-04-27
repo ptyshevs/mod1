@@ -19,6 +19,7 @@
 #include <sstream>
 #include <iomanip>
 #include "Emitter.hpp"
+#include <parsing.hpp>
 
 
 int main(int ac, char *av[]) {
@@ -26,7 +27,6 @@ int main(int ac, char *av[]) {
 	bool running = true;
 	bool emitting = true;
 	bool offline = false;
-	std::string scene_path;
 
 	ParticleSystemData data(MAX_PARTICLES);
 	Emitter emitter(data);
@@ -37,20 +37,7 @@ int main(int ac, char *av[]) {
 	auto core = sdl_gl_init(offline);
 	auto map = generate_map(controlPoints);
 	data.hmap = &map;
-
-	//	emitter.setPointType(P_STATIC);
-//	emitter.sphere(glm::vec3(-50, 17, 70), 2, 5);
-//	emitter.fromFile(glm::vec3(-50, 11, -70), "res/ply/bun_zipper.mod1");
-//	emitter.fromFile(glm::vec3(35, 3, 88), "res/ply/bun_zipper_res3.mod1");
-//	emitter.setViscosity(3);
-//	emitter.setId(1);
-//	emitter.fromFile(glm::vec3(-35, 3, 88), "res/ply/bun_zipper_res3.mod1");
-//	emitter.cube(0.5,5, 7, 35, 49, 24, 25);
-	std::cout << "Num of particles = " << data.numOfParticles() << std::endl;
-	// right near the camera
-//	data.addParticle(glm::vec3(0,25, hf_sl - 2));
-//	data.addParticle(glm::vec3(0.5,25, hf_sl - 2));
-//	data.addParticle(glm::vec3(1,25, hf_sl - 2));
+	std::cout << "Initial # of particles = " << data.numOfParticles() << std::endl;
 
 	auto water = instance_water(&map, &data, &emitter);
 	water.running = running;
@@ -58,9 +45,6 @@ int main(int ac, char *av[]) {
 	water.solver = new ParticleSystemSolver(data);
 	auto camera = GLCamera();
 	bool quit = false;
-	glPointSize(10);
-	glEnable (GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
 
 	do
 	{

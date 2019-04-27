@@ -32,10 +32,7 @@ struct Emitter;
 #include <stdexcept>
 #include <regex>
 #include <cstring>
-// - Custom
-std::vector<glm::vec3> readFile(char *filePath);
-void parse_arguments(int ac, char **av, ControlPoints *cp, bool &running, bool &emitting, bool &offline, Emitter &emitter);
-void save_image(std::string &&dirname);
+
 
 
 // sdl_gl_init.cpp
@@ -57,17 +54,17 @@ struct SDLCore {
 };
 
 struct GLItem  {
-    GLuint vao;
-    GLuint vbo;
-    GLuint ibo;
-    GLuint tex;
+	GLuint vao;
+	GLuint vbo;
+	GLuint ibo;
+	GLuint tex;
 	GLuint tex_n;
 	GLuint tex_ao;
 	GLuint tex_r;
-    GLsizei idx_num;
-    GLuint shader_program;
-    glm::mat4 model;
-    std::function<void (const glm::mat4 &vp)> fill_uniforms;
+	GLsizei idx_num;
+	GLuint shader_program;
+	glm::mat4 model;
+	std::function<void (const glm::mat4 &vp)> fill_uniforms;
 	virtual ~GLItem() = default;
 	void	draw(const glm::mat4 &vp, GLenum type);
 	void	no_err(int err, int line) noexcept(false);
@@ -79,8 +76,7 @@ void	deinit(SDLCore &core);
 // compileshaders.cpp
 char	*reader(const char *path);
 GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
-void	show_usage(void);
-void	panic(const std::string &message);
+
 
 // mapgen.cpp
 
@@ -91,13 +87,23 @@ void	panic(const std::string &message);
 #include <Particle.hpp>
 
 struct CLCore {
-    cl_device_id        device;
-    cl_context          context;
-    cl_command_queue    queue;
-    cl_program          program;
-    cl_kernel           kernel;
+	cl_device_id        device;
+	cl_context          context;
+	cl_command_queue    queue;
+	cl_program          program;
+	cl_kernel           kernel;
 };
 
+/*
+ * Water simulation on GPU consists of the several steps:
+ * 1) Cleaning cache from previous iteration using default CLCore kernel
+ * 2) Particles caching into grid
+ * 3) Neighbor search for each particle
+ * 4) Simulation update with density and pressure estimation and external forces
+ *    application
+ * 5) Force accumulation resulting from negative pressure gradient and viscosity
+ * 6) Collision resolution and integration
+ */
 struct CLWaterCore: CLCore {
 	// kernel is used for neighbors search and density/pressure update
 	cl_kernel           accumForces;
@@ -112,17 +118,6 @@ struct CLWaterCore: CLCore {
 	cl_program          findNeighborsProgram;
 };
 
-struct CLGLDoubleBufferedItem: GLItem {
-	// CL ctx, queue, kernel
-	CLCore cl;
-	// GL second vbo buffer
-	GLuint vbo2;
-	// CL shared vbo's
-	cl_mem cl_vbo;
-	cl_mem cl_vbo2;
-	// Determine buffer that be next
-	bool state = false;
-};
 
 struct Cell
 {

@@ -250,5 +250,5 @@ void Emitter::emit()
     }
     emit_calls++;
     if (emit_calls % 300 == 0 && emit_calls < MAX_PARTICLES)
-    	std::cout << "Approx. # of particles: " << emit_calls << std::endl;
+    	std::cout << "# of emission calls: " << emit_calls << std::endl;
 }
