@@ -234,8 +234,8 @@ clean:
 	@$(RM) -r bin/
 
 distclean: clean
-	@find . -name \*~ | xargs @$(RM)
-	@find . -name .\*.sw\? | xargs @$(RM)
+	# @find . -name \*~ | xargs @$(RM)
+	# @find . -name .\*.sw\? | xargs @$(RM)
 
 # Distributions
 

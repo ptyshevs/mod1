@@ -21,8 +21,42 @@
 #include "Emitter.hpp"
 #include <parsing.hpp>
 
+bool interop_enabled(bool verbose) {
+	char data[2048];
+
+	cl_platform_id platforms_available[10];
+	cl_device_id device;
+	unsigned int num_platforms = 0;
+	cl_int err = clGetPlatformIDs(10, platforms_available, &num_platforms);
+	if (verbose)
+		std::cout << "# platforms:" << num_platforms << std::endl;
+	err = clGetDeviceIDs(platforms_available[0], CL_DEVICE_TYPE_CPU, 1, &(device), NULL);
+	if (verbose)
+	{
+		std::cout << "Device: " << device << std::endl;
+		clGetDeviceInfo(device, CL_DRIVER_VERSION, sizeof(data), &data, NULL);
+		printf("Version: %s\n", data);
+		clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(data), &data, NULL);
+		printf("Device name: %s\n", data);
+	}
+	clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, sizeof(data), &data, NULL);
+	if (verbose)
+		printf("Extensions: %s\n", data);
+	std::stringstream ss(data);
+	std::string item;
+	while (ss >> item) {
+		if (item == "cl_khr_gl_sharing")
+			return (true);
+	}
+	return (false);
+}
 
 int main(int ac, char *av[]) {
+	if (!interop_enabled(false))
+	{
+		std::cout << "GL/CL Interoperability doesn't work on this device" << std::endl;
+		return (1);
+	}
 	ControlPoints controlPoints;
 	bool running = true;
 	bool emitting = true;
@@ -38,22 +72,26 @@ int main(int ac, char *av[]) {
 	auto map = generate_map(controlPoints);
 	data.hmap = &map;
 	std::cout << "Initial # of particles = " << data.numOfParticles() << std::endl;
-
+	std::cout << "Before instance water" << std::endl;
 	auto water = instance_water(&map, &data, &emitter);
+	std::cout << "After instance water" << std::endl;
 	water.running = running;
 	water.emitting = emitting;
 	auto camera = GLCamera();
 	bool quit = false;
-
+	std::cout << "Here" << std::endl;
 	do
 	{
 		// Event handle
 		SDL_PollEvent(&(core.event));
 		process_input(camera, static_cast<GLItem &>(map), water, &quit);
+		std::cout << "Here" << std::endl;
+
 		// Simulation step
 		if (water.running)
 			water.update_particles();
 
+		std::cout << "Here" << std::endl;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.frameStart();

@@ -21,26 +21,76 @@ void	cl_host_part(CLCore &cl_core, bool wGLInterop)
 {
 	int err;
 	// Get platform and device to use
-	err = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &(cl_core.device), NULL);
+	cl_platform_id platforms_available[10];
+	unsigned int num_platforms = 0;
+	err = clGetPlatformIDs(10, platforms_available, &num_platforms);
+	if (err == CL_SUCCESS) {
+		std::cout << "Platforms read" << std::endl;
+	} else if (err == CL_INVALID_VALUE) {
+		std::cout << "Invalid value" << std::endl;
+	} else if (err == CL_OUT_OF_HOST_MEMORY) {
+		std::cout << "Out of host memory" << std::endl;
+	} else if (err == CL_PLATFORM_NOT_FOUND_KHR) {
+		std::cout << "Platform not found" << std::endl;
+	}
+	else {
+		std::cout << "Unknown error:" << err << std::endl;
+	}
+	std::cout << "# of platforms= " << num_platforms << std::endl;
+
+	err = clGetDeviceIDs(platforms_available[0], CL_DEVICE_TYPE_CPU, 1, &(cl_core.device), NULL);
 	if (err != CL_SUCCESS)
 	{
+		if (err == CL_INVALID_PLATFORM) {
+			std::cout << "Invalid platform";
+		} else if (err == CL_INVALID_DEVICE_TYPE) {
+			std::cout << "Invalid device type";
+		} else if (err == CL_INVALID_VALUE) {
+			std::cout << "Invalid value";
+		} else if (err == CL_DEVICE_NOT_FOUND) {
+			std::cout << "Device not found";
+		} else if (err == CL_OUT_OF_RESOURCES) {
+			std::cout << "Out of resources";
+		} else if (err == CL_OUT_OF_HOST_MEMORY) {
+			std::cout << "Out of host memory";
+		}
+		std::cout << std::endl;
 		std::cout << "Error: line " << __LINE__ << ": no valid GPU's found.\n";
 		exit(1);
 	}
 
 	// Shared context for OpenGl-OpenCL interop
-	CGLContextObj glContext = CGLGetCurrentContext();
-	CGLShareGroupObj shareGroup = CGLGetShareGroup(glContext);
+	// CGLContextObj glContext = CGLGetCurrentContext();
+	// CGLShareGroupObj shareGroup = CGLGetShareGroup(glContext);
 
 	cl_context_properties properties[] = {
-		CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
-		(cl_context_properties)shareGroup,
+		 CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+		 CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+		 CL_CONTEXT_PLATFORM, (cl_context_properties)platforms_available[0],
 		0
 	};
 
 	// Create context
 	if (wGLInterop)
-		cl_core.context = clCreateContext(properties, 1, &cl_core.device, NULL, NULL, &err);
+	{
+	  cl_core.context = clCreateContext(properties, 1, &cl_core.device, NULL, NULL, &err);
+
+	  if (err == CL_SUCCESS) {
+			std::cout << "Context created" << std::endl;
+		} else if (err == CL_INVALID_PLATFORM) {
+			std::cout << "Invalid platform" << std::endl;
+		} else if (err == CL_INVALID_VALUE) {
+			std::cout << "Invalid value" << std::endl;
+		} else if (err == CL_INVALID_DEVICE) {
+			std::cout << "Invalid device" << std::endl;
+		} else if (err == CL_DEVICE_NOT_AVAILABLE) {
+			std::cout << "Device not available" << std::endl;
+		} else if (err == CL_OUT_OF_HOST_MEMORY) {
+			std::cout << "Out of host memory" << std::endl;
+		} else {
+			std::cout << "Unknown error:" << err << std::endl;
+		}
+	}
 	else
 		cl_core.context = clCreateContext(0, 1, &cl_core.device, NULL, NULL, &err);
 	if (!cl_core.context || err != CL_SUCCESS)

@@ -39,6 +39,8 @@ class Emitter;
 // OpenGL & SDL
 
 # define GL3_PROTOTYPES 1
+// # define GLEW_STATIC
+
 # include <GL/glew.h>
 # include <SDL2/SDL.h>
 
@@ -80,10 +82,21 @@ GLuint	compile_shaders(const char *vert_fpath, const char *frag_fpath);
 
 // mapgen.cpp
 
-#include <OpenGL/OpenGL.h>
-#include <OpenCL/cl.h>
-#include <OpenCL/cl_gl.h>
-#include <OpenCL/cl_gl_ext.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <CL/cl.h>
+#include <CL/cl_gl.h>
+#include <CL/cl_gl_ext.h>
+#include <CL/cl_ext.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#pragma OPENCL EXTENSION cl_khr_gl_sharing : enable
+
+
+// #include <OpenGL/OpenGL.h>
+// #include <OpenCL/cl.h>
+// #include <OpenCL/cl_gl.h>
+// #include <OpenCL/cl_gl_ext.h>
 #include <Particle.hpp>
 
 struct CLCore {

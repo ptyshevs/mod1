@@ -13,8 +13,8 @@
 # -----------------------------------------------------------
 # Frameworks
 
-FRAMEWORKS = -framework OpenGL -framework SDL2 -framework OpenCL
-
+# FRAMEWORKS = -framework OpenGL -framework SDL2 -framework OpenCL
+FRAMEWORKS = 
 FRAMEWORKSPATH = -F /Library/Frameworks
 
 # -----------------------------------------------------------
@@ -43,7 +43,8 @@ LIBLODEPNG = libs/liblodepng
 # -----------------------------------------------------------
 # Compiler rules
 
-LIBS = -lGLEW -lLodePNG
+LIBS = -lGLEW -lLodePNG -lOpenGL -lSDL2 -lOpenCL -lGLEW -lGLU -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -lGLEW -lGLU -lGL
+
 
 LIBSDIR = -L$(LIBGLEW) -L$(LIBLODEPNG)
 
@@ -57,7 +58,7 @@ EXEC = mod1
 SRCFILENAME := main.cpp parsing.cpp mapgen.cpp sdl_gl_init.cpp \
 				compileshaders.cpp cl_init.cpp ControlPoints.cpp Water.cpp \
 				Emitter.cpp textures.cpp HeightMap.cpp key_bindings.cpp \
-				GLItem.cpp Particle.cpp ParticleSystemData.cpp PolyMixedKernel.cpp
+				GLItem.cpp Particle.cpp ParticleSystemData.cpp PolyMixedKernel.cpp lodepng.cpp glew.cpp
 
 SRC_DIR = src
 SRC = $(addprefix $(SRC_DIR)/, $(SRCFILENAME))
@@ -70,9 +71,13 @@ $(OBJ_DIR)/%.o:$(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CCFLAGS) $(MOD1INC) $(LIBSINC) $(FRAMEWORKSPATH) -o $@ -c $<
 
+
 CC = clang++
 
-CCFLAGS = -Wall -Wextra -Werror -std=c++1z -fvisibility=hidden
+# MacOS
+#CCFLAGS = -Wall -Wextra -Werror -std=c++1z -fvisibility=hidden
+# Linux
+CCFLAGS = -Wall -Wextra -std=c++1z -fvisibility=hidden  -DGLEW_STATIC
 
 MOD1INC = -Iinc
 
@@ -119,3 +124,10 @@ lode.re:
 $(LIBGLEWBIN): glew.all
 
 $(LIBLODEPNGBIN): lode.all
+
+
+obj/lodepng.o:libs/liblodepng/lodepng.cpp
+	$(CC) $(CCFLAGS) -o $@ -c $<
+
+obj/glew.o:libs/libglew/src/src/glew.c
+	clang -DGLEW_NO_GLU -DGLEW_STATIC -I libs/libglew/src/include -o $@ -c $< 

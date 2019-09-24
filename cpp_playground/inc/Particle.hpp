@@ -23,10 +23,14 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "glm/gtx/string_cast.hpp"
-#include <OpenGL/OpenGL.h>
-#include <OpenCL/opencl.h>
-#include <OpenCL/opencl.h>
-#include <OpenCL/opencl.h>
+#include <GL/gl.h>
+#include <CL/cl.h>
+#include <CL/cl_gl.h>
+#include <CL/cl_gl_ext.h>
+// #include <OpenGL/OpenGL.h>
+// #include <OpenCL/opencl.h>
+// #include <OpenCL/opencl.h>
+// #include <OpenCL/opencl.h>
 
 struct Particle {
 	cl_float3		position;

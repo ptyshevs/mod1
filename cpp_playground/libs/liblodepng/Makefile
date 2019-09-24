@@ -14,9 +14,9 @@ NAME = libLodePNG.a
 
 SRC = lodepng.cpp
 
-OBJ = $(SRC:.cpp=.o)
+OBJ = lodepng.o
 
-CFLAGS = -Wall -Wextra -Werror -O3
+CFLAGS = -Wall -Wextra -Werror
 
 all: $(NAME)
 
@@ -25,8 +25,8 @@ $(NAME): $(OBJ)
 	@ranlib $@
 	@echo  "\x1b[32mlibLodePNG   compiled\x1b[0m"
 
-%.o: %.c
-	clang $(CFLAGS) -o $@ -c $<
+lodepng.o: lodepng.cpp
+	g++ $(CFLAGS) -o $@ -c $<
 
 clean:
 	@rm -f $(OBJ)
