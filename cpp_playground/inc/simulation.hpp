@@ -56,6 +56,13 @@ typedef struct {
 	unsigned int     n_cp;               // # of control points
 	unsigned int     hmap_size;          // size of heightmap (vector of cells)
 	unsigned int     n_particles;        // # of "active" particles
+	float            gravity_x;
+	float            gravity_y;
+	float            gravity_z;
+	float            g1;
+	float            g2;
+	float            g3;
+
 } t_constants;
 
 /*

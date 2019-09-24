@@ -48,6 +48,6 @@ __kernel void sim_update(__global t_cell *hmap, __global t_particle *particles, 
 		p.density += 100000;  // to push avay dynamic partics from the static one
 	p.density = PARTICLE_MASS * (density_accum + kernel_weight(0));
 	p.pressure = PRESSURE_CONST * (p.density - TARGET_DENSITY);
-	p.force = PARTICLE_MASS * gravity - DRAG_COEF * p.vel;
+	p.force = PARTICLE_MASS * (float3)(constants->gravity_x, constants->gravity_y, constants->gravity_z) - DRAG_COEF * p.vel;
 	particles[offset] = p;
 }

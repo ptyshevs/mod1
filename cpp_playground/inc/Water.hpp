@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Water.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: ptyshevs <ptyshevs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/07 14:49:36 by ptyshevs          #+#    #+#             */
-/*   Updated: 2019/01/07 14:49:43 by ptyshevs         ###   ########.fr       */
+/*   Updated: 2019/09/25 00:01:21 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ struct WaterConstants {
 	unsigned int	n_control_points;
 	unsigned int 	hmap_size;
 	unsigned int	n_particles;
+	float            gravity_x;
+	float            gravity_y;
+	float            gravity_z;
+	float            g1;
+	float            g2;
+	float            g3;
 };
 
 /*

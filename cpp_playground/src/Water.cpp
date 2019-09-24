@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Water.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: ptyshevs <ptyshevs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/25 21:14:47 by ptyshevs          #+#    #+#             */
-/*   Updated: 2018/12/25 21:14:48 by ptyshevs         ###   ########.fr       */
+/*   Updated: 2019/09/25 00:05:56 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ Water	instance_water(HeightMap *hmap, ParticleSystemData *data, Emitter *emitter
 	w.constants.hmap_size = hmap->hmap.size();
 	w.constants.n_control_points = hmap->_cpoints._arr.size();
 	w.constants.n_particles = w.data->n_particles;
+	w.constants.gravity_x = 0;
+	w.constants.gravity_y = -9.81f;
+	w.constants.gravity_z = 0;
+	std::cout << "GRAVITY = " << w.constants.gravity_x << " " << w.constants.gravity_y << " " << w.constants.gravity_z << std::endl;
+	std::cout << "sizeof = " << sizeof(w.constants) << " " << sizeof(WaterConstants) << std::endl;
 	w.cl = CLWaterCore();
 	cl_host_part(w.cl, true);
 	cl_compile_kernel(w.cl, "src/kernels/clear_caching.cl", "clear_caching");
@@ -155,10 +160,11 @@ void Water::update_particles()
 	static size_t global_neighbor_caching_jobs = data->hmap->hmap.size();
 	static size_t global_work_size = MAX_PARTICLES;
 	static size_t n_iter = 0;
-	int err;
+	int err = 0;
 	glFinish();
 
 	clEnqueueAcquireGLObjects(cl.queue, 1, &cl_vbo, 0, NULL, NULL);
+	err |= clEnqueueWriteBuffer(w.cl.queue, w.cl_constants, CL_TRUE, 0, sizeof(WaterConstants), &w.constants, 0, NULL, NULL);
 
 	// Emit some water
 	if (emitting)
