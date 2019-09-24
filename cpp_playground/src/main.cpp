@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ptyshevs <ptyshevs@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: ptyshevs <ptyshevs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:40:21 by vpopovyc          #+#    #+#             */
-/*   Updated: 2018/12/25 13:20:21 by ptyshevs         ###   ########.fr       */
+/*   Updated: 2019/09/24 22:22:12 by ptyshevs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ int main(int ac, char *av[]) {
 	water.emitting = emitting;
 	auto camera = GLCamera();
 	bool quit = false;
-
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	do
 	{
 		// Event handle
@@ -58,7 +59,10 @@ int main(int ac, char *av[]) {
 
 		camera.frameStart();
 		map.draw(camera.vp(), GL_TRIANGLES);
+		glEnable(GL_BLEND);
+		// glDepthMask(0);
 		water.draw(camera.vp(), GL_POINTS);
+		glDisable(GL_BLEND);
 		camera.frameEnd();
 
 		if (offline)

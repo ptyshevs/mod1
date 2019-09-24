@@ -3,22 +3,28 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vpopovyc <vpopovyc@student.42.fr>          +#+  +:+       +#+         #
+#    By: ptyshevs <ptyshevs@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/12/09 17:42:51 by vpopovyc          #+#    #+#              #
-#    Updated: 2018/12/17 16:55:27 by vpopovyc         ###   ########.fr        #
+#    Updated: 2019/09/24 22:12:48 by ptyshevs         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # -----------------------------------------------------------
 # Frameworks
 
-FRAMEWORKS = -framework OpenGL -framework SDL2 -framework OpenCL
+FRAMEWORKS = -framework OpenGL -framework OpenCL
 
 FRAMEWORKSPATH = -F /Library/Frameworks
 
 # -----------------------------------------------------------
 # Libraries
+
+# SDL2
+
+LIBSDLBIN = /Users/ptyshevs/.brew/Cellar/sdl2/2.0.10/lib/libSDL2.a
+LIBSDLINC = /Users/ptyshevs/.brew/Cellar/sdl2/2.0.10/include
+LIBSDLDIR = /Users/ptyshevs/.brew/Cellar/sdl2/2.0.10/lib
 
 # libGLEW
 
@@ -27,6 +33,7 @@ LIBGLEWBIN = libs/libglew/src/lib/libGLEW.a
 LIBGLEWINC = libs/libglew/src/include
 
 LIBGLEW = libs/libglew/src/lib
+
 
 # libglm
 
@@ -43,11 +50,11 @@ LIBLODEPNG = libs/liblodepng
 # -----------------------------------------------------------
 # Compiler rules
 
-LIBS = -lGLEW -lLodePNG
+LIBS = -lGLEW -lLodePNG -lSDl2
 
-LIBSDIR = -L$(LIBGLEW) -L$(LIBLODEPNG)
+LIBSDIR = -L$(LIBGLEW) -L$(LIBLODEPNG) -L$(LIBSDLDIR)
 
-LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC)
+LIBSINC = -I$(LIBGLEWINC) -I$(LIBGLMINC) -I$(LIBLODEINC) -I$(LIBSDLINC)
 
 # -----------------------------------------------------------
 

@@ -17,9 +17,9 @@ typedef struct {
 */
 void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_constants *constants);
 
-void havaji(__global t_particle *particles, __global t_constants *constants);
+void havaji(__global t_particle *particles, size_t seed, __global t_constants *constants);
 
-void boundaries(__global t_particle *particles, __global t_constants *constants);
+void boundaries(__global t_particle *particles, size_t seed, __global t_constants *constants);
 
 void flush(__global t_particle *particles, __global t_constants *constants);
 
@@ -52,9 +52,9 @@ __kernel void emit_kernel(__global t_particle *particles,
 	if (_emiter.type == EMITER_RAIN)
 		it_s_raining_man(particles, (size_t)_emiter.seed, constants);
 	else if (_emiter.type == EMITER_WAVE)
-		havaji(particles, constants);
+		havaji(particles, (size_t)_emiter.seed, constants);
 	else if (_emiter.type == EMITER_BOUNDARIES)
-		boundaries(particles, constants);
+		boundaries(particles, (size_t)_emiter.seed, constants);
 }
 
 void flush(__global t_particle *particles, __global t_constants *constants)
@@ -79,12 +79,16 @@ void it_s_raining_man(__global t_particle *particles, size_t seed, __global t_co
 	p.pos.x = foo;
 	p.pos.z = foo2;
 	p.pos.y = hf_hf_sl - 1;
-	p.vel.y = -1;
+	p.vel.y = -10;
 	particles[constants->n_particles] = p;
 	constants->n_particles += 1;
 }
 
-void havaji(__global t_particle *particles, __global t_constants *constants)
+/*
+** Particles appear only from a single side
+*/
+
+void havaji(__global t_particle *particles, size_t seed, __global t_constants *constants)
 {
 	int cnt = 0;
 	int store_n = constants->n_particles;
@@ -92,7 +96,10 @@ void havaji(__global t_particle *particles, __global t_constants *constants)
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
 		t_particle p = make_particle();
-		p.pos.x = -hf_sl;
+		p.vel.x = 5;
+		// p.vel.z = 100;
+		p.vel.y = 5;
+		p.pos.x = -(float)hf_sl + (rand(seed + i) % 5);
 		p.pos.z = i;
 		p.pos.y = 1;
 		particles[store_n + cnt] = p;
@@ -101,7 +108,10 @@ void havaji(__global t_particle *particles, __global t_constants *constants)
 	constants->n_particles += cnt;
 }
 
-void boundaries(__global t_particle *particles, __global t_constants *constants)
+/*
+* Particles appear from all four sides simultaneously
+*/
+void boundaries(__global t_particle *particles, size_t seed, __global t_constants *constants)
 {
 	int cnt = 0;
 	int store_n = constants->n_particles;
@@ -110,22 +120,28 @@ void boundaries(__global t_particle *particles, __global t_constants *constants)
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
 		t_particle p = make_particle();
-		p.pos = (float3)(i - (float)hf_sl, 1, -(float)hf_sl);
+		p.pos = (float3)(i - (float)hf_sl, 1, -(float)hf_sl + rand(seed + i) % 5);
+		p.vel.z = 10;
 		particles[store_n + cnt] = p;
 		cnt++;
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
-		p.pos = (float3)(-(float)hf_sl, 1, i - (float)hf_sl);
+		p.pos = (float3)(-(float)hf_sl + rand(seed + i) % 5, 1, i - (float)hf_sl);
+		p.vel.z = 0;
+		p.vel.x = 10;
 		particles[store_n + cnt] = p;
 		cnt++;
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
-		p.pos = (float3)((float)hf_sl - 1, 1, i - (float)hf_sl);
+		p.pos = (float3)((float)hf_sl - 1 - rand(seed + i) % 5, 1, i - (float)hf_sl);
+		p.vel.x = -10;
 		particles[store_n + cnt] = p;
 		cnt++;
 		if (store_n + cnt >= MAX_PARTICLES)
 			break ;
-		p.pos = (float3)(i - (float)hf_sl, 1, (float)hf_sl - 1);
+		p.pos = (float3)(i - (float)hf_sl, 1, (float)hf_sl - 1 - rand(seed + i) % 5);
+		p.vel.x = 0;
+		p.vel.z = -10;
 		particles[store_n + cnt] = p;
 		cnt++;
 	}

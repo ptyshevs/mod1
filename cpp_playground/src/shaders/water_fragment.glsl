@@ -42,7 +42,7 @@ void main() {
     vec4 S = light_specular*mat_specular* spec;
     float vel_mag = sqrt(dot(velocity, velocity)) * 0.05;
     float v = float(viscosity);
-    color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 1.0f) * diffuse + S;
+    color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 0.8f) * diffuse;
 //    if (id == 0)
 //        color = vec4(0.3f + vel_mag, 0.3f + v * 0.1 + vel_mag, 0.5f + vel_mag, 0.5f) * diffuse + S;
 //    else
